@@ -1,11 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
 import { Briefcase } from "lucide-react";
+import LogActivityChart from "../components/LogActivityChart";
+
+// Helper function to transform log data for the calendar
+const transformDataForCalendar = (logs) => {
+  const counts = logs.reduce((acc, log) => {
+    const date = log.date;
+    acc[date] = (acc[date] || 0) + 1;
+    return acc;
+  }, {});
+
+  return Object.keys(counts).map((date) => {
+    const count = counts[date];
+    let level = 0;
+    if (count > 0) level = 1;
+    if (count > 2) level = 2;
+    if (count > 4) level = 3;
+    if (count > 6) level = 4;
+
+    return {
+      date: date,
+      count: count,
+      level: level,
+    };
+  });
+};
 
 function HomePage() {
+  // We need some sample log data to visualize
+  const [logs] = useState([
+    { date: "2025-06-23", entry: "Added activity chart to homepage." },
+    { date: "2025-06-22", entry: "Worked on homepage UI." },
+    { date: "2025-06-21", entry: "Planned new features." },
+    { date: "2025-06-21", entry: "Refactored some old code." },
+    { date: "2025-05-15", entry: "Fixed a bug." },
+    { date: "2025-04-01", entry: "Initial project setup." },
+    // Add more dummy logs spread across different dates to see a better visualization
+  ]);
+
+  const calendarData = transformDataForCalendar(logs);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-8">
       <aside className="lg:col-span-1 xl:col-span-1 h-fit sticky top-8">
+        {/* This is the existing About Me card, no changes needed here */}
         <div className="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700/60">
           <div className="flex flex-col items-center text-center">
             <img
@@ -16,7 +56,6 @@ function HomePage() {
             <h1 className="text-2xl font-bold text-white">Rizon Kumar Rahi</h1>
             <p className="text-teal-400 font-medium">Software Developer</p>
           </div>
-
           <div className="mt-6 space-y-4 text-sm">
             <div className="flex items-center">
               <Briefcase
@@ -34,10 +73,9 @@ function HomePage() {
               </span>
             </div>
             <p className="text-gray-400 leading-relaxed">
-              A short bio. Passionate about building cool things with code,
+              A short bio. Passionate about building cool things with code.
             </p>
           </div>
-
           <div className="mt-6 pt-4 border-t border-gray-700/50 flex justify-center">
             <Link
               to="/logs"
@@ -50,16 +88,8 @@ function HomePage() {
       </aside>
 
       <main className="lg:col-span-3 xl:col-span-4">
-        <div className="bg-gray-800/80 p-8 rounded-2xl border border-gray-700/60 h-full flex flex-col justify-center items-center text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Welcome to My Digital Garden
-          </h2>
-          <p className="text-gray-400 max-w-2xl">
-            This is my personal space on the internet. The "About Me" card gives
-            you a quick summary. To see my day-to-day progress, project updates,
-            and random thoughts, head over to the dev logs.
-          </p>
-        </div>
+        {/* The welcome text is now replaced by our new component */}
+        <LogActivityChart data={calendarData} />
       </main>
     </div>
   );
