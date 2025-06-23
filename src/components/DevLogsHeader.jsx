@@ -23,14 +23,15 @@ function DevLogsHeader() {
       <div className="flex items-center -mt-10 ml-8 z-10 relative">
         <img
           src="https://i.pravatar.cc/100?u=a042581f4e29026704d"
-          alt="Your Name"
+          alt="Rizon Kumar Rahi"
           className="w-24 h-24 rounded-full border-4 border-gray-800"
         />
         <div className="ml-4 mt-8">
-          <h1 className="text-2xl font-bold text-white">Your Name</h1>
+          <h1 className="text-2xl font-bold text-white">Rizon Kumar Rahi</h1>
           <p className="text-sm text-gray-400">
-            cto<span className="text-teal-400"> . </span>sde
-            <span className="text-teal-400"> . </span>shipping products
+            Software Developer<span className="text-teal-400"> . </span>Merkle
+            Inspire
+            <span className="text-teal-400"> . </span>Building products
           </p>
         </div>
       </div>
