@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import DevLogsHeader from "../components/DevLogsHeader.jsx";
+import { useSelector } from "react-redux";
+import DevLogsHeader from "../components/DevLogsHeader";
 import { ArrowRight } from "lucide-react";
 
 const groupLogsByDate = (logs) => {
@@ -14,7 +15,9 @@ const groupLogsByDate = (logs) => {
   }, {});
 };
 
-function DevLogsPage({ logs }) {
+function DevLogsPage() {
+  const logs = useSelector((state) => state.logs.value);
+
   const groupedLogs = groupLogsByDate(logs);
   const sortedDates = Object.keys(groupedLogs).sort(
     (a, b) => new Date(b) - new Date(a)

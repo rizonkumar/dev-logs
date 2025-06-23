@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Briefcase } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import RecentLogs from "../components/RecentLogs";
 import LogStats from "../components/LogStats";
 
-// Helper function to transform log data for the calendar
 const transformDataForCalendar = (logs) => {
   const counts = logs.reduce((acc, log) => {
     const date = log.date;
@@ -15,7 +15,6 @@ const transformDataForCalendar = (logs) => {
 
   return Object.keys(counts).map((date) => {
     const count = counts[date];
-    // Determine color intensity level for the chart
     let level = 0;
     if (count > 0) level = 1;
     if (count > 2) level = 2;
@@ -30,8 +29,9 @@ const transformDataForCalendar = (logs) => {
   });
 };
 
-// The component now receives 'logs' as a prop from App.js
-function HomePage({ logs }) {
+function HomePage() {
+  const logs = useSelector((state) => state.logs.value);
+
   const calendarData = transformDataForCalendar(logs);
 
   return (
@@ -86,7 +86,6 @@ function HomePage({ logs }) {
         </main>
       </div>
 
-      {/* --- BOTTOM SECTION --- */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
         <RecentLogs logs={logs} />
         <LogStats logs={logs} />
