@@ -42,7 +42,7 @@ function HomePage() {
             <div className="flex flex-col items-center text-center">
               <img
                 src="https://i.pravatar.cc/120?u=a042581f4e29026704d"
-                alt="Your Name"
+                alt="Rizon Kumar Rahi"
                 className="w-24 h-24 rounded-full border-2 border-teal-400 object-cover mb-4"
               />
               <h1 className="text-2xl font-bold text-white">

@@ -34,7 +34,6 @@ function LogDetailPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* --- HEADER --- */}
       <div className="mb-8">
         <Link
           to="/logs"
@@ -54,7 +53,6 @@ function LogDetailPage() {
         </div>
       </div>
 
-      {/* --- ADD NEW LOG FORM --- */}
       <div className="mb-10">
         <form
           onSubmit={handleAddEntry}
@@ -79,7 +77,6 @@ function LogDetailPage() {
         </form>
       </div>
 
-      {/* --- LOG ENTRIES LIST --- */}
       <div>
         <h2 className="text-xl font-bold text-white mb-4">
           {logsForDate.length} {logsForDate.length === 1 ? "Entry" : "Entries"}
