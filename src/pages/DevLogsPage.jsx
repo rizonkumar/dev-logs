@@ -1,41 +1,80 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import DevLogsHeader from "../components/DevLogsHeader.jsx";
+import { ArrowRight } from "lucide-react";
 
-function DevLogsHeader() {
+const groupLogsByDate = (logs) => {
+  return logs.reduce((acc, log) => {
+    const date = log.date;
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(log);
+    return acc;
+  }, {});
+};
+
+function DevLogsPage({ logs }) {
+  const groupedLogs = groupLogsByDate(logs);
+  const sortedDates = Object.keys(groupedLogs).sort(
+    (a, b) => new Date(b) - new Date(a)
+  );
+
   return (
-    <div className="mb-12">
-      <div className="relative rounded-lg overflow-hidden border border-gray-700/60">
-        <img
-          src="https://placehold.co/1200x300/1a202c/7dd3fc?text=Banner+Image"
-          alt="Banner"
-          className="w-full h-48 object-cover"
-        />
-        <div
-          className="absolute inset-0 bg-repeat"
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            backgroundImage:
-              "radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px)",
-            backgroundSize: "4px 4px",
-          }}
-        ></div>
+    <div className="max-w-4xl mx-auto">
+      <DevLogsHeader />
+
+      <div className="mb-12">
+        <h2 className="text-2xl font-bold text-white">DAILY DEVLOGS</h2>
+        <p className="text-gray-400 mt-1">
+          Documenting my daily development journey — bugs, features, and
+          everything in between.
+        </p>
       </div>
 
-      <div className="flex items-center -mt-10 ml-8 z-10 relative">
-        <img
-          src="https://i.pravatar.cc/100?u=a042581f4e29026704d"
-          alt="Your Name"
-          className="w-24 h-24 rounded-full border-4 border-gray-800"
-        />
-        <div className="ml-4 mt-8">
-          <h1 className="text-2xl font-bold text-white">Your Name</h1>
-          <p className="text-sm text-gray-400">
-            cto<span className="text-teal-400"> . </span>sde
-            <span className="text-teal-400"> . </span>shipping products
-          </p>
-        </div>
+      <div className="space-y-8">
+        {sortedDates.map((date) => {
+          const logsForDate = groupedLogs[date];
+          const formattedDate = new Date(date).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+          const dayOfWeek = new Date(date).toLocaleDateString("en-US", {
+            weekday: "long",
+          });
+
+          return (
+            <div key={date}>
+              <div className="flex items-baseline justify-between border-b-2 border-gray-700 pb-2">
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    {formattedDate}
+                  </h3>
+                  <p className="text-sm text-gray-500">{dayOfWeek}</p>
+                </div>
+                <p className="text-sm text-gray-400">
+                  {logsForDate.length}{" "}
+                  {logsForDate.length > 1 ? "entries" : "entry"}
+                </p>
+              </div>
+              <div className="mt-4">
+                <Link
+                  to={`/logs/${date}`}
+                  className="bg-gray-800 hover:bg-gray-700/80 p-4 rounded-lg flex justify-between items-center transition-colors duration-200 border border-gray-700/60"
+                >
+                  <span className="font-medium text-gray-300">
+                    View entries for this day
+                  </span>
+                  <ArrowRight size={16} className="text-teal-400" />
+                </Link>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-export default DevLogsHeader;
+export default DevLogsPage;

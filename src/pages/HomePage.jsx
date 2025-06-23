@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Briefcase } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import RecentLogs from "../components/RecentLogs";
 import LogStats from "../components/LogStats";
 
+// Helper function to transform log data for the calendar
 const transformDataForCalendar = (logs) => {
   const counts = logs.reduce((acc, log) => {
     const date = log.date;
@@ -14,6 +15,7 @@ const transformDataForCalendar = (logs) => {
 
   return Object.keys(counts).map((date) => {
     const count = counts[date];
+    // Determine color intensity level for the chart
     let level = 0;
     if (count > 0) level = 1;
     if (count > 2) level = 2;
@@ -28,40 +30,8 @@ const transformDataForCalendar = (logs) => {
   });
 };
 
-function HomePage() {
-  const [logs] = useState([
-    {
-      date: "2025-06-23",
-      entry:
-        "Replaced the static Tech Stack component with a more dynamic and scalable Log Stats widget. This new component calculates data directly from logs.",
-    },
-    {
-      date: "2025-06-22",
-      entry:
-        "Refactored the homepage layout to be more modular, using a two-row grid system to better organize dashboard components.",
-    },
-    {
-      date: "2025-06-21",
-      entry:
-        "Fixed a critical React Router bug caused by importing Link from the wrong package. A good lesson in debugging dependencies.",
-    },
-    {
-      date: "2025-06-20",
-      entry:
-        "Planned new features for the homepage dashboard and decided to add more dynamic, data-driven components to fill whitespace.",
-    },
-    {
-      date: "2025-05-15",
-      entry:
-        "Fixed a minor bug related to styling on mobile viewports, ensuring better responsiveness.",
-    },
-    {
-      date: "2025-04-01",
-      entry:
-        "Initial project setup and configuration of Tailwind CSS with a custom Poppins font.",
-    },
-  ]);
-
+// The component now receives 'logs' as a prop from App.js
+function HomePage({ logs }) {
   const calendarData = transformDataForCalendar(logs);
 
   return (
@@ -116,6 +86,7 @@ function HomePage() {
         </main>
       </div>
 
+      {/* --- BOTTOM SECTION --- */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
         <RecentLogs logs={logs} />
         <LogStats logs={logs} />
