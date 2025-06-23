@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { addLog } from "../app/features/logsSlice";
 import DevLogsHeader from "../components/DevLogsHeader";
+import LogFilterBar from "../components/LogFilterBar";
+import { format } from "date-fns";
 import {
   Plus,
   ChevronDown,
@@ -10,9 +12,8 @@ import {
   ChevronRight,
   ExternalLink,
   ArrowLeft,
-} from "lucide-react"; // Import ArrowLeft
+} from "lucide-react";
 
-// Helper function to group logs by date
 const groupLogsByDate = (logs) => {
   return logs.reduce((acc, log) => {
     const date = log.date;
@@ -24,10 +25,8 @@ const groupLogsByDate = (logs) => {
   }, {});
 };
 
-// Helper to get today's date in YYYY-MM-DD format
 const getTodayDateString = () => {
   const today = new Date();
-  // Adjust for timezone differences to ensure correct date
   const offset = today.getTimezoneOffset();
   const todayInTimezone = new Date(today.getTime() - offset * 60 * 1000);
   return todayInTimezone.toISOString().split("T")[0];
@@ -41,6 +40,31 @@ function DevLogsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [newEntry, setNewEntry] = useState("");
   const [expandedDate, setExpandedDate] = useState(null);
+  const [dateRange, setDateRange] = useState({
+    from: undefined,
+    to: undefined,
+  });
+
+  const filteredLogs = useMemo(() => {
+    return logs.filter((log) => {
+      if (!dateRange.from && !dateRange.to) return true;
+
+      const logDate = new Date(log.date);
+      logDate.setUTCHours(0, 0, 0, 0);
+
+      if (dateRange.from) {
+        const fromDate = new Date(dateRange.from);
+        fromDate.setUTCHours(0, 0, 0, 0);
+        if (logDate < fromDate) return false;
+      }
+      if (dateRange.to) {
+        const toDate = new Date(dateRange.to);
+        toDate.setUTCHours(0, 0, 0, 0);
+        if (logDate > toDate) return false;
+      }
+      return true;
+    });
+  }, [logs, dateRange]);
 
   const handleAddEntry = (e) => {
     e.preventDefault();
@@ -55,23 +79,20 @@ function DevLogsPage() {
     setExpandedDate((prev) => (prev === date ? null : date));
   };
 
-  const groupedLogs = groupLogsByDate(logs);
+  const groupedLogs = groupLogsByDate(filteredLogs);
   const sortedDates = Object.keys(groupedLogs).sort(
     (a, b) => new Date(b) - new Date(a)
   );
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* --- BACK TO HOME LINK --- */}
-      <div className="mb-6">
-        <Link
-          to="/"
-          className="flex items-center text-sm text-teal-400 hover:text-teal-300 transition-colors font-semibold"
-        >
-          <ArrowLeft size={14} className="mr-2" />
-          Back to Homepage
-        </Link>
-      </div>
+      <Link
+        to="/"
+        className="flex items-center text-sm text-teal-400 hover:text-teal-300 transition-colors font-semibold mb-6"
+      >
+        <ArrowLeft size={14} className="mr-2" />
+        Back to Homepage
+      </Link>
 
       <DevLogsHeader />
 
@@ -83,7 +104,16 @@ function DevLogsPage() {
         </p>
       </div>
 
-      {/* --- ADD NEW LOG FOR TODAY (Collapsible Form) --- */}
+      <LogFilterBar range={dateRange} setRange={setDateRange} />
+
+      {(dateRange.from || dateRange.to) && (
+        <div className="mb-8 text-sm text-gray-400">
+          Showing logs{" "}
+          {dateRange.from && `from ${format(dateRange.from, "LLL dd, y")}`}{" "}
+          {dateRange.to && `to ${format(dateRange.to, "LLL dd, y")}`}.
+        </div>
+      )}
+
       <div className="mb-10 bg-gray-800/60 rounded-xl border border-gray-700/60 transition-all duration-300">
         <button
           onClick={() => setIsFormOpen(!isFormOpen)}
@@ -126,7 +156,6 @@ function DevLogsPage() {
         )}
       </div>
 
-      {/* --- LOG LIST (ACCORDION STYLE) --- */}
       <div className="space-y-2">
         {sortedDates.map((date) => {
           const logsForDate = groupedLogs[date];
@@ -137,7 +166,6 @@ function DevLogsPage() {
               key={date}
               className="bg-gray-800/50 rounded-lg border border-gray-700/60"
             >
-              {/* --- CLICKABLE HEADER ROW --- */}
               <div className="flex items-center p-4">
                 <div
                   className="flex-grow flex items-center cursor-pointer"
@@ -183,8 +211,6 @@ function DevLogsPage() {
                   </button>
                 </div>
               </div>
-
-              {/* --- EXPANDED CONTENT --- */}
               {isExpanded && (
                 <div className="px-4 pb-4 pt-2 border-t border-gray-700/60">
                   <ul className="space-y-3 pl-5">
