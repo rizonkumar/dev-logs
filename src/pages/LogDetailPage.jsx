@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { addLog } from "../app/features/logsSlice";
 import { ArrowLeft, Calendar, PlusCircle } from "lucide-react";
 
-function LogDetailPage({ logs, setLogs }) {
+function LogDetailPage() {
   const { date } = useParams();
   const [newEntry, setNewEntry] = useState("");
+
+  const dispatch = useDispatch();
+  const logs = useSelector((state) => state.logs.value);
 
   const logsForDate = logs.filter((log) => log.date === date);
 
@@ -12,16 +17,13 @@ function LogDetailPage({ logs, setLogs }) {
     e.preventDefault();
     if (newEntry.trim() === "") return;
 
-    const newLog = {
-      date: date, // The date for the new log is the date of this page
+    const newLogPayload = {
+      date: date,
       entry: newEntry,
     };
 
-    // Update the main logs state, sorting by date to keep things tidy
-    setLogs((prevLogs) =>
-      [...prevLogs, newLog].sort((a, b) => new Date(b.date) - new Date(a.date))
-    );
-    setNewEntry(""); // Clear the textarea
+    dispatch(addLog(newLogPayload));
+    setNewEntry("");
   };
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
