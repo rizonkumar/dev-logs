@@ -1,14 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react"; // 1. Import useEffect
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; // 2. Import useDispatch
+import { fetchLogs } from "../app/features/logsSlice"; // 3. Import fetchLogs
 import { Briefcase } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import RecentLogs from "../components/RecentLogs";
 import LogStats from "../components/LogStats";
+import Loader from "../components/Loader"; // Import the Loader
 
+// 4. Add a guard clause to handle the initial render when logs might be undefined.
 const transformDataForCalendar = (logs) => {
+  if (!logs || logs.length === 0) return []; // Return an empty array if no logs
+
   const counts = logs.reduce((acc, log) => {
-    const date = log.date;
+    const date = new Date(log.date).toISOString().split("T")[0];
     acc[date] = (acc[date] || 0) + 1;
     return acc;
   }, {});
@@ -21,16 +26,21 @@ const transformDataForCalendar = (logs) => {
     if (count > 4) level = 3;
     if (count > 6) level = 4;
 
-    return {
-      date: date,
-      count: count,
-      level: level,
-    };
+    return { date, count, level };
   });
 };
 
 function HomePage() {
-  const logs = useSelector((state) => state.logs.value);
+  const dispatch = useDispatch();
+  // 5. Select the correct state and the status
+  const { logs, status } = useSelector((state) => state.logs);
+
+  // 6. Fetch logs when the component mounts if they haven't been fetched yet.
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchLogs());
+    }
+  }, [status, dispatch]);
 
   const calendarData = transformDataForCalendar(logs);
 
@@ -38,6 +48,7 @@ function HomePage() {
     <div>
       <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-8">
         <aside className="lg:col-span-1 xl:col-span-1 h-fit sticky top-8">
+          {/* ... About Me Card JSX is unchanged ... */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700/60">
             <div className="flex flex-col items-center text-center">
               <img
@@ -81,15 +92,23 @@ function HomePage() {
           </div>
         </aside>
 
+        {/* 7. Conditionally render the main content area */}
         <main className="lg:col-span-3 xl:col-span-4">
-          <LogActivityChart data={calendarData} />
+          {status === "loading" ? (
+            <Loader />
+          ) : (
+            <LogActivityChart data={calendarData} />
+          )}
         </main>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <RecentLogs logs={logs} />
-        <LogStats logs={logs} />
-      </div>
+      {/* Conditionally render the bottom widgets */}
+      {status === "succeeded" && (
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <RecentLogs logs={logs} />
+          <LogStats logs={logs} />
+        </div>
+      )}
     </div>
   );
 }

@@ -8,15 +8,21 @@ function LogActivityChart({ data }) {
   };
 
   return (
-    <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700/60 backdrop-blur-sm">
+    <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700/60 backdrop-blur-sm min-h-[220px]">
       <h3 className="text-lg font-bold text-white mb-4">Log Activity</h3>
-      <ActivityCalendar
-        data={data}
-        theme={explicitTheme}
-        blockSize={12}
-        blockMargin={3}
-        fontSize={14}
-      />
+      {data && data.length > 0 ? (
+        <ActivityCalendar
+          data={data}
+          theme={explicitTheme}
+          blockSize={12}
+          blockMargin={3}
+          fontSize={14}
+        />
+      ) : (
+        <div className="flex items-center justify-center h-full pt-10">
+          <p className="text-gray-400 text-sm">No activity to display yet.</p>
+        </div>
+      )}
     </div>
   );
 }
