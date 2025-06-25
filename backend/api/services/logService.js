@@ -14,4 +14,16 @@ const createNewLog = async (logData) => {
   return log;
 };
 
-module.exports = { getAllLogs, createNewLog };
+const updateLogById = async (logId, logData) => {
+  const updatedLog = await Log.findByIdAndUpdate(logId, logData, {
+    new: true,
+  });
+  return updatedLog;
+};
+
+const deleteLogById = async (logId) => {
+  const deletedLog = await Log.findByIdAndDelete(logId);
+  return deletedLog;
+};
+
+module.exports = { getAllLogs, createNewLog, updateLogById, deleteLogById };
