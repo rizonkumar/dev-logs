@@ -1,46 +1,48 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import logService from "../../services/logService.js";
 
 const initialState = {
-  value: [
-    {
-      date: "2025-06-23",
-      entry:
-        "Replaced the static Tech Stack component with a more dynamic and scalable Log Stats widget.",
-    },
-    {
-      date: "2025-06-23",
-      entry:
-        "Enhanced the UI of the Log Detail Page and added functionality to add new logs directly from the page.",
-    },
-    {
-      date: "2025-06-22",
-      entry: "Refactored the homepage layout to be more modular.",
-    },
-    {
-      date: "2025-06-21",
-      entry:
-        "Fixed the React Router bug caused by importing Link from the wrong package.",
-    },
-    {
-      date: "2025-06-20",
-      entry: "Planned new features for the homepage dashboard.",
-    },
-    { date: "2025-05-15", entry: "Fixed a bug related to styling on mobile." },
-    { date: "2025-04-01", entry: "Initial project setup." },
-  ],
+  logs: [],
+  status: "idle",
+  error: null,
 };
+
+export const fetchLogs = createAsyncThunk(
+  "logs/fetchLogs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await logService.fetchAllLogs();
+      return data;
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return rejectWithValue(message);
+    }
+  }
+);
 
 export const logsSlice = createSlice({
   name: "logs",
   initialState,
-  reducers: {
-    addLog: (state, action) => {
-      state.value.push(action.payload);
-      state.value.sort((a, b) => new Date(b.date) - new Date(a.date));
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchLogs.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchLogs.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.logs = action.payload;
+      })
+      .addCase(fetchLogs.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
   },
 });
-
-export const { addLog } = logsSlice.actions;
 
 export default logsSlice.reducer;
