@@ -1,16 +1,16 @@
-// @desc    Get all logs
-// @route   GET /api/logs
-// @access  Public (for now)
-const getLogs = async (req, res) => {
-  res.status(200).json({ message: "Get all logs" });
-};
+const asyncHandler = require("../middleware/asyncHandler");
+const logService = require("../services/logService");
 
-// @desc    Create a new log
-// @route   POST /api/logs
-// @access  Public (for now)
-const createLog = async (req, res) => {
-  res.status(200).json({ message: "Create a log" });
-};
+const getLogs = asyncHandler(async (req, res) => {
+  const logs = await logService.getAllLogs();
+  res.status(200).json(logs);
+});
+
+const createLog = asyncHandler(async (req, res) => {
+  const { entry, date } = req.body;
+  const newLog = await logService.createNewLog({ entry, date });
+  res.status(201).json(newLog);
+});
 
 module.exports = {
   getLogs,
