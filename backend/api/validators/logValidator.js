@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const validateCreateLog = [
   body("entry").notEmpty().withMessage("Entry is required"),
