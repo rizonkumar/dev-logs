@@ -1,28 +1,25 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { addLog } from "../app/features/logsSlice";
+import { useSelector } from "react-redux";
 import { ArrowLeft, Calendar, PlusCircle } from "lucide-react";
+import Loader from "../components/Loader";
 
 function LogDetailPage() {
   const { date } = useParams();
   const [newEntry, setNewEntry] = useState("");
 
-  const dispatch = useDispatch();
-  const logs = useSelector((state) => state.logs.value);
+  const { logs, status, error } = useSelector((state) => state.logs);
 
-  const logsForDate = logs.filter((log) => log.date === date);
+  const logsForDate = logs.filter((log) => {
+    return new Date(log.date).toISOString().split("T")[0] === date;
+  });
 
   const handleAddEntry = (e) => {
     e.preventDefault();
     if (newEntry.trim() === "") return;
 
-    const newLogPayload = {
-      date: date,
-      entry: newEntry,
-    };
+    console.log("TODO: Implement create log API call.");
 
-    dispatch(addLog(newLogPayload));
     setNewEntry("");
   };
 
@@ -31,6 +28,22 @@ function LogDetailPage() {
     month: "long",
     day: "numeric",
   });
+
+  if (status === "loading") {
+    return (
+      <div className="max-w-3xl mx-auto">
+        <Loader />
+      </div>
+    );
+  }
+
+  if (status === "failed") {
+    return (
+      <div className="max-w-3xl mx-auto text-center py-10 text-red-400">
+        Error loading data: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -84,7 +97,7 @@ function LogDetailPage() {
         {logsForDate.length > 0 ? (
           <ol className="space-y-4">
             {logsForDate.map((log, index) => (
-              <li key={index} className="flex">
+              <li key={log._id || index} className="flex">
                 <div className="flex flex-col items-center mr-4">
                   <div className="bg-teal-500 text-gray-900 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
                     {index + 1}
