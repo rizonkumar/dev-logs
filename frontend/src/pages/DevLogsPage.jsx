@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { addLog } from "../app/features/logsSlice";
+import { fetchLogs } from "../app/features/logsSlice";
 import DevLogsHeader from "../components/DevLogsHeader";
 import LogFilterBar from "../components/LogFilterBar";
+import Loader from "../components/Loader";
 import { format } from "date-fns";
 import {
   Plus,
@@ -15,8 +16,9 @@ import {
 } from "lucide-react";
 
 const groupLogsByDate = (logs) => {
+  if (!logs) return {};
   return logs.reduce((acc, log) => {
-    const date = log.date;
+    const date = new Date(log.date).toISOString().split("T")[0];
     if (!acc[date]) {
       acc[date] = [];
     }
@@ -35,7 +37,8 @@ const getTodayDateString = () => {
 function DevLogsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const logs = useSelector((state) => state.logs.value);
+
+  const { logs, status, error } = useSelector((state) => state.logs);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [newEntry, setNewEntry] = useState("");
@@ -45,7 +48,29 @@ function DevLogsPage() {
     to: undefined,
   });
 
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchLogs());
+    }
+  }, [status, dispatch]);
+
+  const handleAddEntry = (e) => {
+    e.preventDefault();
+    if (newEntry.trim() === "") return;
+    console.log("TODO: Dispatch create log API call with data:", {
+      date: getTodayDateString(),
+      entry: newEntry,
+    });
+    setNewEntry("");
+    setIsFormOpen(false);
+  };
+
+  const handleToggleDate = (date) => {
+    setExpandedDate((prev) => (prev === date ? null : date));
+  };
+
   const filteredLogs = useMemo(() => {
+    if (!logs) return [];
     return logs.filter((log) => {
       if (!dateRange.from && !dateRange.to) return true;
 
@@ -66,23 +91,112 @@ function DevLogsPage() {
     });
   }, [logs, dateRange]);
 
-  const handleAddEntry = (e) => {
-    e.preventDefault();
-    if (newEntry.trim() === "") return;
-    const newLogPayload = { date: getTodayDateString(), entry: newEntry };
-    dispatch(addLog(newLogPayload));
-    setNewEntry("");
-    setIsFormOpen(false);
-  };
-
-  const handleToggleDate = (date) => {
-    setExpandedDate((prev) => (prev === date ? null : date));
-  };
-
   const groupedLogs = groupLogsByDate(filteredLogs);
   const sortedDates = Object.keys(groupedLogs).sort(
     (a, b) => new Date(b) - new Date(a)
   );
+
+  let content;
+
+  if (status === "loading") {
+    content = <Loader />;
+  } else if (status === "succeeded") {
+    content = (
+      <div className="space-y-2">
+        {sortedDates.length > 0 ? (
+          sortedDates.map((date) => {
+            const logsForDate = groupedLogs[date];
+            const isExpanded = expandedDate === date;
+
+            return (
+              <div
+                key={date}
+                className="bg-gray-800/50 rounded-lg border border-gray-700/60"
+              >
+                <div className="flex items-center p-4">
+                  <div
+                    className="flex-grow flex items-center cursor-pointer"
+                    onClick={() => handleToggleDate(date)}
+                  >
+                    {isExpanded ? (
+                      <ChevronDown
+                        size={20}
+                        className="text-teal-400 mr-3 flex-shrink-0"
+                      />
+                    ) : (
+                      <ChevronRight
+                        size={20}
+                        className="text-gray-500 mr-3 flex-shrink-0"
+                      />
+                    )}
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">
+                        {new Date(date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {new Date(date).toLocaleDateString("en-US", {
+                          weekday: "long",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 ml-4">
+                    <p className="text-sm text-gray-400 hidden sm:block">
+                      {logsForDate.length}{" "}
+                      {logsForDate.length > 1 ? "entries" : "entry"}
+                    </p>
+                    <button
+                      onClick={() => navigate(`/logs/${date}`)}
+                      className="p-2 text-gray-400 hover:text-teal-400 hover:bg-gray-700/50 rounded-md transition-colors"
+                      title="View full devlog page"
+                    >
+                      <ExternalLink size={16} />
+                    </button>
+                  </div>
+                </div>
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-2 border-t border-gray-700/60">
+                    <ul className="space-y-3 pl-5">
+                      {logsForDate.map((log, index) => (
+                        <li
+                          key={log._id || index}
+                          className="text-gray-300 leading-relaxed relative whitespace-pre-wrap"
+                        >
+                          <span className="absolute left-[-20px] top-[9px] text-red-400 text-xl leading-none">
+                            •
+                          </span>
+                          {log.entry}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-center py-10 bg-gray-800/50 rounded-lg">
+            <p className="text-gray-400">No log entries found.</p>
+            <p className="text-gray-500 text-sm mt-1">
+              {dateRange.from
+                ? "Try a different date range, or"
+                : "Use the form above to add your first log!"}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  } else if (status === "failed") {
+    content = (
+      <div className="text-center py-10 text-red-400 bg-red-900/20 rounded-lg">
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -156,82 +270,7 @@ function DevLogsPage() {
         )}
       </div>
 
-      <div className="space-y-2">
-        {sortedDates.map((date) => {
-          const logsForDate = groupedLogs[date];
-          const isExpanded = expandedDate === date;
-
-          return (
-            <div
-              key={date}
-              className="bg-gray-800/50 rounded-lg border border-gray-700/60"
-            >
-              <div className="flex items-center p-4">
-                <div
-                  className="flex-grow flex items-center cursor-pointer"
-                  onClick={() => handleToggleDate(date)}
-                >
-                  {isExpanded ? (
-                    <ChevronDown
-                      size={20}
-                      className="text-teal-400 mr-3 flex-shrink-0"
-                    />
-                  ) : (
-                    <ChevronRight
-                      size={20}
-                      className="text-gray-500 mr-3 flex-shrink-0"
-                    />
-                  )}
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">
-                      {new Date(date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {new Date(date).toLocaleDateString("en-US", {
-                        weekday: "long",
-                      })}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4 ml-4">
-                  <p className="text-sm text-gray-400 hidden sm:block">
-                    {logsForDate.length}{" "}
-                    {logsForDate.length > 1 ? "entries" : "entry"}
-                  </p>
-                  <button
-                    onClick={() => navigate(`/logs/${date}`)}
-                    className="p-2 text-gray-400 hover:text-teal-400 hover:bg-gray-700/50 rounded-md transition-colors"
-                    title="View full devlog page"
-                  >
-                    <ExternalLink size={16} />
-                  </button>
-                </div>
-              </div>
-              {isExpanded && (
-                <div className="px-4 pb-4 pt-2 border-t border-gray-700/60">
-                  <ul className="space-y-3 pl-5">
-                    {logsForDate.map((log, index) => (
-                      <li
-                        key={index}
-                        className="text-gray-300 leading-relaxed relative whitespace-pre-wrap"
-                      >
-                        <span className="absolute left-[-20px] top-[9px] text-red-400 text-xl leading-none">
-                          •
-                        </span>
-                        {log.entry}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {content}
     </div>
   );
 }
