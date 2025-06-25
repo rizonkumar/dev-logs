@@ -17,6 +17,8 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Dev-Logs API!" });
 });
 
+app.use("/api/logs", require("./api/routes/logRoutes"));
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
