@@ -38,6 +38,32 @@ export const createLog = createAsyncThunk(
   }
 );
 
+export const deleteLog = createAsyncThunk(
+  "logs/deleteLog",
+  async (logId, { rejectWithValue }) => {
+    try {
+      return await logService.deleteLog(logId);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || error.toString();
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const updateLog = createAsyncThunk(
+  "logs/updateLog",
+  async ({ logId, updateData }, { rejectWithValue }) => {
+    try {
+      return await logService.updateLog(logId, updateData);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || error.toString();
+      return rejectWithValue(message);
+    }
+  }
+);
+
 export const logsSlice = createSlice({
   name: "logs",
   initialState,
@@ -61,8 +87,31 @@ export const logsSlice = createSlice({
       })
       .addCase(createLog.rejected, (state, action) => {
         state.error = action.payload;
-      });
+      })
+      .addCase(deleteLog.fulfilled, (state, action) => {
+        state.logs = state.logs.filter((log) => log._id !== action.payload.id);
+      })
+      .addCase(updateLog.fulfilled, (state, action) => {
+        const index = state.logs.findIndex(
+          (log) => log._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.logs[index] = action.payload;
+        }
+      })
+      .addMatcher(
+        (action) => action.type.endsWith("/pending"),
+        (state) => {
+          state.status = "loading";
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith("/rejected"),
+        (state, action) => {
+          state.status = "failed";
+          state.error = action.payload;
+        }
+      );
   },
 });
-
 export default logsSlice.reducer;
