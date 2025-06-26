@@ -11,8 +11,7 @@ export const fetchLogs = createAsyncThunk(
   "logs/fetchLogs",
   async (_, { rejectWithValue }) => {
     try {
-      const data = await logService.fetchAllLogs();
-      return data;
+      return await logService.fetchAllLogs();
     } catch (error) {
       const message =
         (error.response &&
@@ -70,23 +69,11 @@ export const logsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchLogs.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(fetchLogs.fulfilled, (state, action) => {
-        state.status = "succeeded";
         state.logs = action.payload;
       })
-      .addCase(fetchLogs.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
-      .addCase(createLog.pending, (state) => {})
       .addCase(createLog.fulfilled, (state, action) => {
         state.logs.unshift(action.payload);
-      })
-      .addCase(createLog.rejected, (state, action) => {
-        state.error = action.payload;
       })
       .addCase(deleteLog.fulfilled, (state, action) => {
         state.logs = state.logs.filter((log) => log._id !== action.payload.id);
@@ -106,6 +93,12 @@ export const logsSlice = createSlice({
         }
       )
       .addMatcher(
+        (action) => action.type.endsWith("/fulfilled"),
+        (state) => {
+          state.status = "succeeded";
+        }
+      )
+      .addMatcher(
         (action) => action.type.endsWith("/rejected"),
         (state, action) => {
           state.status = "failed";
@@ -114,4 +107,5 @@ export const logsSlice = createSlice({
       );
   },
 });
+
 export default logsSlice.reducer;
