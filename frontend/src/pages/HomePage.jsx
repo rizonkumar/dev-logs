@@ -7,16 +7,15 @@ import LogActivityChart from "../components/LogActivityChart";
 import RecentLogs from "../components/RecentLogs";
 import LogStats from "../components/LogStats";
 import Loader from "../components/Loader";
+import TodoList from "../components/TodoList.jsx";
 
 const transformDataForCalendar = (logs) => {
   if (!logs || logs.length === 0) return [];
-
   const counts = logs.reduce((acc, log) => {
     const date = new Date(log.date).toISOString().split("T")[0];
     acc[date] = (acc[date] || 0) + 1;
     return acc;
   }, {});
-
   return Object.keys(counts).map((date) => {
     const count = counts[date];
     let level = 0;
@@ -24,7 +23,6 @@ const transformDataForCalendar = (logs) => {
     if (count > 2) level = 2;
     if (count > 4) level = 3;
     if (count > 6) level = 4;
-
     return { date, count, level };
   });
 };
@@ -91,8 +89,15 @@ function HomePage() {
         <main className="lg:col-span-3 xl:col-span-4">
           {status === "loading" ? (
             <Loader />
+          ) : status === "succeeded" ? (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <LogActivityChart data={calendarData} />
+              <TodoList />
+            </div>
           ) : (
-            <LogActivityChart data={calendarData} />
+            <div className="text-center py-10 text-red-400">
+              Failed to load log data.
+            </div>
           )}
         </main>
       </div>
