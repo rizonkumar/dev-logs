@@ -1,16 +1,15 @@
-import React, { useEffect } from "react"; // 1. Import useEffect
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux"; // 2. Import useDispatch
-import { fetchLogs } from "../app/features/logsSlice"; // 3. Import fetchLogs
+import { useSelector, useDispatch } from "react-redux";
+import { fetchLogs } from "../app/features/logsSlice";
 import { Briefcase } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import RecentLogs from "../components/RecentLogs";
 import LogStats from "../components/LogStats";
-import Loader from "../components/Loader"; // Import the Loader
+import Loader from "../components/Loader";
 
-// 4. Add a guard clause to handle the initial render when logs might be undefined.
 const transformDataForCalendar = (logs) => {
-  if (!logs || logs.length === 0) return []; // Return an empty array if no logs
+  if (!logs || logs.length === 0) return [];
 
   const counts = logs.reduce((acc, log) => {
     const date = new Date(log.date).toISOString().split("T")[0];
@@ -32,10 +31,8 @@ const transformDataForCalendar = (logs) => {
 
 function HomePage() {
   const dispatch = useDispatch();
-  // 5. Select the correct state and the status
   const { logs, status } = useSelector((state) => state.logs);
 
-  // 6. Fetch logs when the component mounts if they haven't been fetched yet.
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchLogs());
@@ -48,7 +45,6 @@ function HomePage() {
     <div>
       <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-8">
         <aside className="lg:col-span-1 xl:col-span-1 h-fit sticky top-8">
-          {/* ... About Me Card JSX is unchanged ... */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700/60">
             <div className="flex flex-col items-center text-center">
               <img
@@ -92,7 +88,6 @@ function HomePage() {
           </div>
         </aside>
 
-        {/* 7. Conditionally render the main content area */}
         <main className="lg:col-span-3 xl:col-span-4">
           {status === "loading" ? (
             <Loader />
@@ -102,7 +97,6 @@ function HomePage() {
         </main>
       </div>
 
-      {/* Conditionally render the bottom widgets */}
       {status === "succeeded" && (
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           <RecentLogs logs={logs} />
