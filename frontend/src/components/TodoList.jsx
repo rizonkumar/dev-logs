@@ -6,26 +6,22 @@ import {
   updateTodo,
   deleteTodo,
 } from "../app/features/todosSlice";
-import { Plus, Trash2, Edit, Check, X, Loader2 } from "lucide-react"; // Import a different loader icon for inline use
+import { Plus, Trash2, Edit, Check, X, Loader2 } from "lucide-react";
 
-// Sub-component for a single todo item
 const TodoItem = ({ todo }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.task);
-  // This state is local to each item and controls its specific loading spinner
   const [itemStatus, setItemStatus] = useState("idle");
 
-  // These handlers are now async to allow us to manage the local loading state
   const handleUpdate = async () => {
     if (editText.trim() === "") return;
     setItemStatus("loading");
-    // We 'await' the dispatch so we know when the API call is complete
     await dispatch(
       updateTodo({ todoId: todo._id, updateData: { task: editText } })
     );
     setIsEditing(false);
-    setItemStatus("idle"); // Set status back to idle after completion
+    setItemStatus("idle");
   };
 
   const handleToggle = async () => {
@@ -42,13 +38,11 @@ const TodoItem = ({ todo }) => {
   const handleDelete = async () => {
     setItemStatus("loading");
     await dispatch(deleteTodo(todo._id));
-    // No need to set status back to idle, as the component will be removed from the list
   };
 
   return (
     <li className="flex items-center justify-between p-3 transition-colors duration-200 rounded-lg hover:bg-gray-800/50">
       {isEditing ? (
-        // --- EDITING VIEW ---
         <div className="flex-grow flex items-center gap-2">
           <input
             type="text"
@@ -73,7 +67,6 @@ const TodoItem = ({ todo }) => {
           </button>
         </div>
       ) : (
-        // --- NORMAL VIEW ---
         <>
           <div
             className="flex items-center flex-grow cursor-pointer"
@@ -101,7 +94,6 @@ const TodoItem = ({ todo }) => {
             </span>
           </div>
           <div className="flex items-center space-x-1 ml-2">
-            {/* Conditionally show the mini-loader or the action buttons */}
             {itemStatus === "loading" ? (
               <Loader2 size={16} className="animate-spin text-gray-500" />
             ) : (
@@ -135,12 +127,16 @@ function TodoList() {
   const { todos, status, error } = useSelector((state) => state.todos);
   const [newTask, setNewTask] = useState("");
 
-  // Fetch todos when the component mounts for the first time
+  // THIS IS THE CRUCIAL PART FOR PERSISTENCE
+  // This useEffect hook runs once when the component first mounts.
   useEffect(() => {
+    // We check the status. If it's 'idle', it means we haven't fetched data yet.
     if (status === "idle") {
+      console.log("Fetching todos from the backend...");
+      // We dispatch the action to fetch all todos from our API.
       dispatch(fetchTodos());
     }
-  }, [status, dispatch]);
+  }, [status, dispatch]); // It depends on 'status' and 'dispatch'.
 
   const handleAddTask = async (e) => {
     e.preventDefault();
@@ -151,7 +147,6 @@ function TodoList() {
 
   let listContent;
 
-  // The main loader only shows on the very first fetch
   if (status === "loading" && todos.length === 0) {
     listContent = (
       <div className="text-center py-10 text-gray-400">Loading tasks...</div>
