@@ -121,22 +121,16 @@ const TodoItem = ({ todo }) => {
   );
 };
 
-// Main TodoList Component
 function TodoList() {
   const dispatch = useDispatch();
   const { todos, status, error } = useSelector((state) => state.todos);
   const [newTask, setNewTask] = useState("");
 
-  // THIS IS THE CRUCIAL PART FOR PERSISTENCE
-  // This useEffect hook runs once when the component first mounts.
   useEffect(() => {
-    // We check the status. If it's 'idle', it means we haven't fetched data yet.
     if (status === "idle") {
-      console.log("Fetching todos from the backend...");
-      // We dispatch the action to fetch all todos from our API.
       dispatch(fetchTodos());
     }
-  }, [status, dispatch]); // It depends on 'status' and 'dispatch'.
+  }, [status, dispatch]);
 
   const handleAddTask = async (e) => {
     e.preventDefault();
@@ -146,6 +140,7 @@ function TodoList() {
   };
 
   let listContent;
+  console.log("List of todos", todos);
 
   if (status === "loading" && todos.length === 0) {
     listContent = (
