@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchLogs } from "../app/features/logsSlice";
 import { Briefcase } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import RecentLogs from "../components/RecentLogs";
 import LogStats from "../components/LogStats";
+import Loader from "../components/Loader";
 
 const transformDataForCalendar = (logs) => {
+  if (!logs || logs.length === 0) return [];
+
   const counts = logs.reduce((acc, log) => {
-    const date = log.date;
+    const date = new Date(log.date).toISOString().split("T")[0];
     acc[date] = (acc[date] || 0) + 1;
     return acc;
   }, {});
@@ -21,16 +25,19 @@ const transformDataForCalendar = (logs) => {
     if (count > 4) level = 3;
     if (count > 6) level = 4;
 
-    return {
-      date: date,
-      count: count,
-      level: level,
-    };
+    return { date, count, level };
   });
 };
 
 function HomePage() {
-  const logs = useSelector((state) => state.logs.value);
+  const dispatch = useDispatch();
+  const { logs, status } = useSelector((state) => state.logs);
+
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchLogs());
+    }
+  }, [status, dispatch]);
 
   const calendarData = transformDataForCalendar(logs);
 
@@ -82,14 +89,20 @@ function HomePage() {
         </aside>
 
         <main className="lg:col-span-3 xl:col-span-4">
-          <LogActivityChart data={calendarData} />
+          {status === "loading" ? (
+            <Loader />
+          ) : (
+            <LogActivityChart data={calendarData} />
+          )}
         </main>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <RecentLogs logs={logs} />
-        <LogStats logs={logs} />
-      </div>
+      {status === "succeeded" && (
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <RecentLogs logs={logs} />
+          <LogStats logs={logs} />
+        </div>
+      )}
     </div>
   );
 }
