@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchLogs } from "../app/features/logsSlice";
+import { createLog, fetchLogs } from "../app/features/logsSlice";
 import DevLogsHeader from "../components/DevLogsHeader";
 import LogFilterBar from "../components/LogFilterBar";
 import Loader from "../components/Loader";
@@ -57,10 +57,14 @@ function DevLogsPage() {
   const handleAddEntry = (e) => {
     e.preventDefault();
     if (newEntry.trim() === "") return;
-    console.log("TODO: Dispatch create log API call with data:", {
+
+    const logData = {
       date: getTodayDateString(),
       entry: newEntry,
-    });
+    };
+
+    dispatch(createLog(logData));
+
     setNewEntry("");
     setIsFormOpen(false);
   };

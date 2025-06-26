@@ -25,6 +25,19 @@ export const fetchLogs = createAsyncThunk(
   }
 );
 
+export const createLog = createAsyncThunk(
+  "logs/createLog",
+  async (logData, { rejectWithValue }) => {
+    try {
+      return await logService.createLog(logData);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || error.toString();
+      return rejectWithValue(message);
+    }
+  }
+);
+
 export const logsSlice = createSlice({
   name: "logs",
   initialState,
@@ -40,6 +53,13 @@ export const logsSlice = createSlice({
       })
       .addCase(fetchLogs.rejected, (state, action) => {
         state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(createLog.pending, (state) => {})
+      .addCase(createLog.fulfilled, (state, action) => {
+        state.logs.unshift(action.payload);
+      })
+      .addCase(createLog.rejected, (state, action) => {
         state.error = action.payload;
       });
   },
