@@ -18,6 +18,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/logs", require("./api/routes/logRoutes"));
+app.use("/api/todos", require("./api/routes/todoRoutes.js"));
+app.use("/api/github", require("./api/routes/githubRoutes"));
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

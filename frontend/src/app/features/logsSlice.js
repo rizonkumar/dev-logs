@@ -69,8 +69,16 @@ export const logsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchLogs.pending, (state) => {
+        state.status = "loading";
+      })
       .addCase(fetchLogs.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.logs = action.payload;
+      })
+      .addCase(fetchLogs.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       })
       .addCase(createLog.fulfilled, (state, action) => {
         state.logs.unshift(action.payload);
@@ -85,26 +93,7 @@ export const logsSlice = createSlice({
         if (index !== -1) {
           state.logs[index] = action.payload;
         }
-      })
-      .addMatcher(
-        (action) => action.type.endsWith("/pending"),
-        (state) => {
-          state.status = "loading";
-        }
-      )
-      .addMatcher(
-        (action) => action.type.endsWith("/fulfilled"),
-        (state) => {
-          state.status = "succeeded";
-        }
-      )
-      .addMatcher(
-        (action) => action.type.endsWith("/rejected"),
-        (state, action) => {
-          state.status = "failed";
-          state.error = action.payload;
-        }
-      );
+      });
   },
 });
 
