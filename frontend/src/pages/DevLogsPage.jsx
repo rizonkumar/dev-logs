@@ -6,21 +6,20 @@ import DevLogsHeader from "../components/DevLogsHeader";
 import LogFilterBar from "../components/LogFilterBar";
 import { format } from "date-fns";
 import {
-  Plus,
   ChevronDown,
-  ChevronUp,
   ChevronRight,
   ExternalLink,
   ArrowLeft,
   Calendar,
   BookOpen,
-  Coffee,
   Code,
   Zap,
   Clock,
-  Edit3,
   Save,
   X,
+  Eye,
+  Hash,
+  Type,
 } from "lucide-react";
 
 const groupLogsByDate = (logs) => {
@@ -66,38 +65,74 @@ const getDateRelativeDisplay = (dateString) => {
   });
 };
 
-const AnimatedLogEntry = ({ log, index }) => (
-  <div
-    className="group relative p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 
-               border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 
-               hover:shadow-lg hover:shadow-purple-500/10 hover:scale-[1.01]"
-    style={{ animationDelay: `${index * 100}ms` }}
-  >
-    <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-pink-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-    <div className="relative">
-      <div className="flex items-start space-x-3">
-        <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 mt-2" />
-        <p className="text-gray-200 leading-relaxed whitespace-pre-wrap text-sm group-hover:text-white transition-colors duration-300">
-          {log.entry}
-        </p>
-      </div>
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-700/30">
-        <span className="text-xs text-gray-500 flex items-center">
-          <Clock size={12} className="mr-1" />
-          {new Date(log.createdAt || log.date).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </span>
-        <button className="text-xs text-gray-500 hover:text-purple-400 transition-colors duration-200 opacity-0 group-hover:opacity-100">
-          <Edit3 size={12} />
-        </button>
+const AnimatedLogEntry = ({ log, index, onViewDetails }) => {
+  const getWordCount = (text) => {
+    return text
+      ? text
+          .trim()
+          .split(/\s+/)
+          .filter((word) => word.length > 0).length
+      : 0;
+  };
+
+  const getCharacterCount = (text) => {
+    return text ? text.length : 0;
+  };
+
+  const wordCount = getWordCount(log.entry);
+  const charCount = getCharacterCount(log.entry);
+
+  return (
+    <div
+      className="group relative p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 
+                 border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 
+                 hover:shadow-lg hover:shadow-purple-500/10 hover:scale-[1.01]"
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-pink-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="relative">
+        <div className="flex items-start space-x-3">
+          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 mt-2" />
+          <p className="text-gray-200 leading-relaxed whitespace-pre-wrap text-sm group-hover:text-white transition-colors duration-300">
+            {log.entry}
+          </p>
+        </div>
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-700/30">
+          <div className="flex items-center space-x-4 text-xs text-gray-500">
+            <span className="flex items-center">
+              <Clock size={12} className="mr-1" />
+              {new Date(log.createdAt || log.date).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+            <span className="flex items-center">
+              <Type size={12} className="mr-1" />
+              {wordCount} words
+            </span>
+            <span className="flex items-center">
+              <Hash size={12} className="mr-1" />
+              {charCount} chars
+            </span>
+          </div>
+          <button
+            onClick={onViewDetails}
+            className="text-xs text-gray-500 hover:text-purple-400 transition-colors duration-200 
+                      opacity-0 group-hover:opacity-100 flex items-center space-x-1 
+                      hover:bg-purple-500/10 px-2 py-1 rounded-md"
+            title="View in detail page"
+          >
+            <Eye size={12} />
+            <span>Details</span>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const DateCard = ({ date, logs, isExpanded, onToggle, onViewFull }) => {
+  const navigate = useNavigate();
   const relativeDate = getDateRelativeDisplay(date);
   const fullDate = new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -105,6 +140,10 @@ const DateCard = ({ date, logs, isExpanded, onToggle, onViewFull }) => {
     day: "numeric",
     weekday: "long",
   });
+
+  const handleViewEntryDetails = () => {
+    navigate(`/logs/${date}`);
+  };
 
   return (
     <div className="group relative overflow-hidden">
@@ -193,6 +232,7 @@ const DateCard = ({ date, logs, isExpanded, onToggle, onViewFull }) => {
                 key={log._id || index}
                 log={log}
                 index={index}
+                onViewDetails={handleViewEntryDetails}
               />
             ))}
           </div>
@@ -269,45 +309,7 @@ const AddEntryCard = ({
                  rounded-2xl border border-gray-700/40 shadow-xl 
                  hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-500"
     >
-      {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-to-br from-teal-600/10 via-transparent to-green-600/10 opacity-0 hover:opacity-100 transition-opacity duration-500" />
-
-      <button
-        onClick={onToggle}
-        className="relative w-full flex justify-between items-center p-6 group"
-      >
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500/20 to-green-500/20 flex items-center justify-center border border-teal-500/30 group-hover:scale-110 transition-transform duration-300">
-            <Plus
-              size={24}
-              className="text-teal-400 group-hover:rotate-180 transition-transform duration-500"
-            />
-          </div>
-          <div className="text-left">
-            <span className="text-xl font-bold text-white group-hover:text-teal-300 transition-colors duration-300">
-              Capture Today's Journey
-            </span>
-            <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
-              Document your development insights, challenges, and victories
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Coffee className="w-5 h-5 text-amber-400" />
-          {isOpen ? (
-            <ChevronUp
-              size={24}
-              className="text-gray-400 group-hover:text-teal-400 transition-colors duration-300"
-            />
-          ) : (
-            <ChevronDown
-              size={24}
-              className="text-gray-400 group-hover:text-teal-400 transition-colors duration-300"
-            />
-          )}
-        </div>
-      </button>
 
       <div
         className={`overflow-hidden transition-all duration-500 ease-in-out ${
