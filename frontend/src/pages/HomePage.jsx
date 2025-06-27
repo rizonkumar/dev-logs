@@ -263,7 +263,9 @@ function HomePage() {
 
       <header className="mb-6 relative z-10">
         <h1 className="text-2xl md:text-3xl font-bold">Developer Dashboard</h1>
-        <p className="text-gray-400 text-sm">Your coding journey at a glance</p>
+        <p className="text-gray-400 text-sm">
+          👣 A quick peek into your coding journey 🚀💡
+        </p>
       </header>
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
