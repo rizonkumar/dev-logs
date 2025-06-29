@@ -314,7 +314,6 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
         Detailed Insights
       </h3>
 
-      {/* Main Stats Grid */}
       <div className="grid grid-cols-2 gap-4 text-xs mb-6">
         <div className="space-y-3">
           <div>
@@ -364,7 +363,6 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
         </p>
       </div>
 
-      {/* Additional Stats Row */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-gray-900/50 p-3 rounded-lg text-center border border-gray-700/30">
           <p className="text-sm font-bold text-white">{thisMonthLogs}</p>
@@ -376,7 +374,6 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
         </div>
       </div>
 
-      {/* Achievements Section */}
       <div className="mt-auto">
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-semibold text-white">
@@ -588,7 +585,6 @@ function HomePage() {
       </header>
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {/* First Row - Profile and Quick Stats */}
         <div className="lg:col-span-1">
           <ProfileCard githubData={githubData} />
         </div>
@@ -605,16 +601,6 @@ function HomePage() {
           />
         </div>
 
-        {/* Second Row - Activity Charts */}
-        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
-          <LogActivityCard logData={logCalendarData} />
-        </div>
-
-        <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
-          <GithubActivityCard githubData={githubData} />
-        </div>
-
-        {/* Third Row - Entry and Tasks */}
         <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
           <QuickAddLogCard
             onAddLog={handleAddLog}
@@ -624,6 +610,14 @@ function HomePage() {
 
         <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
           <CompactTodoCard />
+        </div>
+
+        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
+          <LogActivityCard logData={logCalendarData} />
+        </div>
+
+        <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
+          <GithubActivityCard githubData={githubData} />
         </div>
       </div>
     </div>
