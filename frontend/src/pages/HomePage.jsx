@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchLogs, createLog } from "../app/features/logsSlice";
+import { fetchLogs, createLog, fetchLogStats } from "../app/features/logsSlice";
 import { fetchTodos } from "../app/features/todosSlice";
 import { fetchGithubData } from "../app/features/githubSlice";
 import {
@@ -160,7 +160,7 @@ const GithubActivityCard = ({ githubData }) => (
   </div>
 );
 
-const DetailedStatsCard = ({ logs, githubData }) => {
+const DetailedStatsCard = ({ logs, githubData, logStats }) => {
   const thisWeekLogs =
     logs?.filter((log) => {
       const logDate = new Date(log.date);
@@ -202,7 +202,9 @@ const DetailedStatsCard = ({ logs, githubData }) => {
           </div>
           <div>
             <p className="text-gray-400">Most Active</p>
-            <p className="text-lg font-bold text-white">Mon</p>
+            <p className="text-lg font-bold text-white">
+              {logStats?.mostActiveDay || "N/A"}
+            </p>
             <p className="text-gray-500">Day of week</p>
           </div>
         </div>
@@ -333,7 +335,12 @@ const QuickAddLogCard = ({ onAddLog, isLoading }) => {
 
 function HomePage() {
   const dispatch = useDispatch();
-  const { logs, status: logsStatus } = useSelector((state) => state.logs);
+  const {
+    logs,
+    status: logsStatus,
+    stats: logStats,
+    statsStatus,
+  } = useSelector((state) => state.logs);
   const { status: todosStatus } = useSelector((state) => state.todos);
   const { data: githubData, status: githubStatus } = useSelector(
     (state) => state.github
@@ -343,7 +350,8 @@ function HomePage() {
     if (logsStatus === "idle") dispatch(fetchLogs());
     if (todosStatus === "idle") dispatch(fetchTodos());
     if (githubStatus === "idle") dispatch(fetchGithubData());
-  }, [logsStatus, todosStatus, githubStatus, dispatch]);
+    if (statsStatus === "idle") dispatch(fetchLogStats());
+  }, [logsStatus, todosStatus, githubStatus, statsStatus, dispatch]);
 
   const handleAddLog = (logData) => {
     dispatch(createLog(logData));
@@ -386,7 +394,11 @@ function HomePage() {
           <QuickStatsCard logs={logs} githubData={githubData} />
         </div>
         <div className="md:col-span-2">
-          <DetailedStatsCard logs={logs} githubData={githubData} />
+          <DetailedStatsCard
+            logs={logs}
+            githubData={githubData}
+            logStats={logStats}
+          />
         </div>
 
         <div className="md:col-span-2">

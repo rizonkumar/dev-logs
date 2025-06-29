@@ -23,11 +23,17 @@ const updateLog = async (logId, updateData) => {
   return response.data;
 };
 
+const fetchLogStats = async () => {
+  const response = await axios.get(API_URL + "stats");
+  return response.data;
+};
+
 const logService = {
   fetchAllLogs,
   createLog,
   deleteLog,
   updateLog,
+  fetchLogStats,
 };
 
 export default logService;

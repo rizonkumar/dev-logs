@@ -3,8 +3,11 @@ import logService from "../../services/logService.js";
 
 const initialState = {
   logs: [],
+  stats: null,
   status: "idle",
+  statsStatus: "idle",
   error: null,
+  statsError: null,
 };
 
 export const fetchLogs = createAsyncThunk(
@@ -63,6 +66,19 @@ export const updateLog = createAsyncThunk(
   }
 );
 
+export const fetchLogStats = createAsyncThunk(
+  "logs/fetchLogStats",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await logService.fetchLogStats();
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || error.toString();
+      return rejectWithValue(message);
+    }
+  }
+);
+
 export const logsSlice = createSlice({
   name: "logs",
   initialState,
@@ -93,6 +109,17 @@ export const logsSlice = createSlice({
         if (index !== -1) {
           state.logs[index] = action.payload;
         }
+      })
+      .addCase(fetchLogStats.pending, (state) => {
+        state.statsStatus = "loading";
+      })
+      .addCase(fetchLogStats.fulfilled, (state, action) => {
+        state.statsStatus = "succeeded";
+        state.stats = action.payload;
+      })
+      .addCase(fetchLogStats.rejected, (state, action) => {
+        state.statsStatus = "failed";
+        state.statsError = action.payload;
       });
   },
 });
