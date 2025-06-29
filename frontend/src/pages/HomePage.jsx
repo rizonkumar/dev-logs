@@ -16,6 +16,8 @@ import {
   TrendingUp,
   Plus,
   Send,
+  ExternalLink,
+  Globe,
 } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import TodoList from "../components/TodoList.jsx";
@@ -42,11 +44,11 @@ const transformDataForCalendar = (logs) => {
 const cardBaseStyle =
   "bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/20";
 
-const ProfileCard = () => (
+const ProfileCard = ({ githubData }) => (
   <div className={`${cardBaseStyle} h-fit`}>
     <div className="flex items-center space-x-3 mb-3">
       <img
-        src="https://i.pravatar.cc/80?u=a042581f4e29026704d"
+        src="https://i.pinimg.com/564x/e8/67/34/e86734a7cc5e96681d20fa86b7b15bc8.jpg"
         alt="Rizon Kumar Rahi"
         className="w-12 h-12 rounded-full border-2 border-fuchsia-400 object-cover"
       />
@@ -58,7 +60,8 @@ const ProfileCard = () => (
       </div>
     </div>
     <p className="text-gray-300 text-xs leading-relaxed mb-3">
-      Code 💻. Coffee ☕. Curiosity 🔍. Repeat 🔁.
+      🚀 Building digital dreams with passion and precision. Turning caffeine
+      into code, one commit at a time! ⚡️
     </p>
     <div className="space-y-2 text-xs mb-4">
       <div className="flex items-center text-gray-300">
@@ -67,9 +70,37 @@ const ProfileCard = () => (
       </div>
       <div className="flex items-center text-gray-300">
         <GitBranch size={12} className="mr-2 text-gray-400" />
-        <span>8 Public Repositories</span>
+        <span>{githubData?.publicRepositories || 0} Public Repositories</span>
       </div>
     </div>
+
+    <div className="flex space-x-2 mb-4">
+      <a
+        href="https://rizonkumarrahi.in/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 
+                   border border-blue-500/30 hover:border-blue-400/50 rounded-lg p-2 
+                   transition-all duration-300 flex items-center justify-center space-x-1 text-xs"
+      >
+        <Globe size={12} />
+        <span>Portfolio</span>
+        <ExternalLink size={10} />
+      </a>
+      <a
+        href="https://github.com/rizonkumar"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex-1 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white 
+                   border border-gray-600/50 hover:border-gray-500/50 rounded-lg p-2 
+                   transition-all duration-300 flex items-center justify-center space-x-1 text-xs"
+      >
+        <Github size={12} />
+        <span>GitHub</span>
+        <ExternalLink size={10} />
+      </a>
+    </div>
+
     <Link
       to="/logs"
       className="block w-full text-center bg-fuchsia-500/80 hover:bg-fuchsia-500 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm"
@@ -388,7 +419,7 @@ function HomePage() {
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Row 1: Profile & Quick Stats */}
         <div className="md:col-span-1">
-          <ProfileCard />
+          <ProfileCard githubData={githubData} />
         </div>
         <div className="md:col-span-1">
           <QuickStatsCard logs={logs} githubData={githubData} />
