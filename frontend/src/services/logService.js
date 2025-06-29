@@ -1,6 +1,7 @@
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api.js";
 
-const API_URL = "http://localhost:5001/api/logs/";
+const API_URL = API_ENDPOINTS.LOGS;
 
 const fetchAllLogs = async () => {
   const response = await axios.get(API_URL);
@@ -22,11 +23,17 @@ const updateLog = async (logId, updateData) => {
   return response.data;
 };
 
+const fetchLogStats = async () => {
+  const response = await axios.get(API_URL + "stats");
+  return response.data;
+};
+
 const logService = {
   fetchAllLogs,
   createLog,
   deleteLog,
   updateLog,
+  fetchLogStats,
 };
 
 export default logService;

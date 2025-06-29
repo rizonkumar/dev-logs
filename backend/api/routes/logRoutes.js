@@ -7,6 +7,7 @@ const {
   createLog,
   updateLog,
   deleteLog,
+  getLogStats,
 } = require("../controllers/logController.js");
 const {
   validateCreateLog,
@@ -15,6 +16,7 @@ const {
 const validate = require("../middleware/validationMiddleware.js");
 
 router.route("/").get(getLogs).post(validateCreateLog, validate, createLog);
+router.route("/stats").get(getLogStats);
 
 router
   .route("/:id")

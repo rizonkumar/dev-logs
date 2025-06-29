@@ -44,9 +44,15 @@ const deleteLog = asyncHandler(async (req, res) => {
   res.status(200).json({ id: logId, message: "Log removed successfully" });
 });
 
+const getLogStats = asyncHandler(async (req, res) => {
+  const stats = await logService.getLogStats();
+  res.status(200).json(stats);
+});
+
 module.exports = {
   getLogs,
   createLog,
   updateLog,
   deleteLog,
+  getLogStats,
 };
