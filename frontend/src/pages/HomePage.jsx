@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchLogs } from "../app/features/logsSlice";
+import { fetchLogs, createLog } from "../app/features/logsSlice";
 import { fetchTodos } from "../app/features/todosSlice";
 import { fetchGithubData } from "../app/features/githubSlice";
 import {
@@ -14,12 +14,13 @@ import {
   Star,
   Clock,
   TrendingUp,
+  Plus,
+  Send,
 } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import TodoList from "../components/TodoList.jsx";
 import Loader from "../components/Loader";
 
-// Helper function to transform log data for the activity chart
 const transformDataForCalendar = (logs) => {
   if (!logs || logs.length === 0) return [];
   const counts = logs.reduce((acc, log) => {
@@ -37,8 +38,6 @@ const transformDataForCalendar = (logs) => {
     return { date, count, level };
   });
 };
-
-// --- UI Sub-components for the Revamped Grid ---
 
 const cardBaseStyle =
   "bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/20";
@@ -224,7 +223,113 @@ const CompactTodoCard = () => (
   </div>
 );
 
-// --- Main HomePage Component ---
+const QuickAddLogCard = ({ onAddLog, isLoading }) => {
+  const [newEntry, setNewEntry] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (newEntry.trim() === "") return;
+
+    const today = new Date();
+    const todayString = today.toISOString().split("T")[0];
+
+    onAddLog({
+      entry: newEntry,
+      date: todayString,
+    });
+
+    setNewEntry("");
+    setIsExpanded(false);
+  };
+
+  return (
+    <div className={`${cardBaseStyle}`}>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-bold text-white flex items-center">
+          <Plus size={16} className="mr-2 text-emerald-400" />
+          Quick Log Entry
+        </h3>
+        {!isExpanded && (
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg p-2 transition-all duration-300"
+          >
+            <Plus size={14} />
+          </button>
+        )}
+      </div>
+
+      {isExpanded ? (
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <textarea
+            value={newEntry}
+            onChange={(e) => setNewEntry(e.target.value)}
+            placeholder="What did you accomplish today? Share your insights..."
+            className="w-full bg-gray-900/70 p-3 rounded-lg border border-gray-600/50 
+                      focus:ring-2 focus:ring-emerald-400 focus:border-transparent focus:outline-none 
+                      transition-all duration-300 text-gray-300 placeholder-gray-500 resize-none
+                      min-h-[80px] text-sm"
+            autoFocus
+          />
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <Calendar size={12} />
+              <span>Today</span>
+            </div>
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsExpanded(false);
+                  setNewEntry("");
+                }}
+                className="px-3 py-1.5 text-gray-400 hover:text-white border border-gray-600 
+                          hover:border-gray-500 rounded-lg transition-all duration-300 text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!newEntry.trim() || isLoading}
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 
+                          text-white font-semibold py-1.5 px-4 rounded-lg transition-all duration-300 
+                          flex items-center space-x-1 text-xs shadow-lg shadow-emerald-500/25
+                          disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Adding...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send size={12} />
+                    <span>Add Log</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
+      ) : (
+        <div className="space-y-2">
+          <p className="text-xs text-gray-400">
+            Quickly capture your development progress and insights for today.
+          </p>
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="w-full bg-gray-900/50 hover:bg-gray-800/50 text-gray-400 hover:text-white 
+                      p-3 rounded-lg border border-gray-700/50 hover:border-emerald-500/50
+                      transition-all duration-300 text-xs text-left"
+          >
+            What did you work on today?
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 function HomePage() {
   const dispatch = useDispatch();
@@ -239,6 +344,10 @@ function HomePage() {
     if (todosStatus === "idle") dispatch(fetchTodos());
     if (githubStatus === "idle") dispatch(fetchGithubData());
   }, [logsStatus, todosStatus, githubStatus, dispatch]);
+
+  const handleAddLog = (logData) => {
+    dispatch(createLog(logData));
+  };
 
   const logCalendarData = transformDataForCalendar(logs);
 
@@ -280,7 +389,6 @@ function HomePage() {
           <DetailedStatsCard logs={logs} githubData={githubData} />
         </div>
 
-        {/* Row 2: Activity Charts */}
         <div className="md:col-span-2">
           <LogActivityCard logData={logCalendarData} />
         </div>
@@ -288,8 +396,13 @@ function HomePage() {
           <GithubActivityCard githubData={githubData} />
         </div>
 
-        {/* Row 3: Todo List spanning full width */}
-        <div className="md:col-span-2 lg:col-span-4">
+        <div className="md:col-span-2">
+          <QuickAddLogCard
+            onAddLog={handleAddLog}
+            isLoading={logsStatus === "loading"}
+          />
+        </div>
+        <div className="md:col-span-2">
           <CompactTodoCard />
         </div>
       </div>
