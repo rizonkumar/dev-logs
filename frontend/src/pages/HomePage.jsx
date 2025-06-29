@@ -267,13 +267,55 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
     ? Math.round((logs.length / 52) * 10) / 10
     : 0;
 
+  const thisMonthLogs =
+    logs?.filter((log) => {
+      const logDate = new Date(log.date);
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      return logDate >= monthAgo;
+    }).length || 0;
+
+  const currentStreak =
+    logs?.length > 0
+      ? (() => {
+          const uniqueDates = Array.from(
+            new Set(logs.map((log) => log.date))
+          ).sort((a, b) => new Date(b) - new Date(a));
+          let streak = 0;
+          const today = new Date().toISOString().split("T")[0];
+
+          for (let i = 0; i < uniqueDates.length; i++) {
+            const expectedDate = new Date();
+            expectedDate.setDate(expectedDate.getDate() - i);
+            const expectedDateStr = expectedDate.toISOString().split("T")[0];
+
+            if (
+              uniqueDates[i] === expectedDateStr ||
+              (i === 0 && uniqueDates[i] === today)
+            ) {
+              streak++;
+            } else {
+              break;
+            }
+          }
+          return streak;
+        })()
+      : 0;
+
+  const productivityScore = Math.min(
+    100,
+    Math.round((thisWeekLogs / 7) * 100 + currentStreak * 5)
+  );
+
   return (
-    <div className={`${cardBaseStyle}`}>
-      <h3 className="text-sm font-bold text-white mb-3 flex items-center">
-        <Star size={16} className="mr-2 text-yellow-400" />
+    <div className={`${cardBaseStyle} h-full flex flex-col`}>
+      <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+        <Star size={18} className="mr-2 text-yellow-400" />
         Detailed Insights
       </h3>
-      <div className="grid grid-cols-2 gap-4 text-xs">
+
+      {/* Main Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 text-xs mb-6">
         <div className="space-y-3">
           <div>
             <p className="text-gray-400">This Week</p>
@@ -301,6 +343,72 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
             </p>
             <p className="text-gray-500">Day of week</p>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 p-4 rounded-xl border border-blue-500/20 mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-semibold text-white">Productivity Score</p>
+          <span className="text-sm font-bold text-blue-400">
+            {productivityScore}%
+          </span>
+        </div>
+        <div className="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+          <div
+            className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${productivityScore}%` }}
+          ></div>
+        </div>
+        <p className="text-xs text-gray-400">
+          Based on recent activity and consistency
+        </p>
+      </div>
+
+      {/* Additional Stats Row */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="bg-gray-900/50 p-3 rounded-lg text-center border border-gray-700/30">
+          <p className="text-sm font-bold text-white">{thisMonthLogs}</p>
+          <p className="text-gray-400 text-xs">This Month</p>
+        </div>
+        <div className="bg-gray-900/50 p-3 rounded-lg text-center border border-gray-700/30">
+          <p className="text-sm font-bold text-white">{currentStreak}</p>
+          <p className="text-gray-400 text-xs">Current Streak</p>
+        </div>
+      </div>
+
+      {/* Achievements Section */}
+      <div className="mt-auto">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-semibold text-white">
+            Recent Achievements
+          </p>
+          <div className="flex space-x-1">
+            {thisWeekLogs >= 5 && <span className="text-xs">🔥</span>}
+            {currentStreak >= 3 && <span className="text-xs">⚡</span>}
+            {(logs?.length || 0) >= 10 && <span className="text-xs">🏆</span>}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {thisWeekLogs >= 5 && (
+            <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded-full">
+              Weekly Warrior
+            </span>
+          )}
+          {currentStreak >= 3 && (
+            <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full">
+              Consistent Coder
+            </span>
+          )}
+          {(logs?.length || 0) >= 10 && (
+            <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">
+              Dedicated Dev
+            </span>
+          )}
+          {(logs?.length || 0) === 0 && (
+            <span className="text-xs bg-gray-600/20 text-gray-400 px-2 py-1 rounded-full">
+              Just Getting Started
+            </span>
+          )}
         </div>
       </div>
     </div>
