@@ -96,8 +96,18 @@ export const logsSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
+      .addCase(createLog.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
       .addCase(createLog.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.logs.unshift(action.payload);
+        state.error = null;
+      })
+      .addCase(createLog.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       })
       .addCase(deleteLog.fulfilled, (state, action) => {
         state.logs = state.logs.filter((log) => log._id !== action.payload.id);

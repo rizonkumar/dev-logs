@@ -9,8 +9,13 @@ const fetchAllLogs = async () => {
 };
 
 const createLog = async (logData) => {
-  const response = await axios.post(API_URL, logData);
-  return response.data;
+  try {
+    const response = await axios.post(API_URL, logData);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 const deleteLog = async (logId) => {
