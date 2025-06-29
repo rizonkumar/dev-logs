@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import DevLogsPage from "./pages/DevLogsPage";
-import LogDetailPage from "./pages/LogDetailPage";
 
 function App() {
   return (
@@ -11,7 +10,6 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/logs" element={<DevLogsPage />} />
-          <Route path="/logs/:date" element={<LogDetailPage />} />
         </Routes>
       </Router>
     </div>

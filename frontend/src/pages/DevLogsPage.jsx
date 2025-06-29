@@ -50,7 +50,6 @@ function DevLogsPage() {
   }, [status, dispatch]);
 
   const handleAddEntry = async (e) => {
-    console.log("handleAddEntry called");
     e.preventDefault();
     if (newEntry.trim() === "") return;
 
@@ -63,7 +62,6 @@ function DevLogsPage() {
       await dispatch(createLog(logData)).unwrap();
       setNewEntry("");
       setIsFormOpen(false);
-      console.log("Entry saved successfully");
     } catch (error) {
       console.error("Failed to create log:", error);
     }
