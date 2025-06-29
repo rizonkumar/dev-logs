@@ -7,6 +7,9 @@ const getContributionData = async (username, token) => {
   const body = {
     query: `query {
       user(login: "${username}") {
+        repositories(privacy: PUBLIC) {
+          totalCount
+        }
         contributionsCollection {
           contributionCalendar {
             totalContributions
@@ -26,8 +29,8 @@ const getContributionData = async (username, token) => {
     const response = await axios.post("https://api.github.com/graphql", body, {
       headers,
     });
-    const calendar =
-      response.data.data.user.contributionsCollection.contributionCalendar;
+    const userData = response.data.data.user;
+    const calendar = userData.contributionsCollection.contributionCalendar;
     let contributions = [];
     calendar.weeks.forEach((week) => {
       week.contributionDays.forEach((day) => {
@@ -41,8 +44,36 @@ const getContributionData = async (username, token) => {
       });
     });
 
+    // Calculate longest streak
+    const sortedContributions = contributions.sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+    let longestStreak = 0;
+    let currentStreak = 0;
+    let lastDate = null;
+
+    for (const contrib of sortedContributions) {
+      const currentDate = new Date(contrib.date);
+      if (lastDate) {
+        const diffTime = currentDate - lastDate;
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        if (diffDays === 1) {
+          currentStreak++;
+        } else {
+          longestStreak = Math.max(longestStreak, currentStreak);
+          currentStreak = 1;
+        }
+      } else {
+        currentStreak = 1;
+      }
+      lastDate = currentDate;
+    }
+    longestStreak = Math.max(longestStreak, currentStreak);
+
     return {
       totalContributions: calendar.totalContributions,
+      publicRepositories: userData.repositories.totalCount,
+      longestStreak: longestStreak,
       contributions: contributions,
     };
   } catch (error) {
