@@ -45,10 +45,10 @@ const cardBaseStyle =
   "bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/20";
 
 const ProfileCard = ({ githubData }) => (
-  <div className={`${cardBaseStyle} h-fit`}>
+  <div className={`${cardBaseStyle} h-full flex flex-col`}>
     <div className="flex items-center space-x-3 mb-3">
       <img
-        src="https://i.pinimg.com/564x/e8/67/34/e86734a7cc5e96681d20fa86b7b15bc8.jpg"
+        src="https://lh3.googleusercontent.com/a/ACg8ocI31k4K1EtKO05KYDgS1aAcXFbReVGt0EOQcBSWQsPVkZ8PnLCklg=s96-c-rg-br100"
         alt="Rizon Kumar Rahi"
         className="w-12 h-12 rounded-full border-2 border-fuchsia-400 object-cover"
       />
@@ -59,10 +59,32 @@ const ProfileCard = ({ githubData }) => (
         </p>
       </div>
     </div>
-    <p className="text-gray-300 text-xs leading-relaxed mb-3">
-      🚀 Building digital dreams with passion and precision. Turning caffeine
-      into code, one commit at a time! ⚡️
-    </p>
+
+    {/* Enhanced Bio Section */}
+    <div className="mb-4 p-3 bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-blue-500/10 rounded-lg border border-fuchsia-500/20">
+      <p className="text-center text-sm font-medium leading-relaxed">
+        <span className="inline-block mr-1 animate-pulse">💻</span>
+        <span className="text-white">Code</span>
+        <span className="text-gray-400 mx-2">•</span>
+        <span className="inline-block mr-1">☕</span>
+        <span className="text-white">Coffee</span>
+        <span className="text-gray-400 mx-2">•</span>
+        <span className="inline-block mr-1">🔍</span>
+        <span className="text-white">Curiosity</span>
+        <span className="text-gray-400 mx-2">•</span>
+        <span
+          className="inline-block mr-1 animate-spin"
+          style={{ animationDuration: "3s" }}
+        >
+          🔁
+        </span>
+        <span className="text-white">Repeat</span>
+      </p>
+      <p className="text-center text-xs text-gray-400 mt-1 italic">
+        "Building the future, one commit at a time"
+      </p>
+    </div>
+
     <div className="space-y-2 text-xs mb-4">
       <div className="flex items-center text-gray-300">
         <Briefcase size={12} className="mr-2 text-gray-400" />
@@ -103,7 +125,7 @@ const ProfileCard = ({ githubData }) => (
 
     <Link
       to="/logs"
-      className="block w-full text-center bg-fuchsia-500/80 hover:bg-fuchsia-500 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm"
+      className="block w-full text-center bg-fuchsia-500/80 hover:bg-fuchsia-500 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm mt-auto"
     >
       View DevLogs
     </Link>
@@ -116,36 +138,77 @@ const QuickStatsCard = ({ logs, githubData }) => {
   const recentLogs = logs?.slice(0, 3) || [];
 
   return (
-    <div className={`${cardBaseStyle} h-fit`}>
-      <h3 className="text-sm font-bold text-white mb-3 flex items-center">
-        <TrendingUp size={16} className="mr-2 text-purple-400" />
+    <div className={`${cardBaseStyle} h-full flex flex-col`}>
+      <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+        <TrendingUp size={18} className="mr-2 text-purple-400" />
         Quick Stats
       </h3>
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-gray-900/50 p-3 rounded-lg text-center">
-          <Hash className="w-5 h-5 mx-auto mb-1 text-purple-400" />
-          <p className="text-xl font-bold text-white">{totalLogs}</p>
-          <p className="text-gray-400 text-xs">Dev Logs</p>
+
+      {/* Main Stats */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-4 rounded-xl text-center border border-purple-500/20 hover:border-purple-400/30 transition-all duration-300">
+          <Hash className="w-6 h-6 mx-auto mb-2 text-purple-400" />
+          <p className="text-2xl font-bold text-white mb-1">{totalLogs}</p>
+          <p className="text-purple-300 text-xs font-medium">Dev Logs</p>
         </div>
-        <div className="bg-gray-900/50 p-3 rounded-lg text-center">
-          <Github className="w-5 h-5 mx-auto mb-1 text-green-400" />
-          <p className="text-xl font-bold text-white">{totalCommits}</p>
-          <p className="text-gray-400 text-xs">Commits</p>
+        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 p-4 rounded-xl text-center border border-green-500/20 hover:border-green-400/30 transition-all duration-300">
+          <Github className="w-6 h-6 mx-auto mb-2 text-green-400" />
+          <p className="text-2xl font-bold text-white mb-1">{totalCommits}</p>
+          <p className="text-green-300 text-xs font-medium">Commits</p>
         </div>
       </div>
-      <div className="text-xs">
-        <p className="text-gray-400 mb-2 font-medium">Recent Activity:</p>
+
+      {/* Recent Activity */}
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-white text-sm font-semibold flex items-center">
+            <Clock size={14} className="mr-2 text-purple-400" />
+            Recent Activity
+          </p>
+          {recentLogs.length > 0 && (
+            <span className="text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded-full">
+              {recentLogs.length} logs
+            </span>
+          )}
+        </div>
+
         {recentLogs.length > 0 ? (
-          <div className="space-y-1">
+          <div className="space-y-2">
             {recentLogs.map((log, index) => (
-              <div key={index} className="flex items-center text-gray-300">
-                <Clock size={10} className="mr-2 text-gray-500" />
-                <span className="truncate">{log.title}</span>
+              <div
+                key={log._id || index}
+                className="p-3 bg-gray-900/40 rounded-lg border border-gray-700/30 hover:border-gray-600/50 transition-all duration-200"
+              >
+                <p
+                  className="text-gray-300 text-xs leading-relaxed mb-1"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {log.entry || "No content"}
+                </p>
+                <p className="text-gray-500 text-xs">
+                  {new Date(log.date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No recent logs</p>
+          <div className="text-center py-6 flex-1 flex flex-col justify-center">
+            <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
+              <Clock size={16} className="text-gray-500" />
+            </div>
+            <p className="text-gray-500 text-sm">No recent logs</p>
+            <p className="text-gray-600 text-xs">
+              Start logging your progress!
+            </p>
+          </div>
         )}
       </div>
     </div>
@@ -416,15 +479,17 @@ function HomePage() {
         </p>
       </header>
 
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Row 1: Profile & Quick Stats */}
-        <div className="md:col-span-1">
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* First Row - Profile and Quick Stats */}
+        <div className="lg:col-span-1">
           <ProfileCard githubData={githubData} />
         </div>
-        <div className="md:col-span-1">
+
+        <div className="md:col-span-1 lg:col-span-1">
           <QuickStatsCard logs={logs} githubData={githubData} />
         </div>
-        <div className="md:col-span-2">
+
+        <div className="md:col-span-2 lg:col-span-1 xl:col-span-2">
           <DetailedStatsCard
             logs={logs}
             githubData={githubData}
@@ -432,20 +497,24 @@ function HomePage() {
           />
         </div>
 
-        <div className="md:col-span-2">
+        {/* Second Row - Activity Charts */}
+        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
           <LogActivityCard logData={logCalendarData} />
         </div>
-        <div className="md:col-span-2">
+
+        <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
           <GithubActivityCard githubData={githubData} />
         </div>
 
-        <div className="md:col-span-2">
+        {/* Third Row - Entry and Tasks */}
+        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
           <QuickAddLogCard
             onAddLog={handleAddLog}
             isLoading={logsStatus === "loading"}
           />
         </div>
-        <div className="md:col-span-2">
+
+        <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
           <CompactTodoCard />
         </div>
       </div>
