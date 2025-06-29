@@ -10,7 +10,15 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? [process.env.FRONTEND_URL, /\.vercel\.app$/]
+      : true,
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -22,6 +30,11 @@ app.use("/api/todos", require("./api/routes/todoRoutes.js"));
 app.use("/api/github", require("./api/routes/githubRoutes"));
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

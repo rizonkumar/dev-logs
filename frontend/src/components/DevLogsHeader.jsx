@@ -12,8 +12,7 @@ function DevLogsHeader() {
         <div className="ml-4">
           <h1 className="text-2xl font-bold text-white">Rizon Kumar Rahi</h1>
           <p className="text-sm text-gray-400">
-            Software Developer<span className="text-teal-400"> . </span>
-            sde<span className="text-teal-400"> . </span>
+            Software Developer<span className="text-teal-400"> | </span>
             Building products
           </p>
         </div>
