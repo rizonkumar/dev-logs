@@ -80,6 +80,40 @@ const DetailedTodoModal = ({ isOpen, onClose }) => {
     return true;
   });
 
+  const groupedTodos = filteredTodos.reduce((acc, todo) => {
+    if (!todo.createdAt) return acc;
+    const date = new Date(todo.createdAt).toLocaleDateString("en-CA");
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(todo);
+    return acc;
+  }, {});
+
+  const sortedDates = Object.keys(groupedTodos).sort(
+    (a, b) => new Date(b) - new Date(a)
+  );
+
+  const formatDateLabel = (dateStr) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // Adjust for timezone differences by comparing date strings
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    }
+    if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    }
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+  };
+
   const stats = {
     total: todos.length,
     completed: todos.filter((todo) => todo.isCompleted).length,
@@ -257,108 +291,119 @@ const DetailedTodoModal = ({ isOpen, onClose }) => {
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {filteredTodos.map((todo) => (
-                  <div
-                    key={todo._id}
-                    className={`bg-gray-800/40 rounded-xl p-4 border transition-all duration-300 hover:shadow-lg ${
-                      todo.isCompleted
-                        ? "border-green-500/20 bg-green-500/5"
-                        : "border-gray-700/30 hover:border-gray-600/50"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <button
-                        onClick={() => handleToggleComplete(todo)}
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
-                          todo.isCompleted
-                            ? "border-green-500 bg-green-500 text-white"
-                            : "border-gray-500 hover:border-green-400"
-                        }`}
-                      >
-                        {todo.isCompleted ? (
-                          <CheckCircle2 className="w-4 h-4" />
-                        ) : (
-                          <Circle className="w-4 h-4 opacity-0 group-hover:opacity-100" />
-                        )}
-                      </button>
+              <div className="space-y-6">
+                {sortedDates.map((date) => (
+                  <div key={date}>
+                    <h3 className="text-gray-400 font-semibold mb-3 text-sm sticky top-0 bg-gradient-to-b from-gray-800/95 via-gray-800/90 to-transparent py-2 -mx-6 px-6">
+                      {formatDateLabel(date)}
+                    </h3>
+                    <div className="space-y-3">
+                      {groupedTodos[date].map((todo) => (
+                        <div
+                          key={todo._id}
+                          className={`bg-gray-800/40 rounded-xl p-4 border transition-all duration-300 hover:shadow-lg ${
+                            todo.isCompleted
+                              ? "border-green-500/20 bg-green-500/5"
+                              : "border-gray-700/30 hover:border-gray-600/50"
+                          }`}
+                        >
+                          <div className="flex items-center space-x-4">
+                            <button
+                              onClick={() => handleToggleComplete(todo)}
+                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+                                todo.isCompleted
+                                  ? "border-green-500 bg-green-500 text-white"
+                                  : "border-gray-500 hover:border-green-400"
+                              }`}
+                            >
+                              {todo.isCompleted ? (
+                                <CheckCircle2 className="w-4 h-4" />
+                              ) : (
+                                <Circle className="w-4 h-4 opacity-0 group-hover:opacity-100" />
+                              )}
+                            </button>
 
-                      <div className="flex-1">
-                        {editingId === todo._id ? (
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              value={editingText}
-                              onChange={(e) => setEditingText(e.target.value)}
-                              className="flex-1 bg-gray-900/70 px-3 py-2 rounded-lg border border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 text-gray-300"
-                              autoFocus
-                            />
-                            <button
-                              onClick={handleSaveEdit}
-                              className="px-3 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors"
-                            >
-                              <Save className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => setEditingId(null)}
-                              className="px-3 py-2 bg-gray-500/20 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-colors"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <p
-                                className={`transition-all duration-300 ${
-                                  todo.isCompleted
-                                    ? "text-gray-500 line-through"
-                                    : "text-gray-200"
-                                }`}
-                              >
-                                {todo.task}
-                              </p>
-                              {todo.createdAt && (
-                                <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                                  <div className="flex items-center space-x-1">
-                                    <Calendar className="w-3 h-3" />
-                                    <span>
-                                      {new Date(
-                                        todo.createdAt
-                                      ).toLocaleDateString()}
-                                    </span>
+                              {editingId === todo._id ? (
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={editingText}
+                                    onChange={(e) =>
+                                      setEditingText(e.target.value)
+                                    }
+                                    className="flex-1 bg-gray-900/70 px-3 py-2 rounded-lg border border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 text-gray-300"
+                                    autoFocus
+                                  />
+                                  <button
+                                    onClick={handleSaveEdit}
+                                    className="px-3 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors"
+                                  >
+                                    <Save className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => setEditingId(null)}
+                                    className="px-3 py-2 bg-gray-500/20 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-colors"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <p
+                                      className={`transition-all duration-300 ${
+                                        todo.isCompleted
+                                          ? "text-gray-500 line-through"
+                                          : "text-gray-200"
+                                      }`}
+                                    >
+                                      {todo.task}
+                                    </p>
+                                    {todo.createdAt && (
+                                      <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                        <div className="flex items-center space-x-1">
+                                          <Calendar className="w-3 h-3" />
+                                          <span>
+                                            {new Date(
+                                              todo.createdAt
+                                            ).toLocaleDateString()}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center space-x-1">
+                                          <Clock className="w-3 h-3" />
+                                          <span>
+                                            {new Date(
+                                              todo.createdAt
+                                            ).toLocaleTimeString([], {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="flex items-center space-x-1">
-                                    <Clock className="w-3 h-3" />
-                                    <span>
-                                      {new Date(
-                                        todo.createdAt
-                                      ).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })}
-                                    </span>
+                                  <div className="flex items-center space-x-2 ml-4">
+                                    <button
+                                      onClick={() => handleEdit(todo)}
+                                      className="p-2 text-gray-500 hover:text-blue-400 rounded-lg hover:bg-blue-500/10 transition-all duration-300"
+                                    >
+                                      <Edit3 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDelete(todo._id)}
+                                      className="p-2 text-gray-500 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-all duration-300"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
                                   </div>
                                 </div>
                               )}
                             </div>
-                            <div className="flex items-center space-x-2 ml-4">
-                              <button
-                                onClick={() => handleEdit(todo)}
-                                className="p-2 text-gray-500 hover:text-blue-400 rounded-lg hover:bg-blue-500/10 transition-all duration-300"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(todo._id)}
-                                className="p-2 text-gray-500 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-all duration-300"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}
