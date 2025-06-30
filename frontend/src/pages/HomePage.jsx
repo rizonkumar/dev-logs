@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLogs, createLog, fetchLogStats } from "../app/features/logsSlice";
 import { fetchTodos } from "../app/features/todosSlice";
@@ -18,10 +18,13 @@ import {
   Send,
   ExternalLink,
   Globe,
+  Maximize2,
+  ArrowUpRight,
 } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import TodoList from "../components/TodoList.jsx";
 import Loader from "../components/Loader";
+import DetailedTodoModal from "../components/DetailedTodoModal";
 
 const transformDataForCalendar = (logs) => {
   if (!logs || logs.length === 0) return [];
@@ -60,7 +63,6 @@ const ProfileCard = ({ githubData }) => (
       </div>
     </div>
 
-    {/* Enhanced Bio Section */}
     <div className="mb-4 p-3 bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-blue-500/10 rounded-lg border border-fuchsia-500/20">
       <p className="text-center text-sm font-medium leading-relaxed">
         <span className="inline-block mr-1 animate-pulse">💻</span>
@@ -144,7 +146,6 @@ const QuickStatsCard = ({ logs, githubData }) => {
         Quick Stats
       </h3>
 
-      {/* Main Stats */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-4 rounded-xl text-center border border-purple-500/20 hover:border-purple-400/30 transition-all duration-300">
           <Hash className="w-6 h-6 mx-auto mb-2 text-purple-400" />
@@ -158,7 +159,6 @@ const QuickStatsCard = ({ logs, githubData }) => {
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className="flex-1">
         <div className="flex items-center justify-between mb-3">
           <p className="text-white text-sm font-semibold flex items-center">
@@ -412,19 +412,33 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
   );
 };
 
-const CompactTodoCard = () => (
+const CompactTodoCard = ({ onOpenTodoModal }) => (
   <div className={`${cardBaseStyle}`}>
-    <h3 className="text-sm font-bold text-white mb-3 flex items-center">
-      <Calendar size={16} className="mr-2 text-blue-400" />
-      Today's Tasks
-    </h3>
+    <div className="flex items-center justify-between mb-3">
+      <h3 className="text-sm font-bold text-white flex items-center">
+        <Calendar size={16} className="mr-2 text-blue-400" />
+        Today's Tasks
+      </h3>
+      <button
+        onClick={onOpenTodoModal}
+        className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 
+                   border border-blue-500/30 hover:border-blue-400/50 rounded-lg p-2 
+                   transition-all duration-300 flex items-center justify-center group"
+        title="View detailed todo manager"
+      >
+        <Maximize2
+          size={14}
+          className="group-hover:scale-110 transition-transform duration-200"
+        />
+      </button>
+    </div>
     <div className="max-h-40 overflow-y-auto">
       <TodoList compact={true} />
     </div>
   </div>
 );
 
-const QuickAddLogCard = ({ onAddLog, isLoading }) => {
+const QuickAddLogCard = ({ onAddLog, isLoading, onNavigateToLogs }) => {
   const [newEntry, setNewEntry] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -451,14 +465,28 @@ const QuickAddLogCard = ({ onAddLog, isLoading }) => {
           <Plus size={16} className="mr-2 text-emerald-400" />
           Quick Log Entry
         </h3>
-        {!isExpanded && (
+        <div className="flex items-center space-x-2">
           <button
-            onClick={() => setIsExpanded(true)}
-            className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg p-2 transition-all duration-300"
+            onClick={onNavigateToLogs}
+            className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 hover:text-emerald-300 
+                       border border-emerald-500/30 hover:border-emerald-400/50 rounded-lg p-2 
+                       transition-all duration-300 flex items-center justify-center group"
+            title="View all dev logs"
           >
-            <Plus size={14} />
+            <ArrowUpRight
+              size={14}
+              className="group-hover:scale-110 transition-transform duration-200"
+            />
           </button>
-        )}
+          {!isExpanded && (
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg p-2 transition-all duration-300"
+            >
+              <Plus size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       {isExpanded ? (
@@ -534,6 +562,9 @@ const QuickAddLogCard = ({ onAddLog, isLoading }) => {
 
 function HomePage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [isTodoModalOpen, setIsTodoModalOpen] = useState(false);
+
   const {
     logs,
     status: logsStatus,
@@ -554,6 +585,18 @@ function HomePage() {
 
   const handleAddLog = (logData) => {
     dispatch(createLog(logData));
+  };
+
+  const handleNavigateToLogs = () => {
+    navigate("/logs");
+  };
+
+  const handleOpenTodoModal = () => {
+    setIsTodoModalOpen(true);
+  };
+
+  const handleCloseTodoModal = () => {
+    setIsTodoModalOpen(false);
   };
 
   const logCalendarData = transformDataForCalendar(logs);
@@ -605,11 +648,12 @@ function HomePage() {
           <QuickAddLogCard
             onAddLog={handleAddLog}
             isLoading={logsStatus === "loading"}
+            onNavigateToLogs={handleNavigateToLogs}
           />
         </div>
 
         <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
-          <CompactTodoCard />
+          <CompactTodoCard onOpenTodoModal={handleOpenTodoModal} />
         </div>
 
         <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
@@ -620,6 +664,12 @@ function HomePage() {
           <GithubActivityCard githubData={githubData} />
         </div>
       </div>
+
+      {/* Todo Modal */}
+      <DetailedTodoModal
+        isOpen={isTodoModalOpen}
+        onClose={handleCloseTodoModal}
+      />
     </div>
   );
 }
