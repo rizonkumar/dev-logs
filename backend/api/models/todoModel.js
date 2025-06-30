@@ -7,6 +7,12 @@ const todoSchema = new mongoose.Schema(
       required: [true, "Please add a task"],
       trim: true,
     },
+    status: {
+      type: String,
+      enum: ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"],
+      default: "TODO",
+      required: true,
+    },
     isCompleted: {
       type: Boolean,
       required: true,
