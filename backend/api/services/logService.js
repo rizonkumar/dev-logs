@@ -6,7 +6,6 @@ const getAllLogs = async () => {
 };
 
 const createNewLog = async (logData) => {
-  console.log("Log Data", logData);
   const log = await Log.create({
     entry: logData.entry,
     date: logData.date,
@@ -67,10 +66,6 @@ const getLogStats = async () => {
   const mostActiveDay = Object.keys(dayStats).reduce((a, b) =>
     dayStats[a] > dayStats[b] ? a : b
   );
-
-  console.log("Most Active Day", mostActiveDay);
-  console.log("Day Abbreviations", dayAbbreviations);
-  console.log("Day Stats", dayStats);
 
   return {
     totalLogs: logs.length,
