@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import DevLogsPage from "./pages/DevLogsPage";
-import EnhancedDevBoard from "./pages/EnhancedDevBoard";
 import "./App.css";
+import DevBoardPage from "./pages/DevBoardPage";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/logs" element={<DevLogsPage />} />
-          <Route path="/board" element={<EnhancedDevBoard />} />
+          <Route path="/board" element={<DevBoardPage />} />
         </Routes>
       </Router>
     </div>
