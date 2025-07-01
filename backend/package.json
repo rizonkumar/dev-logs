@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "start:dev": "nodemon server.js",
-    "build": "echo 'No build step required for backend'"
+    "build": "mkdir -p dist && cp -r api config server.js package.json dist/"
   },
   "keywords": [],
   "author": "",
