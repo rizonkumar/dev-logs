@@ -11,7 +11,6 @@ import {
   GripHorizontal,
   Search,
   Plus,
-  Filter,
   MoreHorizontal,
   Calendar,
 } from "lucide-react";
@@ -19,28 +18,28 @@ import { useNavigate } from "react-router-dom";
 
 const BOARD_THEME = {
   TODO: {
-    bg: "from-blue-500/5 to-blue-600/5",
+    bg: "bg-gradient-to-br from-blue-500/5 via-blue-500/2 to-transparent",
     hoverBg: "hover:bg-blue-500/10",
     border: "border-blue-500/20",
     text: "text-blue-400",
     icon: Circle,
   },
   IN_PROGRESS: {
-    bg: "from-amber-500/5 to-amber-600/5",
+    bg: "bg-gradient-to-br from-amber-500/5 via-amber-500/2 to-transparent",
     hoverBg: "hover:bg-amber-500/10",
     border: "border-amber-500/20",
     text: "text-amber-400",
     icon: Clock,
   },
   IN_REVIEW: {
-    bg: "from-purple-500/5 to-purple-600/5",
+    bg: "bg-gradient-to-br from-purple-500/5 via-purple-500/2 to-transparent",
     hoverBg: "hover:bg-purple-500/10",
     border: "border-purple-500/20",
     text: "text-purple-400",
     icon: AlertCircle,
   },
   DONE: {
-    bg: "from-emerald-500/5 to-emerald-600/5",
+    bg: "bg-gradient-to-br from-emerald-500/5 via-emerald-500/2 to-transparent",
     hoverBg: "hover:bg-emerald-500/10",
     border: "border-emerald-500/20",
     text: "text-emerald-400",
@@ -180,14 +179,14 @@ const EnhancedDevBoard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-[#0A0F1C]">
       {/* Header */}
-      <div className="bg-gradient-to-b from-gray-800/50 via-gray-800/25 to-transparent backdrop-blur-sm sticky top-0 z-10 border-b border-gray-700/50">
+      <div className="bg-gradient-to-b from-[#151B2E]/90 via-[#151B2E]/50 to-transparent backdrop-blur-xl sticky top-0 z-10 border-b border-[#1F2B4E]">
         <div className="max-w-[1800px] mx-auto px-6 py-4">
           <div className="flex items-center gap-6">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg border border-gray-600 hover:border-gray-500"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-200 bg-[#1F2B4E]/50 hover:bg-[#2A3655] px-4 py-2 rounded-lg border border-[#2A3655] hover:border-[#3A476E]"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back</span>
@@ -195,25 +194,22 @@ const EnhancedDevBoard = () => {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-white flex items-center gap-3">
                 Development Board
-                <span className="text-sm font-normal bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">
+                <span className="text-sm font-medium bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20">
                   {totalTasks} tasks
                 </span>
               </h1>
             </div>
             <div className="flex items-center gap-3">
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="text"
                   placeholder="Search tasks..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 pl-10 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+                  className="w-64 bg-[#1F2B4E]/30 border border-[#2A3655] rounded-lg px-4 py-2 pl-10 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200"
                 />
-                <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <Search className="w-4 h-4 text-gray-500 group-hover:text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors" />
               </div>
-              <button className="p-2 text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
-                <Filter className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>
@@ -231,9 +227,9 @@ const EnhancedDevBoard = () => {
               return (
                 <div
                   key={columnId}
-                  className="flex flex-col bg-gray-800/50 rounded-xl border border-gray-700/50"
+                  className={`flex flex-col bg-[#151B2E]/50 rounded-xl border border-[#1F2B4E] backdrop-blur-sm transition-all duration-200 group ${theme.bg}`}
                 >
-                  <div className="p-3 flex items-center justify-between border-b border-gray-700/50">
+                  <div className="p-4 flex items-center justify-between border-b border-[#1F2B4E]">
                     <div className="flex items-center gap-2">
                       {columnId === "TODO" && theme && (
                         <Circle className={`w-4 h-4 ${theme.text}`} />
@@ -247,14 +243,16 @@ const EnhancedDevBoard = () => {
                       {columnId === "DONE" && theme && (
                         <CheckCircle className={`w-4 h-4 ${theme.text}`} />
                       )}
-                      <h3 className="font-medium text-white">
+                      <h3 className="font-medium text-white flex items-center gap-2">
                         {getColumnTitle(columnId)}
-                        <span className="ml-2 text-sm font-normal text-gray-400">
+                        <span
+                          className={`text-sm font-normal ${theme.text} bg-[#0A0F1C]/80 px-2 py-0.5 rounded-md border ${theme.border}`}
+                        >
                           {columns[columnId].length}
                         </span>
                       </h3>
                     </div>
-                    <button className="p-1 text-gray-400 hover:text-white rounded">
+                    <button className="p-1 text-gray-400 hover:text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
                   </div>
@@ -264,8 +262,8 @@ const EnhancedDevBoard = () => {
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`flex-1 p-3 space-y-3 min-h-[150px] ${
-                          snapshot.isDraggingOver ? "bg-gray-800/50" : ""
+                        className={`flex-1 p-4 space-y-3 min-h-[200px] transition-colors duration-200 relative ${
+                          snapshot.isDraggingOver ? "bg-[#1F2B4E]/30" : ""
                         }`}
                       >
                         {columns[columnId].map((todo, index) => (
@@ -278,11 +276,17 @@ const EnhancedDevBoard = () => {
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                className={`group bg-gray-900 rounded-lg border border-gray-700/50 ${
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  position: snapshot.isDragging
+                                    ? "absolute"
+                                    : "relative",
+                                }}
+                                className={`group bg-[#1A2236] rounded-lg border border-[#2A3655] hover:border-[#3A476E] ${
                                   theme.hoverBg
                                 } transition-all duration-200 ${
                                   snapshot.isDragging
-                                    ? "shadow-lg ring-2 ring-blue-500/50 rotate-2"
+                                    ? "shadow-lg shadow-blue-500/10 ring-1 ring-blue-500/20 rotate-2 scale-105 z-50"
                                     : ""
                                 }`}
                               >
@@ -290,7 +294,7 @@ const EnhancedDevBoard = () => {
                                   <div className="flex items-start gap-2">
                                     <div
                                       {...provided.dragHandleProps}
-                                      className="mt-1 p-1 rounded hover:bg-gray-800 cursor-grab active:cursor-grabbing"
+                                      className="mt-1 p-1 rounded hover:bg-[#2A3655] cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
                                       <GripHorizontal className="w-4 h-4 text-gray-500" />
                                     </div>
@@ -321,11 +325,15 @@ const EnhancedDevBoard = () => {
                         {provided.placeholder}
 
                         {columnId === "TODO" && (
-                          <div>
+                          <div
+                            className={
+                              columns[columnId].length === 0 ? "" : "mt-3"
+                            }
+                          >
                             {showAddCard ? (
                               <form
                                 onSubmit={handleAddTask}
-                                className="bg-gray-900 rounded-lg border border-gray-700/50 p-3"
+                                className="bg-[#1A2236] rounded-lg border border-[#2A3655] p-3"
                               >
                                 <textarea
                                   value={newTaskText}
@@ -344,14 +352,14 @@ const EnhancedDevBoard = () => {
                                       setShowAddCard(false);
                                       setNewTaskText("");
                                     }}
-                                    className="px-3 py-1 text-sm text-gray-400 hover:text-white"
+                                    className="px-3 py-1.5 text-sm text-gray-400 hover:text-white transition-colors"
                                   >
                                     Cancel
                                   </button>
                                   <button
                                     type="submit"
                                     disabled={!newTaskText.trim()}
-                                    className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-3 py-1.5 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                   >
                                     Add
                                   </button>
@@ -360,7 +368,7 @@ const EnhancedDevBoard = () => {
                             ) : (
                               <button
                                 onClick={() => setShowAddCard(true)}
-                                className="w-full p-2 flex items-center gap-2 text-gray-400 hover:text-white bg-gray-900/50 hover:bg-gray-900 rounded-lg border border-dashed border-gray-700 hover:border-gray-600 transition-colors"
+                                className="w-full p-2 flex items-center gap-2 text-gray-400 hover:text-white bg-[#1A2236]/50 hover:bg-[#1A2236] rounded-lg border border-dashed border-[#2A3655] hover:border-[#3A476E] transition-all duration-200"
                               >
                                 <Plus className="w-4 h-4" />
                                 <span>Add task</span>
