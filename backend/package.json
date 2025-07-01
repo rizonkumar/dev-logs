@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "start:dev": "nodemon server.js",
-    "build": "mkdir -p dist && cp -r api config server.js package.json dist/"
+    "start:dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
