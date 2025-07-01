@@ -72,11 +72,8 @@ const EnhancedDevBoard = () => {
       todo.task.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    console.log("Filtered todos:", filteredTodos);
-
     const newColumns = filteredTodos.reduce(
       (acc, todo) => {
-        // Normalize the status to ensure it's one of our valid statuses
         const normalizedStatus = [
           "TODO",
           "IN_PROGRESS",
@@ -100,7 +97,6 @@ const EnhancedDevBoard = () => {
       }
     );
 
-    console.log("New columns:", newColumns);
     setColumns(newColumns);
   }, [todos, searchTerm]);
 
@@ -119,7 +115,6 @@ const EnhancedDevBoard = () => {
     const todo = todos.find((t) => t._id === draggableId);
     if (!todo) return;
 
-    // Update the todo in the backend
     dispatch(
       updateTodo({
         todoId: draggableId,
@@ -129,7 +124,6 @@ const EnhancedDevBoard = () => {
         },
       })
     ).then(() => {
-      // Refetch todos to ensure sync
       dispatch(fetchTodos());
     });
   };
