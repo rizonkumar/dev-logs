@@ -7,18 +7,19 @@ const getTodos = asyncHandler(async (req, res) => {
 });
 
 const createTodo = asyncHandler(async (req, res) => {
-  const { task } = req.body;
-  const newTodo = await todoService.createNewTodo({ task });
+  const { task, status } = req.body;
+  const newTodo = await todoService.createNewTodo({ task, status });
   res.status(201).json(newTodo);
 });
 
 const updateTodo = asyncHandler(async (req, res) => {
   const todoId = req.params.id;
-  const { task, isCompleted } = req.body;
+  const { task, isCompleted, status } = req.body;
 
   const updateData = {};
   if (task !== undefined) updateData.task = task;
   if (isCompleted !== undefined) updateData.isCompleted = isCompleted;
+  if (status !== undefined) updateData.status = status;
 
   const updatedTodo = await todoService.updateTodoById(todoId, updateData);
 
