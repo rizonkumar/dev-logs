@@ -43,6 +43,8 @@ function DevLogsPage() {
   const [viewMode, setViewMode] = useState("timeline");
   const [selectedDate, setSelectedDate] = useState(null);
 
+  const [selectedCategory, setSelectedCategory] = useState("Work");
+  console.log("selectedCategory", selectedCategory);
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchLogs());
@@ -56,6 +58,7 @@ function DevLogsPage() {
     const logData = {
       date: selectedDate || getTodayDateString(),
       entry: newEntry,
+      category: selectedCategory,
     };
 
     try {
@@ -238,6 +241,8 @@ function DevLogsPage() {
           isLoading={status === "loading"}
           selectedDate={selectedDate}
           error={error}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
         />
 
         {content}
