@@ -1,7 +1,11 @@
 const Log = require("../models/logModel");
 
-const getAllLogs = async () => {
-  const logs = await Log.find({}).sort({ date: -1 });
+const getAllLogs = async (filters = {}) => {
+  const query = {};
+  if (filters.category) {
+    query.category = filters.category;
+  }
+  const logs = await Log.find(query).sort({ date: -1 });
   return logs;
 };
 
@@ -9,6 +13,7 @@ const createNewLog = async (logData) => {
   const log = await Log.create({
     entry: logData.entry,
     date: logData.date,
+    category: logData.category,
   });
   return log;
 };

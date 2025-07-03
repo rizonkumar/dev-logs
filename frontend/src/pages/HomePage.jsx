@@ -380,9 +380,9 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
             Recent Achievements
           </p>
           <div className="flex space-x-1">
-            {thisWeekLogs >= 5 && <span className="text-xs">🔥</span>}
-            {currentStreak >= 3 && <span className="text-xs">⚡</span>}
-            {(logs?.length || 0) >= 10 && <span className="text-xs">🏆</span>}
+            {thisWeekLogs >= 5 && <span className="text-xl">🔥</span>}
+            {currentStreak >= 3 && <span className="text-xl">⚡</span>}
+            {(logs?.length || 0) >= 10 && <span className="text-xl">🏆</span>}
           </div>
         </div>
         <div className="flex flex-wrap gap-1">

@@ -2,12 +2,45 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { deleteLog, updateLog } from "../app/features/logsSlice";
 import ConfirmationModal from "./ConfirmationModal";
-import { Clock, Type, Hash, Edit, Trash2, Save, X } from "lucide-react";
+import {
+  Clock,
+  Type,
+  Hash,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Briefcase,
+  User,
+  MoreHorizontal,
+} from "lucide-react";
+
+const CATEGORIES = [
+  {
+    id: "Work",
+    icon: Briefcase,
+    color: "text-blue-400 bg-blue-400/10 border-blue-400/30",
+    hoverColor: "hover:text-blue-300 hover:border-blue-400/50",
+  },
+  {
+    id: "Personal",
+    icon: User,
+    color: "text-purple-400 bg-purple-400/10 border-purple-400/30",
+    hoverColor: "hover:text-purple-300 hover:border-purple-400/50",
+  },
+  {
+    id: "Others",
+    icon: MoreHorizontal,
+    color: "text-gray-400 bg-gray-400/10 border-gray-400/30",
+    hoverColor: "hover:text-gray-300 hover:border-gray-400/50",
+  },
+];
 
 const TimelineLogEntry = ({ log, index, totalLogs }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(log.entry);
+  const [editCategory, setEditCategory] = useState(log.category || "Work");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDeleteClick = () => {
@@ -21,7 +54,15 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
 
   const handleUpdate = () => {
     if (editText.trim() === "") return;
-    dispatch(updateLog({ logId: log._id, updateData: { entry: editText } }));
+    dispatch(
+      updateLog({
+        logId: log._id,
+        updateData: {
+          entry: editText,
+          category: editCategory,
+        },
+      })
+    );
     setIsEditing(false);
   };
 
@@ -48,6 +89,47 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
 
   const wordCount = getWordCount(log.entry);
   const charCount = getCharacterCount(log.entry);
+
+  const CategoryBadge = ({ category, isEditing = false, onSelect = null }) => {
+    const categoryInfo =
+      CATEGORIES.find((c) => c.id === category) || CATEGORIES[2]; // Default to Others
+    const Icon = categoryInfo.icon;
+
+    if (isEditing) {
+      return (
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIES.map((cat) => {
+            const CatIcon = cat.icon;
+            const isSelected = category === cat.id;
+            return (
+              <div
+                key={cat.id}
+                onClick={() => onSelect && onSelect(cat.id)}
+                className={`cursor-pointer flex items-center space-x-2 px-3 py-1 rounded-lg border transition-all duration-300
+                          ${
+                            isSelected
+                              ? `${cat.color} shadow-lg scale-105`
+                              : `text-gray-400 border-gray-600/50 ${cat.hoverColor}`
+                          }`}
+              >
+                <CatIcon size={14} />
+                <span>{cat.id}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    return (
+      <span
+        className={`flex items-center space-x-2 px-3 py-1 rounded-lg border ${categoryInfo.color}`}
+      >
+        <Icon size={14} />
+        <span>{category}</span>
+      </span>
+    );
+  };
 
   return (
     <>
@@ -93,6 +175,12 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
               <div className="relative">
                 {isEditing ? (
                   <div className="space-y-4">
+                    <CategoryBadge
+                      category={editCategory}
+                      isEditing={true}
+                      onSelect={setEditCategory}
+                    />
+
                     <div className="relative">
                       <textarea
                         value={editText}
@@ -133,6 +221,9 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                   </div>
                 ) : (
                   <>
+                    <div className="flex items-center justify-between mb-4">
+                      <CategoryBadge category={log.category || "Work"} />
+                    </div>
                     <div className="mb-4">
                       <p className="text-gray-200 leading-relaxed whitespace-pre-wrap text-sm group-hover:text-white transition-colors duration-300">
                         {log.entry}

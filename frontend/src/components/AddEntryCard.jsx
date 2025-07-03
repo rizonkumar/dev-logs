@@ -7,6 +7,9 @@ import {
   Save,
   X,
   AlertTriangle,
+  Briefcase,
+  User,
+  MoreHorizontal,
 } from "lucide-react";
 
 const getTodayDateString = () => {
@@ -14,6 +17,48 @@ const getTodayDateString = () => {
   const offset = today.getTimezoneOffset();
   const todayInTimezone = new Date(today.getTime() - offset * 60 * 1000);
   return todayInTimezone.toISOString().split("T")[0];
+};
+
+const CATEGORIES = [
+  {
+    id: "Work",
+    icon: Briefcase,
+    color: "text-blue-400 bg-blue-400/10 border-blue-400/30",
+    hoverColor: "hover:text-blue-300 hover:border-blue-400/50",
+  },
+  {
+    id: "Personal",
+    icon: User,
+    color: "text-purple-400 bg-purple-400/10 border-purple-400/30",
+    hoverColor: "hover:text-purple-300 hover:border-purple-400/50",
+  },
+  {
+    id: "Others",
+    icon: MoreHorizontal,
+    color: "text-gray-400 bg-gray-400/10 border-gray-400/30",
+    hoverColor: "hover:text-gray-300 hover:border-gray-400/50",
+  },
+];
+
+const CategoryButton = ({ category, isSelected, onClick }) => {
+  const Icon = category.icon;
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all duration-300 cursor-pointer
+                ${
+                  isSelected
+                    ? `${category.color} shadow-lg scale-105`
+                    : `text-gray-400 border-gray-600/50 ${category.hoverColor}`
+                }`}
+    >
+      <Icon size={16} className="flex-shrink-0" />
+      <span className="whitespace-nowrap">{category.id}</span>
+    </div>
+  );
 };
 
 const AddEntryCard = ({
@@ -25,12 +70,16 @@ const AddEntryCard = ({
   isLoading,
   selectedDate,
   error,
+  // Receive state and handler from parent
+  selectedCategory,
+  onCategoryChange,
 }) => {
+  // Local state for category is removed
+
   const handleFormSubmit = (e) => {
+    e.preventDefault();
     if (onSubmit) {
-      onSubmit(e);
-    } else {
-      e.preventDefault();
+      onSubmit(e); // Parent already has the category state
     }
   };
 
@@ -48,6 +97,11 @@ const AddEntryCard = ({
     }
   };
 
+  const handleCategoryClick = (categoryId) => {
+    console.log("Category clicked:", categoryId);
+    onCategoryChange(categoryId);
+  };
+
   return (
     <div className="mb-8 relative overflow-hidden">
       <div
@@ -55,10 +109,11 @@ const AddEntryCard = ({
                    rounded-2xl border border-gray-700/40 shadow-xl 
                    hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-500"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-600/10 via-transparent to-green-600/10 opacity-0 hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-teal-600/10 via-transparent to-green-600/10 opacity-0 hover:opacity-100 transition-opacity duration-500" />
 
         <div className="relative p-6 border-b border-gray-700/30">
           <button
+            type="button"
             onClick={handleToggleClick}
             className="w-full flex items-center justify-between text-left group"
           >
@@ -84,19 +139,18 @@ const AddEntryCard = ({
                 </p>
               </div>
             </div>
-            <div className="flex-shrink-0">
-              {isOpen ? (
-                <ChevronDown
-                  size={24}
-                  className="text-teal-400 transition-transform duration-300 rotate-0"
-                />
-              ) : (
-                <ChevronRight
-                  size={24}
-                  className="text-gray-500 group-hover:text-teal-400 transition-all duration-300"
-                />
-              )}
-            </div>
+
+            {isOpen ? (
+              <ChevronDown
+                size={24}
+                className="text-teal-400 transition-transform duration-300 rotate-0"
+              />
+            ) : (
+              <ChevronRight
+                size={24}
+                className="text-gray-500 group-hover:text-teal-400 transition-all duration-300"
+              />
+            )}
           </button>
         </div>
 
@@ -107,6 +161,17 @@ const AddEntryCard = ({
         >
           <div className="p-6">
             <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div className="flex flex-wrap gap-2 mb-4">
+                {CATEGORIES.map((category) => (
+                  <CategoryButton
+                    key={category.id}
+                    category={category}
+                    isSelected={selectedCategory === category.id} // Use prop for selection
+                    onClick={() => handleCategoryClick(category.id)}
+                  />
+                ))}
+              </div>
+
               <div className="relative">
                 <textarea
                   value={newEntry}
@@ -138,10 +203,7 @@ const AddEntryCard = ({
                   <span>{selectedDate || getTodayDateString()}</span>
                 </div>
 
-                <div
-                  className="flex space-x-3"
-                  style={{ position: "relative", zIndex: 10 }}
-                >
+                <div className="flex space-x-3">
                   <button
                     type="button"
                     onClick={handleCancelClick}
