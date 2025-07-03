@@ -2,13 +2,14 @@ const asyncHandler = require("../middleware/asyncHandler");
 const logService = require("../services/logService");
 
 const getLogs = asyncHandler(async (req, res) => {
-  const logs = await logService.getAllLogs();
+  const { category } = req.query;
+  const logs = await logService.getAllLogs({ category });
   res.status(200).json(logs);
 });
 
 const createLog = asyncHandler(async (req, res) => {
-  const { entry, date } = req.body;
-  const newLog = await logService.createNewLog({ entry, date });
+  const { entry, date, category } = req.body;
+  const newLog = await logService.createNewLog({ entry, date, category });
   res.status(201).json(newLog);
 });
 
@@ -18,6 +19,7 @@ const updateLog = asyncHandler(async (req, res) => {
   const updateData = {};
   if (req.body.entry) updateData.entry = req.body.entry;
   if (req.body.date) updateData.date = req.body.date;
+  if (req.body.category) updateData.category = req.body.category;
 
   if (Object.keys(updateData).length === 0) {
     res.status(400);

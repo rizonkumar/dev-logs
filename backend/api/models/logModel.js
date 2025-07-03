@@ -10,6 +10,12 @@ const logSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Please provide a date for the log entry"],
     },
+    category: {
+      type: String,
+      enum: ["Work", "Personal", "Others"],
+      required: [true, "Please specify a category"],
+      default: "Work",
+    },
   },
   {
     timestamps: true,
