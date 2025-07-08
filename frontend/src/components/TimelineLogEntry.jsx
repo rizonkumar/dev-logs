@@ -2,45 +2,14 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { deleteLog, updateLog } from "../app/features/logsSlice";
 import ConfirmationModal from "./ConfirmationModal";
-import {
-  Clock,
-  Type,
-  Hash,
-  Edit,
-  Trash2,
-  Save,
-  X,
-  Briefcase,
-  User,
-  MoreHorizontal,
-} from "lucide-react";
-
-const CATEGORIES = [
-  {
-    id: "Work",
-    icon: Briefcase,
-    color: "text-blue-400 bg-blue-400/10 border-blue-400/30",
-    hoverColor: "hover:text-blue-300 hover:border-blue-400/50",
-  },
-  {
-    id: "Personal",
-    icon: User,
-    color: "text-purple-400 bg-purple-400/10 border-purple-400/30",
-    hoverColor: "hover:text-purple-300 hover:border-purple-400/50",
-  },
-  {
-    id: "Others",
-    icon: MoreHorizontal,
-    color: "text-gray-400 bg-gray-400/10 border-gray-400/30",
-    hoverColor: "hover:text-gray-300 hover:border-gray-400/50",
-  },
-];
+import TagInput from "./TagInput";
+import { Clock, Type, Hash, Edit, Trash2, Save, X } from "lucide-react";
 
 const TimelineLogEntry = ({ log, index, totalLogs }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(log.entry);
-  const [editCategory, setEditCategory] = useState(log.category || "Work");
+  const [editTags, setEditTags] = useState(log.tags || []);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDeleteClick = () => {
@@ -59,7 +28,7 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
         logId: log._id,
         updateData: {
           entry: editText,
-          category: editCategory,
+          tags: editTags,
         },
       })
     );
@@ -90,44 +59,38 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
   const wordCount = getWordCount(log.entry);
   const charCount = getCharacterCount(log.entry);
 
-  const CategoryBadge = ({ category, isEditing = false, onSelect = null }) => {
-    const categoryInfo =
-      CATEGORIES.find((c) => c.id === category) || CATEGORIES[2]; // Default to Others
-    const Icon = categoryInfo.icon;
+  const TagsDisplay = ({ tags }) => {
+    if (!tags || tags.length === 0) return null;
 
-    if (isEditing) {
+    const getTagColor = (tagName) => {
+      const predefinedTags = {
+        Work: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+        Personal: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+        Learning: "bg-green-500/20 text-green-400 border-green-500/30",
+        "Bug Fix": "bg-red-500/20 text-red-400 border-red-500/30",
+        Feature: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+        Urgent: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+      };
       return (
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => {
-            const CatIcon = cat.icon;
-            const isSelected = category === cat.id;
-            return (
-              <div
-                key={cat.id}
-                onClick={() => onSelect && onSelect(cat.id)}
-                className={`cursor-pointer flex items-center space-x-2 px-3 py-1 rounded-lg border transition-all duration-300
-                          ${
-                            isSelected
-                              ? `${cat.color} shadow-lg scale-105`
-                              : `text-gray-400 border-gray-600/50 ${cat.hoverColor}`
-                          }`}
-              >
-                <CatIcon size={14} />
-                <span>{cat.id}</span>
-              </div>
-            );
-          })}
-        </div>
+        predefinedTags[tagName] ||
+        "bg-gray-500/20 text-gray-400 border-gray-500/30"
       );
-    }
+    };
 
     return (
-      <span
-        className={`flex items-center space-x-2 px-3 py-1 rounded-lg border ${categoryInfo.color}`}
-      >
-        <Icon size={14} />
-        <span>{category}</span>
-      </span>
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <span
+            key={tag}
+            className={`inline-flex items-center space-x-1 px-2 py-1 rounded-lg text-xs border transition-all duration-200 hover:scale-105 ${getTagColor(
+              tag
+            )}`}
+          >
+            <Hash className="w-3 h-3" />
+            <span>{tag}</span>
+          </span>
+        ))}
+      </div>
     );
   };
 
@@ -175,10 +138,10 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
               <div className="relative">
                 {isEditing ? (
                   <div className="space-y-4">
-                    <CategoryBadge
-                      category={editCategory}
-                      isEditing={true}
-                      onSelect={setEditCategory}
+                    <TagInput
+                      selectedTags={editTags}
+                      onTagsChange={setEditTags}
+                      compact={false}
                     />
 
                     <div className="relative">
@@ -222,7 +185,7 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                 ) : (
                   <>
                     <div className="flex items-center justify-between mb-4">
-                      <CategoryBadge category={log.category || "Work"} />
+                      <TagsDisplay tags={log.tags} />
                     </div>
                     <div className="mb-4">
                       <p className="text-gray-200 leading-relaxed whitespace-pre-wrap text-sm group-hover:text-white transition-colors duration-300">

@@ -2,23 +2,36 @@ const Log = require("../models/logModel");
 
 const getAllLogs = async (filters = {}) => {
   const query = {};
-  if (filters.category) {
-    query.category = filters.category;
+  if (filters.tags && filters.tags.length > 0) {
+    query.tags = { $in: filters.tags };
   }
   const logs = await Log.find(query).sort({ date: -1 });
   return logs;
 };
 
 const createNewLog = async (logData) => {
+  const { entry, date, tags = [] } = logData;
+  const cleanedTags = [
+    ...new Set(tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)),
+  ];
+
   const log = await Log.create({
-    entry: logData.entry,
-    date: logData.date,
-    category: logData.category,
+    entry,
+    date,
+    tags: cleanedTags,
   });
   return log;
 };
 
 const updateLogById = async (logId, logData) => {
+  if (logData.tags) {
+    logData.tags = [
+      ...new Set(
+        logData.tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)
+      ),
+    ];
+  }
+
   const updatedLog = await Log.findByIdAndUpdate(logId, logData, {
     new: true,
   });
