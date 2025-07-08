@@ -13,6 +13,7 @@ import {
   Target,
   ListTodo,
   Timer,
+  Hash,
 } from "lucide-react";
 import {
   fetchTodos,
@@ -20,11 +21,13 @@ import {
   updateTodo,
   deleteTodo,
 } from "../app/features/todosSlice";
+import TagInput from "./TagInput";
 
 const DetailedTodoModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { todos, status } = useSelector((state) => state.todos);
   const [newTask, setNewTask] = useState("");
+  const [newTags, setNewTags] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editingText, setEditingText] = useState("");
   const [filter, setFilter] = useState("all");
@@ -39,8 +42,9 @@ const DetailedTodoModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     if (newTask.trim() === "") return;
 
-    await dispatch(createTodo({ task: newTask }));
+    await dispatch(createTodo({ task: newTask, tags: newTags }));
     setNewTask("");
+    setNewTags([]);
   };
 
   const handleToggleComplete = async (todo) => {
@@ -245,6 +249,14 @@ const DetailedTodoModal = ({ isOpen, onClose }) => {
             </form>
           </div>
 
+          <div className="px-6 pb-4">
+            <TagInput
+              selectedTags={newTags}
+              onTagsChange={setNewTags}
+              compact={false}
+            />
+          </div>
+
           <div className="px-6 pt-4 pb-2">
             <div className="flex space-x-1 bg-gray-900/50 rounded-xl p-1 w-fit">
               {[
@@ -360,6 +372,19 @@ const DetailedTodoModal = ({ isOpen, onClose }) => {
                                     >
                                       {todo.task}
                                     </p>
+                                    {todo.tags && todo.tags.length > 0 && (
+                                      <div className="flex flex-wrap gap-2 mt-2">
+                                        {todo.tags.map((tag) => (
+                                          <span
+                                            key={tag}
+                                            className="inline-flex items-center space-x-1 px-2 py-1 rounded-lg text-xs bg-gray-600/30 text-gray-400 border border-gray-600/50"
+                                          >
+                                            <Hash className="w-3 h-3" />
+                                            <span>{tag}</span>
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
                                     {todo.createdAt && (
                                       <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
                                         <div className="flex items-center space-x-1">
