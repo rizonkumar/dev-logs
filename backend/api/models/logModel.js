@@ -10,11 +10,21 @@ const logSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Please provide a date for the log entry"],
     },
-    category: {
-      type: String,
-      enum: ["Work", "Personal", "Others"],
-      required: [true, "Please specify a category"],
-      default: "Work",
+    tags: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: function (v) {
+          return v.every(
+            (tag) =>
+              typeof tag === "string" &&
+              tag.trim().length > 0 &&
+              tag.length <= 30
+          );
+        },
+        message:
+          "Each tag must be a non-empty string with maximum 30 characters",
+      },
     },
   },
   {

@@ -43,8 +43,8 @@ function DevLogsPage() {
   const [viewMode, setViewMode] = useState("timeline");
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const [selectedCategory, setSelectedCategory] = useState("Work");
-  console.log("selectedCategory", selectedCategory);
+  const [selectedTags, setSelectedTags] = useState([]);
+
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchLogs());
@@ -58,12 +58,13 @@ function DevLogsPage() {
     const logData = {
       date: selectedDate || getTodayDateString(),
       entry: newEntry,
-      category: selectedCategory,
+      tags: selectedTags,
     };
 
     try {
       await dispatch(createLog(logData)).unwrap();
       setNewEntry("");
+      setSelectedTags([]);
       setIsFormOpen(false);
     } catch (error) {
       console.error("Failed to create log:", error);
@@ -241,8 +242,8 @@ function DevLogsPage() {
           isLoading={status === "loading"}
           selectedDate={selectedDate}
           error={error}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
         />
 
         {content}
