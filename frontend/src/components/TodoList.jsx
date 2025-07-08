@@ -6,7 +6,8 @@ import {
   updateTodo,
   deleteTodo,
 } from "../app/features/todosSlice";
-import { Plus, Trash2, Edit, Check, X, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit, Check, X, Loader2, Hash } from "lucide-react";
+import TagInput from "./TagInput";
 
 const TodoItem = ({ todo, compact = false }) => {
   const dispatch = useDispatch();
@@ -84,15 +85,30 @@ const TodoItem = ({ todo, compact = false }) => {
                   <Check size={8} className="text-gray-900" />
                 )}
               </div>
-              <span
-                className={`text-xs transition-colors duration-200 ${
-                  todo.isCompleted
-                    ? "text-gray-500 line-through"
-                    : "text-gray-200"
-                }`}
-              >
-                {todo.task}
-              </span>
+              <div className="flex-grow">
+                <span
+                  className={`text-xs transition-colors duration-200 ${
+                    todo.isCompleted
+                      ? "text-gray-500 line-through"
+                      : "text-gray-200"
+                  }`}
+                >
+                  {todo.task}
+                </span>
+                {todo.tags && todo.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {todo.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center space-x-1 px-1 py-0.5 rounded text-xs bg-gray-600/30 text-gray-400 border border-gray-600/50"
+                      >
+                        <Hash className="w-2 h-2" />
+                        <span>{tag}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center space-x-1 ml-1">
               {itemStatus === "loading" ? (
@@ -165,15 +181,30 @@ const TodoItem = ({ todo, compact = false }) => {
                 <Check size={14} className="text-gray-900" />
               )}
             </div>
-            <span
-              className={`transition-colors duration-200 ${
-                todo.isCompleted
-                  ? "text-gray-500 line-through"
-                  : "text-gray-200"
-              }`}
-            >
-              {todo.task}
-            </span>
+            <div className="flex-grow">
+              <span
+                className={`transition-colors duration-200 ${
+                  todo.isCompleted
+                    ? "text-gray-500 line-through"
+                    : "text-gray-200"
+                }`}
+              >
+                {todo.task}
+              </span>
+              {todo.tags && todo.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {todo.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center space-x-1 px-1 py-0.5 rounded text-xs bg-gray-600/30 text-gray-400 border border-gray-600/50"
+                    >
+                      <Hash className="w-2 h-2" />
+                      <span>{tag}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex items-center space-x-1 ml-2">
             {itemStatus === "loading" ? (
@@ -207,6 +238,7 @@ function TodoList({ compact = false }) {
   const dispatch = useDispatch();
   const { todos, status, error } = useSelector((state) => state.todos);
   const [newTask, setNewTask] = useState("");
+  const [newTags, setNewTags] = useState([]);
 
   useEffect(() => {
     if (status === "idle") {
@@ -217,8 +249,9 @@ function TodoList({ compact = false }) {
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (newTask.trim() === "") return;
-    await dispatch(createTodo({ task: newTask }));
+    await dispatch(createTodo({ task: newTask, tags: newTags }));
     setNewTask("");
+    setNewTags([]);
   };
 
   let listContent;
@@ -283,6 +316,13 @@ function TodoList({ compact = false }) {
             <Plus size={14} />
           </button>
         </form>
+        <div className="mb-2 relative">
+          <TagInput
+            selectedTags={newTags}
+            onTagsChange={setNewTags}
+            compact={true}
+          />
+        </div>
         <div className="flex-grow overflow-y-auto">{listContent}</div>
       </div>
     );
@@ -308,6 +348,14 @@ function TodoList({ compact = false }) {
           <Plus size={20} />
         </button>
       </form>
+
+      <div className="mb-4">
+        <TagInput
+          selectedTags={newTags}
+          onTagsChange={setNewTags}
+          compact={false}
+        />
+      </div>
 
       <div className="flex-grow overflow-y-auto pr-2">{listContent}</div>
     </div>
