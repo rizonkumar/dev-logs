@@ -184,7 +184,7 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-4">
                       <TagsDisplay tags={log.tags} />
                     </div>
                     <div className="mb-4">
