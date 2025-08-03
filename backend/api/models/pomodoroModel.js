@@ -6,14 +6,20 @@ const pomodoroSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Todo",
     },
-    status: {
+    sessionType: {
       type: String,
-      enum: ["COMPLETED", "INTERRUPTED"],
+      enum: ["WORK", "BREAK"],
       required: true,
+      default: "WORK",
+    },
+    tag: {
+      type: String,
+      trim: true,
     },
     duration: {
       type: Number,
       required: true,
+      default: 25,
     },
     startTime: {
       type: Date,
@@ -25,6 +31,4 @@ const pomodoroSchema = new mongoose.Schema(
   }
 );
 
-const Pomodoro = mongoose.model("Pomodoro", pomodoroSchema);
-
-module.exports = Pomodoro;
+module.exports = mongoose.model("Pomodoro", pomodoroSchema);

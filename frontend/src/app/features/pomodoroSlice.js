@@ -4,11 +4,10 @@ import pomodoroService from "../../services/pomodoroService";
 const initialState = {
   workMinutes: 25,
   breakMinutes: 5,
-
   sessionType: "WORK",
   timeRemaining: 25 * 60,
   isRunning: false,
-
+  currentTag: null,
   stats: { sessionsToday: 0 },
   status: "idle",
   error: null,
@@ -64,6 +63,9 @@ const pomodoroSlice = createSlice({
         action.payload === "WORK"
           ? state.workMinutes * 60
           : state.breakMinutes * 60;
+      if (action.payload === "WORK") {
+        state.currentTag = null;
+      }
     },
     resetTimer: (state) => {
       state.isRunning = false;
@@ -71,6 +73,9 @@ const pomodoroSlice = createSlice({
         state.sessionType === "WORK"
           ? state.workMinutes * 60
           : state.breakMinutes * 60;
+    },
+    setTag: (state, action) => {
+      state.currentTag = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -84,7 +89,13 @@ const pomodoroSlice = createSlice({
   },
 });
 
-export const { startTimer, pauseTimer, tick, setSessionType, resetTimer } =
-  pomodoroSlice.actions;
+export const {
+  startTimer,
+  pauseTimer,
+  tick,
+  setSessionType,
+  resetTimer,
+  setTag,
+} = pomodoroSlice.actions;
 
 export default pomodoroSlice.reducer;
