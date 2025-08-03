@@ -21,6 +21,8 @@ export const API_ENDPOINTS = {
   LOGS: `${API_BASE_URL}/logs/`,
   TODOS: `${API_BASE_URL}/todos/`,
   GITHUB: `${API_BASE_URL}/github/`,
+  POMODOROS: `${API_BASE_URL}/pomodoros/`,
+  REVIEWS: `${API_BASE_URL}/reviews/`,
 };
 
 export default API_BASE_URL;
