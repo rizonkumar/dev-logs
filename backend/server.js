@@ -28,6 +28,7 @@ app.get("/", (req, res) => {
 app.use("/api/logs", require("./api/routes/logRoutes"));
 app.use("/api/todos", require("./api/routes/todoRoutes.js"));
 app.use("/api/github", require("./api/routes/githubRoutes"));
+app.use("/api/pomodoros", require("./api/routes/pomodoroRoutes"));
 
 const PORT = process.env.PORT || 5001;
 

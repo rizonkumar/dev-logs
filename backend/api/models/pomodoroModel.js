@@ -8,7 +8,7 @@ const pomodoroSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["COMPLETED", "INTERRUPTED", "SKIPPED"],
+      enum: ["COMPLETED", "INTERRUPTED"],
       required: true,
     },
     duration: {
