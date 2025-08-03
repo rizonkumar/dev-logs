@@ -44,9 +44,20 @@ const deleteTodo = asyncHandler(async (req, res) => {
   res.status(200).json({ id: todoId, message: "Todo removed successfully" });
 });
 
+const getTodo = asyncHandler(async (req, res) => {
+  const todoId = req.params.id;
+  const todo = await todoService.getTodoById(todoId);
+  if (!todo) {
+    res.status(404);
+    throw new Error("Todo not found");
+  }
+  res.status(200).json(todo);
+});
+
 module.exports = {
   getTodos,
   createTodo,
   updateTodo,
   deleteTodo,
+  getTodo,
 };

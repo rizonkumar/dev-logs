@@ -33,9 +33,14 @@ const deleteTodoById = async (todoId) => {
   return await Todo.findByIdAndDelete(todoId);
 };
 
+const getTodoById = async (todoId) => {
+  return await Todo.findById(todoId);
+};
+
 module.exports = {
   getAllTodos,
   createNewTodo,
   updateTodoById,
   deleteTodoById,
+  getTodoById,
 };
