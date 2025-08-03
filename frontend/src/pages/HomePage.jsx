@@ -25,6 +25,7 @@ import LogActivityChart from "../components/LogActivityChart";
 import TodoList from "../components/TodoList.jsx";
 import Loader from "../components/Loader";
 import DetailedTodoModal from "../components/DetailedTodoModal";
+import PomodoroTimer from "../components/PomodoroTimer.jsx";
 
 const transformDataForCalendar = (logs) => {
   if (!logs || logs.length === 0) return [];
@@ -656,11 +657,15 @@ function HomePage() {
           <CompactTodoCard onOpenTodoModal={handleOpenTodoModal} />
         </div>
 
+        <div className="md:col-span-1 lg:col-span-1 xl:col-span-1">
+          <PomodoroTimer />
+        </div>
+
         <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
           <LogActivityCard logData={logCalendarData} />
         </div>
 
-        <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
+        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
           <GithubActivityCard githubData={githubData} />
         </div>
       </div>
