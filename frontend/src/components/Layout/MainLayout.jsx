@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   Home,
   BookOpen,
@@ -10,6 +10,7 @@ import {
   LogOut,
 } from "lucide-react";
 
+// The navItems array is well-structured and easy to maintain.
 const navItems = [
   { path: "/", icon: Home, label: "Home" },
   { path: "/logs", icon: BookOpen, label: "Log Entry" },
@@ -19,68 +20,63 @@ const navItems = [
 ];
 
 const MainLayout = ({ children }) => {
-  const location = useLocation();
-
-  const isActiveRoute = (path) => {
-    return location.pathname === path;
-  };
-
   return (
-    <div className="flex h-screen bg-gray-900">
+    // Establishes a single, consistent background for the entire app view.
+    <div className="flex h-screen bg-gray-950 bg-gradient-to-br from-gray-950 via-gray-900 to-violet-950/50 font-sans text-gray-200">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-gray-800 bg-gray-900/50 backdrop-blur-xl">
-        <div className="h-full flex flex-col">
-          {/* Logo/Brand */}
-          <div className="p-4 border-b border-gray-800">
-            <h1 className="text-xl font-bold text-white">Dev Logs</h1>
+      <aside className="w-64 flex-shrink-0 flex flex-col bg-black/30 border-r border-white/10 backdrop-blur-lg">
+        {/* Logo/Brand */}
+        <div className="p-4 h-20 flex items-center gap-3 border-b border-white/10">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-violet-500 to-pink-500 text-white flex items-center justify-center font-bold text-lg">
+            R
           </div>
+          <h1 className="text-xl font-bold text-white">Dev Dashboard</h1>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4">
-            <ul className="space-y-2">
-              {navItems.map((item) => (
-                <li key={item.path}>
-                  <NavLink
-                    to={item.path}
-                    className={({ isActive }) =>
-                      `flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                        isActive
-                          ? "bg-purple-500/20 text-purple-400"
-                          : "text-gray-400 hover:bg-gray-800/50 hover:text-white"
-                      }`
-                    }
-                  >
-                    <item.icon size={18} />
-                    <span>{item.label}</span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+        {/* Navigation */}
+        <nav className="flex-1 p-3 space-y-2">
+          {navItems.map((item) => (
+            <li key={item.path} className="list-none">
+              <NavLink
+                to={item.path}
+                end={item.path === "/"} // Ensures "Home" is only active on the exact path
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200 ${
+                    isActive
+                      ? "bg-violet-500/20 text-white font-semibold"
+                      : "text-gray-400 hover:bg-white/10 hover:text-white"
+                  }`
+                }
+              >
+                <item.icon size={20} />
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
+        </nav>
 
-          {/* Auth Buttons */}
-          <div className="p-4 border-t border-gray-800 space-y-2">
-            <button
-              disabled
-              className="w-full flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-800/30 text-gray-500 cursor-not-allowed"
-            >
-              <LogIn size={18} />
-              <span>Login</span>
-            </button>
-            <button
-              disabled
-              className="w-full flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-800/30 text-gray-500 cursor-not-allowed"
-            >
-              <LogOut size={18} />
-              <span>Logout</span>
-            </button>
-          </div>
+        {/* Auth Buttons */}
+        <div className="p-3 border-t border-white/10 space-y-2">
+          <button
+            disabled
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 cursor-not-allowed"
+          >
+            <LogIn size={20} />
+            <span>Login</span>
+          </button>
+          <button
+            disabled
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 cursor-not-allowed"
+          >
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="container mx-auto">{children}</div>
+      <main className="flex-1 overflow-y-auto">
+        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
       </main>
     </div>
   );
