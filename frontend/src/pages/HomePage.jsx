@@ -10,7 +10,6 @@ import {
   GitBranch,
   Github,
   Calendar,
-  Activity,
   Star,
   Clock,
   TrendingUp,
@@ -25,7 +24,6 @@ import LogActivityChart from "../components/LogActivityChart";
 import TodoList from "../components/TodoList.jsx";
 import Loader from "../components/Loader";
 import DetailedTodoModal from "../components/DetailedTodoModal";
-import PomodoroTimer from "../components/PomodoroTimer.jsx";
 
 const transformDataForCalendar = (logs) => {
   if (!logs || logs.length === 0) return [];
@@ -215,23 +213,6 @@ const QuickStatsCard = ({ logs, githubData }) => {
     </div>
   );
 };
-
-const LogActivityCard = ({ logData }) => (
-  <div className={`${cardBaseStyle}`}>
-    <div className="flex items-center justify-between mb-3">
-      <h3 className="text-sm font-bold text-white flex items-center">
-        <Activity size={16} className="mr-2 text-purple-400" />
-        Development Activity
-      </h3>
-      <span className="text-xs text-gray-400">
-        {logData?.length || 0} logs this year
-      </span>
-    </div>
-    <div className="h-32">
-      <LogActivityChart data={logData} title="" compact={true} />
-    </div>
-  </div>
-);
 
 const GithubActivityCard = ({ githubData }) => (
   <div className={`${cardBaseStyle}`}>
@@ -614,60 +595,39 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen w-full p-3 sm:p-4 md:p-6 bg-gray-900 relative text-white">
-      <div className="absolute inset-0 z-0 opacity-20">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-fuchsia-600 rounded-full filter blur-3xl animate-blob"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-sky-500 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-600 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
-      </div>
-
+    <div className="p-6 relative text-white">
       <header className="mb-6 relative z-10">
         <h1 className="text-2xl md:text-3xl font-bold">Developer Dashboard</h1>
         <p className="text-gray-400 text-sm">
-          👣 A quick peek into your coding journey 🚀💡
+          Welcome to your development workspace
         </p>
       </header>
 
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
+      {/* First Row - Three Components */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* About Me */}
+        <div className="col-span-1">
           <ProfileCard githubData={githubData} />
         </div>
 
-        <div className="md:col-span-1 lg:col-span-1">
+        {/* Quick Stats */}
+        <div className="col-span-1">
           <QuickStatsCard logs={logs} githubData={githubData} />
         </div>
 
-        <div className="md:col-span-2 lg:col-span-1 xl:col-span-2">
+        {/* Detailed Insights */}
+        <div className="col-span-1">
           <DetailedStatsCard
             logs={logs}
             githubData={githubData}
             logStats={logStats}
           />
         </div>
+      </div>
 
-        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
-          <QuickAddLogCard
-            onAddLog={handleAddLog}
-            isLoading={logsStatus === "loading"}
-            onNavigateToLogs={handleNavigateToLogs}
-          />
-        </div>
-
-        <div className="md:col-span-1 lg:col-span-1 xl:col-span-2">
-          <CompactTodoCard onOpenTodoModal={handleOpenTodoModal} />
-        </div>
-
-        <div className="md:col-span-1 lg:col-span-1 xl:col-span-1">
-          <PomodoroTimer />
-        </div>
-
-        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
-          <LogActivityCard logData={logCalendarData} />
-        </div>
-
-        <div className="md:col-span-1 lg:col-span-2 xl:col-span-2">
-          <GithubActivityCard githubData={githubData} />
-        </div>
+      {/* Second Row - GitHub Activity */}
+      <div className="w-full">
+        <GithubActivityCard githubData={githubData} />
       </div>
 
       {/* Todo Modal */}

@@ -5,16 +5,20 @@ const getAllTodos = async () => {
 };
 
 const createNewTodo = async (todoData) => {
-  const { task, tags = [] } = todoData;
-  // Clean and deduplicate tags
-  const cleanedTags = [
-    ...new Set(tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)),
-  ];
-  return await Todo.create({ task, tags: cleanedTags });
+  const { task, status, tags = [], isCompleted } = todoData;
+
+  const cleanedTags = tags
+    ? [
+        ...new Set(
+          tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)
+        ),
+      ]
+    : [];
+
+  return await Todo.create({ task, status, tags: cleanedTags, isCompleted });
 };
 
 const updateTodoById = async (todoId, updateData) => {
-  // Clean tags if they are being updated
   if (updateData.tags) {
     updateData.tags = [
       ...new Set(
