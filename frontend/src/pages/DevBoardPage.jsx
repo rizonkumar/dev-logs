@@ -87,6 +87,7 @@ const AddEditModal = ({ todo, onClose, onSave }) => {
           placeholder="Enter task description..."
           className="w-full bg-gray-800/50 p-3 rounded-lg border border-gray-700 focus:ring-2 focus:ring-violet-500 focus:border-transparent focus:outline-none transition-all text-gray-200"
           rows={3}
+          autoFocus
         />
         <select
           value={status}
@@ -99,7 +100,7 @@ const AddEditModal = ({ todo, onClose, onSave }) => {
             </option>
           ))}
         </select>
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 pt-2">
           <button
             onClick={onClose}
             className="px-4 py-2 text-gray-400 hover:text-white"
@@ -144,9 +145,7 @@ const DeleteModal = ({ onClose, onConfirm }) => (
 const DevBoardPage = () => {
   const dispatch = useDispatch();
   const { todos, status } = useSelector((state) => state.todos);
-
   const [viewMode, setViewMode] = useState("today");
-
   const [modal, setModal] = useState(null);
   const [selectedTodo, setSelectedTodo] = useState(null);
 
@@ -157,9 +156,7 @@ const DevBoardPage = () => {
   }, [status, dispatch]);
 
   const filteredTodos = useMemo(() => {
-    if (viewMode === "all") {
-      return todos;
-    }
+    if (viewMode === "all") return todos;
     const todayString = new Date().toDateString();
     return todos.filter(
       (todo) => new Date(todo.createdAt).toDateString() === todayString
@@ -169,9 +166,7 @@ const DevBoardPage = () => {
   const columns = useMemo(() => {
     return filteredTodos.reduce(
       (acc, todo) => {
-        if (acc[todo.status]) {
-          acc[todo.status].push(todo);
-        }
+        if (acc[todo.status]) acc[todo.status].push(todo);
         return acc;
       },
       { TODO: [], IN_PROGRESS: [], IN_REVIEW: [], DONE: [] }
@@ -184,9 +179,8 @@ const DevBoardPage = () => {
       !destination ||
       (destination.droppableId === source.droppableId &&
         destination.index === source.index)
-    ) {
+    )
       return;
-    }
     dispatch(
       updateTodo({
         todoId: draggableId,
@@ -202,16 +196,19 @@ const DevBoardPage = () => {
     if (modal === "edit" && selectedTodo) {
       dispatch(updateTodo({ todoId: selectedTodo._id, updateData: data }));
     } else {
-      dispatch(createTodo({ ...data, isCompleted: data.status === "DONE" }));
+      const newTodoData = {
+        task: data.task,
+        status: data.status,
+        isCompleted: data.status === "DONE",
+      };
+      dispatch(createTodo(newTodoData));
     }
     setModal(null);
     setSelectedTodo(null);
   };
 
   const handleDeleteConfirm = () => {
-    if (selectedTodo) {
-      dispatch(deleteTodo(selectedTodo._id));
-    }
+    if (selectedTodo) dispatch(deleteTodo(selectedTodo._id));
     setModal(null);
     setSelectedTodo(null);
   };
