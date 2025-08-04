@@ -18,6 +18,7 @@ import {
   Trash2,
   X,
   ListTodo,
+  ClipboardList,
 } from "lucide-react";
 
 const COLUMN_THEME = {
@@ -51,6 +52,7 @@ const COLUMN_THEME = {
   },
 };
 
+// --- MODAL COMPONENTS (No changes here) ---
 const Modal = ({ children, onClose }) => (
   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div className="bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl w-full max-w-md relative p-6">
@@ -142,6 +144,28 @@ const DeleteModal = ({ onClose, onConfirm }) => (
   </Modal>
 );
 
+const EmptyState = ({ onAddTaskClick }) => (
+  <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+    <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-10 max-w-lg">
+      <div className="mx-auto w-16 h-16 bg-gradient-to-br from-violet-600/30 to-blue-600/30 text-violet-400 flex items-center justify-center rounded-2xl mb-6">
+        <ClipboardList size={32} />
+      </div>
+      <h2 className="text-2xl font-bold text-white mb-2">
+        Your Board is Clear!
+      </h2>
+      <p className="text-gray-400 mb-6">
+        Get started by adding your first task. Let's make today productive.
+      </p>
+      <button
+        onClick={onAddTaskClick}
+        className="flex items-center mx-auto gap-2 bg-violet-600 hover:bg-violet-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-lg shadow-violet-600/20"
+      >
+        <Plus size={18} /> Add Your First Task
+      </button>
+    </div>
+  </div>
+);
+
 const DevBoardPage = () => {
   const dispatch = useDispatch();
   const { todos, status } = useSelector((state) => state.todos);
@@ -193,14 +217,16 @@ const DevBoardPage = () => {
   };
 
   const handleSaveTodo = (data) => {
+    const newTodoData = {
+      task: data.task,
+      status: data.status,
+      isCompleted: data.status === "DONE",
+    };
     if (modal === "edit" && selectedTodo) {
-      dispatch(updateTodo({ todoId: selectedTodo._id, updateData: data }));
+      dispatch(
+        updateTodo({ todoId: selectedTodo._id, updateData: newTodoData })
+      );
     } else {
-      const newTodoData = {
-        task: data.task,
-        status: data.status,
-        isCompleted: data.status === "DONE",
-      };
       dispatch(createTodo(newTodoData));
     }
     setModal(null);
@@ -262,106 +288,106 @@ const DevBoardPage = () => {
         </div>
       </header>
 
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-y-auto">
-          {Object.entries(columns).map(([columnId, tasks]) => {
-            const theme = COLUMN_THEME[columnId];
-            return (
-              <div
-                key={columnId}
-                className={`flex flex-col ${theme.bg} rounded-xl border ${theme.border}`}
-              >
+      {filteredTodos.length === 0 ? (
+        <EmptyState onAddTaskClick={() => setModal("add")} />
+      ) : (
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-y-auto">
+            {Object.entries(columns).map(([columnId, tasks]) => {
+              const theme = COLUMN_THEME[columnId];
+              return (
                 <div
-                  className={`flex items-center gap-3 p-4 border-b ${theme.border}`}
+                  key={columnId}
+                  className={`flex flex-col ${theme.bg} rounded-xl border ${theme.border}`}
                 >
-                  <theme.icon className={`w-5 h-5 ${theme.text}`} />
-                  <h2 className="text-lg font-semibold text-white">
-                    {theme.title}
-                  </h2>
-                  <span
-                    className={`ml-auto text-sm font-medium ${theme.text} bg-black/20 px-2 py-0.5 rounded-full`}
+                  <div
+                    className={`flex items-center gap-3 p-4 border-b ${theme.border}`}
                   >
-                    {tasks.length}
-                  </span>
-                </div>
-                <Droppable droppableId={columnId}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`flex-1 p-3 space-y-3 transition-colors ${
-                        snapshot.isDraggingOver ? "bg-black/20" : ""
-                      }`}
+                    <theme.icon className={`w-5 h-5 ${theme.text}`} />
+                    <h2 className="text-lg font-semibold text-white">
+                      {theme.title}
+                    </h2>
+                    <span
+                      className={`ml-auto text-sm font-medium ${theme.text} bg-black/20 px-2 py-0.5 rounded-full`}
                     >
-                      {tasks.map((todo, index) => (
-                        <Draggable
-                          key={todo._id}
-                          draggableId={todo._id}
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className={`group p-3 rounded-lg bg-gray-900/50 border border-gray-700/50 backdrop-blur-sm transition-all duration-200 ${
-                                snapshot.isDragging
-                                  ? "ring-2 ring-violet-500 shadow-lg"
-                                  : "hover:bg-gray-800/50"
-                              }`}
-                            >
-                              <div className="flex items-start gap-3">
-                                <div
-                                  {...provided.dragHandleProps}
-                                  className="p-1 mt-0.5 text-gray-500 hover:text-white cursor-grab active:cursor-grabbing"
-                                >
-                                  <GripVertical size={16} />
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-gray-200 font-medium">
-                                    {todo.task}
-                                  </p>
-                                  <div className="flex items-center justify-between mt-3">
-                                    <p className="text-xs text-gray-500">
-                                      {new Date(
-                                        todo.createdAt
-                                      ).toLocaleDateString()}
+                      {tasks.length}
+                    </span>
+                  </div>
+                  <Droppable droppableId={columnId}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`flex-1 p-3 space-y-3 transition-colors ${
+                          snapshot.isDraggingOver ? "bg-black/20" : ""
+                        }`}
+                      >
+                        {tasks.map((todo, index) => (
+                          <Draggable
+                            key={todo._id}
+                            draggableId={todo._id}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className="group p-3 rounded-lg bg-gray-900/50 border border-gray-700/50 backdrop-blur-sm hover:bg-gray-800/50 transition-all"
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div
+                                    {...provided.dragHandleProps}
+                                    className="p-1 mt-0.5 text-gray-500 hover:text-white cursor-grab active:cursor-grabbing"
+                                  >
+                                    <GripVertical size={16} />
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-gray-200 font-medium">
+                                      {todo.task}
                                     </p>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <button
-                                        onClick={() => {
-                                          setSelectedTodo(todo);
-                                          setModal("edit");
-                                        }}
-                                        className="p-1 text-gray-400 hover:text-white rounded hover:bg-gray-700/50"
-                                      >
-                                        <Edit2 size={14} />
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          setSelectedTodo(todo);
-                                          setModal("delete");
-                                        }}
-                                        className="p-1 text-gray-400 hover:text-red-500 rounded hover:bg-gray-700/50"
-                                      >
-                                        <Trash2 size={14} />
-                                      </button>
+                                    <div className="flex items-center justify-between mt-3">
+                                      <p className="text-xs text-gray-500">
+                                        {new Date(
+                                          todo.createdAt
+                                        ).toLocaleDateString()}
+                                      </p>
+                                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                          onClick={() => {
+                                            setSelectedTodo(todo);
+                                            setModal("edit");
+                                          }}
+                                          className="p-1 text-gray-400 hover:text-white rounded hover:bg-gray-700/50"
+                                        >
+                                          <Edit2 size={14} />
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            setSelectedTodo(todo);
+                                            setModal("delete");
+                                          }}
+                                          className="p-1 text-gray-400 hover:text-red-500 rounded hover:bg-gray-700/50"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </div>
-            );
-          })}
-        </div>
-      </DragDropContext>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </div>
+              );
+            })}
+          </div>
+        </DragDropContext>
+      )}
 
       {modal === "add" && (
         <AddEditModal onClose={() => setModal(null)} onSave={handleSaveTodo} />
