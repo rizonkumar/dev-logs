@@ -1,4 +1,4 @@
-import axios from "../utils/axiosConfig"; // <-- Use our custom instance
+import axios from "../utils/axiosConfig";
 import { API_ENDPOINTS } from "../config/api.js";
 
 const API_URL = API_ENDPOINTS.POMODOROS;
@@ -13,9 +13,15 @@ const fetchPomodoroStats = async () => {
   return response.data;
 };
 
+const getPomodoroHistory = async () => {
+  const response = await axios.get(API_URL + "history");
+  return response.data;
+};
+
 const pomodoroService = {
   logPomodoroSession,
   fetchPomodoroStats,
+  getPomodoroHistory,
 };
 
 export default pomodoroService;

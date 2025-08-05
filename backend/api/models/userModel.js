@@ -28,9 +28,10 @@ const userSchema = new mongoose.Schema(
     company: { type: String, default: "" },
     portfolioUrl: { type: String, default: "" },
     githubUrl: { type: String, default: "" },
-
     githubUsername: { type: String, default: "" },
     githubToken: { type: String, default: "" },
+    pomodoroWorkMinutes: { type: Number, default: 25 },
+    pomodoroBreakMinutes: { type: Number, default: 5 },
   },
   {
     timestamps: true,

@@ -7,6 +7,11 @@ const pomodoroSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
+    title: {
+      type: String,
+      trim: true,
+      default: "Pomodoro Session",
+    },
     task: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Todo",
@@ -33,7 +38,7 @@ const pomodoroSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["COMPLETED", "IN_PROGRESS"],
-      default: "IN_PROGRESS",
+      default: "COMPLETED",
     },
   },
   {

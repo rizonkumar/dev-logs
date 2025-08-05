@@ -19,7 +19,6 @@ import {
 import LogActivityChart from "../components/LogActivityChart";
 import Loader from "../components/Loader";
 
-// --- DYNAMIC PROFILE CARD ---
 const ProfileCard = ({ userInfo }) => {
   const {
     name,
@@ -114,7 +113,6 @@ const ProfileCard = ({ userInfo }) => {
   );
 };
 
-// --- DYNAMIC GITHUB CARD ---
 const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
   <div className="bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg">
     <div className="flex items-center justify-between mb-3">
@@ -157,7 +155,6 @@ const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
   </div>
 );
 
-// --- QUICK STATS CARD ---
 const QuickStatsCard = ({ logs, githubData }) => {
   const totalLogs = logs?.length || 0;
   const totalCommits = githubData?.totalContributions || 0;
@@ -217,7 +214,6 @@ const QuickStatsCard = ({ logs, githubData }) => {
   );
 };
 
-// --- DETAILED STATS CARD ---
 const DetailedStatsCard = ({ logs, githubData, logStats }) => {
   const thisWeekLogs =
     logs?.filter(
@@ -287,14 +283,12 @@ function HomePage() {
     error: githubError,
   } = useSelector((state) => state.github);
 
-  // Separate useEffect for initial data loading
   useEffect(() => {
     if (logsStatus === "idle") dispatch(fetchLogs());
     if (githubStatus === "idle") dispatch(fetchGithubData());
     if (statsStatus === "idle") dispatch(fetchLogStats());
   }, [logsStatus, githubStatus, statsStatus, dispatch]);
 
-  // Separate useEffect for user profile
   useEffect(() => {
     dispatch(getUserProfile());
   }, [dispatch]);

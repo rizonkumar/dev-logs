@@ -10,12 +10,14 @@ import {
   User,
   LogIn,
   LogOut,
+  Notebook,
 } from "lucide-react";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home" },
   { path: "/logs", icon: BookOpen, label: "Log Entry" },
   { path: "/todos", icon: CheckSquare, label: "Todo" },
+  { path: "/notes", icon: Notebook, label: "Notes" },
   { path: "/timer", icon: Timer, label: "Timer" },
   { path: "/profile", icon: User, label: "User Profile" },
 ];
@@ -87,9 +89,7 @@ const MainLayout = ({ children }) => {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
-      </main>
+      <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
 };
