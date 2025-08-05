@@ -1,7 +1,7 @@
 const Log = require("../models/logModel");
 
-const getAllLogs = async (filters = {}) => {
-  const query = {};
+const getAllLogs = async (userId, filters = {}) => {
+  const query = { user: userId };
   if (filters.tags && filters.tags.length > 0) {
     query.tags = { $in: filters.tags };
   }
@@ -9,13 +9,14 @@ const getAllLogs = async (filters = {}) => {
   return logs;
 };
 
-const createNewLog = async (logData) => {
+const createNewLog = async (userId, logData) => {
   const { entry, date, tags = [] } = logData;
   const cleanedTags = [
     ...new Set(tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)),
   ];
 
   const log = await Log.create({
+    user: userId,
     entry,
     date,
     tags: cleanedTags,
@@ -23,7 +24,7 @@ const createNewLog = async (logData) => {
   return log;
 };
 
-const updateLogById = async (logId, logData) => {
+const updateLogById = async (userId, logId, logData) => {
   if (logData.tags) {
     logData.tags = [
       ...new Set(
@@ -32,24 +33,39 @@ const updateLogById = async (logId, logData) => {
     ];
   }
 
-  const updatedLog = await Log.findByIdAndUpdate(logId, logData, {
-    new: true,
-  });
-  return updatedLog;
+  const log = await Log.findOne({ _id: logId, user: userId });
+
+  if (!log) {
+    const error = new Error("Log not found or user not authorized");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  Object.assign(log, logData);
+  await log.save();
+  return log;
 };
 
-const deleteLogById = async (logId) => {
-  const deletedLog = await Log.findByIdAndDelete(logId);
-  return deletedLog;
+const deleteLogById = async (userId, logId) => {
+  const log = await Log.findOne({ _id: logId, user: userId });
+
+  if (!log) {
+    const error = new Error("Log not found or user not authorized");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  await log.deleteOne();
+  return log;
 };
 
-const getLogStats = async () => {
-  const logs = await Log.find();
+const getLogStats = async (userId) => {
+  const logs = await Log.find({ user: userId });
 
   if (!logs || logs.length === 0) {
     return {
       totalLogs: 0,
-      mostActiveDay: "Mon",
+      mostActiveDay: "N/A",
       dayStats: {},
     };
   }
@@ -77,6 +93,7 @@ const getLogStats = async () => {
   logs.forEach((log) => {
     const dayOfWeek = new Date(log.date).toLocaleDateString("en-US", {
       weekday: "long",
+      timeZone: "UTC",
     });
     dayStats[dayOfWeek]++;
   });

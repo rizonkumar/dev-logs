@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const logSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
     entry: {
       type: String,
       required: [true, "Please add a log entry"],
@@ -31,7 +36,5 @@ const logSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-const Log = mongoose.model("Log", logSchema);
 
 module.exports = mongoose.model("Log", logSchema);

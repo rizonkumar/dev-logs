@@ -3,53 +3,39 @@ const logService = require("../services/logService");
 
 const getLogs = asyncHandler(async (req, res) => {
   const { tags } = req.query;
-
   const tagArray = tags ? tags.split(",").map((tag) => tag.trim()) : undefined;
-  const logs = await logService.getAllLogs({ tags: tagArray });
+  const logs = await logService.getAllLogs(req.user.id, { tags: tagArray });
   res.status(200).json(logs);
 });
 
 const createLog = asyncHandler(async (req, res) => {
   const { entry, date, tags } = req.body;
-  const newLog = await logService.createNewLog({ entry, date, tags });
+  const newLog = await logService.createNewLog(req.user.id, {
+    entry,
+    date,
+    tags,
+  });
   res.status(201).json(newLog);
 });
 
 const updateLog = asyncHandler(async (req, res) => {
   const logId = req.params.id;
-
-  const updateData = {};
-  if (req.body.entry) updateData.entry = req.body.entry;
-  if (req.body.date) updateData.date = req.body.date;
-  if (req.body.tags !== undefined) updateData.tags = req.body.tags;
-
-  if (Object.keys(updateData).length === 0) {
-    res.status(400);
-    throw new Error("No fields to update provided");
-  }
-
-  const updatedLog = await logService.updateLogById(logId, updateData);
-
-  if (!updatedLog) {
-    res.status(404);
-    throw new Error("Log not found");
-  }
-
+  const updatedLog = await logService.updateLogById(
+    req.user.id,
+    logId,
+    req.body
+  );
   res.status(200).json(updatedLog);
 });
 
 const deleteLog = asyncHandler(async (req, res) => {
   const logId = req.params.id;
-  const deletedLog = await logService.deleteLogById(logId);
-  if (!deletedLog) {
-    res.status(404);
-    throw new Error("Log not found");
-  }
+  await logService.deleteLogById(req.user.id, logId);
   res.status(200).json({ id: logId, message: "Log removed successfully" });
 });
 
 const getLogStats = asyncHandler(async (req, res) => {
-  const stats = await logService.getLogStats();
+  const stats = await logService.getLogStats(req.user.id);
   res.status(200).json(stats);
 });
 

@@ -1,12 +1,11 @@
 const Todo = require("../models/todoModel");
 
-const getAllTodos = async () => {
-  return await Todo.find({}).sort({ createdAt: -1 });
+const getAllTodos = async (userId) => {
+  return await Todo.find({ user: userId }).sort({ createdAt: -1 });
 };
 
-const createNewTodo = async (todoData) => {
+const createNewTodo = async (userId, todoData) => {
   const { task, status, tags = [], isCompleted } = todoData;
-
   const cleanedTags = tags
     ? [
         ...new Set(
@@ -15,10 +14,16 @@ const createNewTodo = async (todoData) => {
       ]
     : [];
 
-  return await Todo.create({ task, status, tags: cleanedTags, isCompleted });
+  return await Todo.create({
+    user: userId,
+    task,
+    status,
+    tags: cleanedTags,
+    isCompleted,
+  });
 };
 
-const updateTodoById = async (todoId, updateData) => {
+const updateTodoById = async (userId, todoId, updateData) => {
   if (updateData.tags) {
     updateData.tags = [
       ...new Set(
@@ -27,18 +32,38 @@ const updateTodoById = async (todoId, updateData) => {
     ];
   }
 
-  return await Todo.findByIdAndUpdate(todoId, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  const todo = await Todo.findOne({ _id: todoId, user: userId });
+
+  if (!todo) {
+    const error = new Error("Todo not found or user not authorized");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  Object.assign(todo, updateData);
+  await todo.save();
+  return todo;
 };
 
-const deleteTodoById = async (todoId) => {
-  return await Todo.findByIdAndDelete(todoId);
+const deleteTodoById = async (userId, todoId) => {
+  const todo = await Todo.findOne({ _id: todoId, user: userId });
+  if (!todo) {
+    const error = new Error("Todo not found or user not authorized");
+    error.statusCode = 404;
+    throw error;
+  }
+  await todo.deleteOne();
+  return todo;
 };
 
-const getTodoById = async (todoId) => {
-  return await Todo.findById(todoId);
+const getTodoById = async (userId, todoId) => {
+  const todo = await Todo.findOne({ _id: todoId, user: userId });
+  if (!todo) {
+    const error = new Error("Todo not found or user not authorized");
+    error.statusCode = 404;
+    throw error;
+  }
+  return todo;
 };
 
 module.exports = {
