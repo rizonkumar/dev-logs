@@ -1,5 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import HomePage from "./pages/HomePage";
 import DevLogsPage from "./pages/DevLogsPage";
 import DevBoardPage from "./pages/DevBoardPage";
@@ -14,7 +17,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
-
         <Route element={<PrivateRoute />}>
           <Route
             path="/*"
@@ -42,6 +44,18 @@ function App() {
           />
         </Route>
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </Router>
   );
 }
