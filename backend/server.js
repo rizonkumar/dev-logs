@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Dev-Logs API!" });
 });
 
+app.use("/api/users", require("./api/routes/userRoutes"));
 app.use("/api/logs", require("./api/routes/logRoutes"));
 app.use("/api/todos", require("./api/routes/todoRoutes.js"));
 app.use("/api/github", require("./api/routes/githubRoutes"));
