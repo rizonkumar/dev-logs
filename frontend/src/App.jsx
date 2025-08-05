@@ -6,10 +6,12 @@ import "react-toastify/dist/ReactToastify.css";
 import HomePage from "./pages/HomePage";
 import DevLogsPage from "./pages/DevLogsPage";
 import DevBoardPage from "./pages/DevBoardPage";
+import ProfilePage from "./pages/ProfilePage";
 import AuthPage from "./pages/AuthPage";
 import MainLayout from "./components/Layout/MainLayout";
 import PomodoroTimer from "./components/PomodoroTimer";
 import PrivateRoute from "./components/PrivateRoute";
+
 import "./App.css";
 
 function App() {
@@ -28,16 +30,7 @@ function App() {
                   <Route path="/board" element={<DevBoardPage />} />
                   <Route path="/timer" element={<PomodoroTimer />} />
                   <Route path="/todos" element={<DevBoardPage />} />
-                  <Route
-                    path="/profile"
-                    element={
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold text-white">
-                          Profile (Coming Soon)
-                        </h1>
-                      </div>
-                    }
-                  />
+                  <Route path="/profile" element={<ProfilePage />} />
                 </Routes>
               </MainLayout>
             }
