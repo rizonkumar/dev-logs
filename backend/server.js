@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const rateLimit = require("express-rate-limit");
 
 dotenv.config();
 
@@ -9,6 +10,16 @@ const connectDB = require("./config/db");
 connectDB();
 
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+
+app.use("/api", limiter);
 
 const corsOptions = {
   origin:
