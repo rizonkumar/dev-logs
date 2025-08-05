@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   GITHUB: `${API_BASE_URL}/github/`,
   POMODOROS: `${API_BASE_URL}/pomodoros/`,
   REVIEWS: `${API_BASE_URL}/reviews/`,
+  USERS: `${API_BASE_URL}/users/`,
 };
 
 export default API_BASE_URL;
