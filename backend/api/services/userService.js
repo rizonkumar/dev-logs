@@ -1,38 +1,19 @@
 const User = require("../models/userModel");
 
-/**
- * Creates a new user in the database.
- * @param {object} userData - The user data (name, email, password).
- * @returns {Promise<User>} The created user object.
- */
 const createUser = async (userData) => {
   const { name, email, password } = userData;
-
   const userExists = await User.findOne({ email });
   if (userExists) {
     const error = new Error("User already exists");
     error.statusCode = 400;
     throw error;
   }
-
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
-
+  const user = await User.create({ name, email, password });
   return user;
 };
 
-/**
- * Authenticates a user.
- * @param {string} email - The user's email.
- * @param {string} password - The user's password.
- * @returns {Promise<User>} The authenticated user object.
- */
 const authenticateUser = async (email, password) => {
   const user = await User.findOne({ email }).select("+password");
-
   if (user && (await user.matchPassword(password))) {
     return user;
   } else {
@@ -42,13 +23,9 @@ const authenticateUser = async (email, password) => {
   }
 };
 
-/**
- * Finds a user by their ID.
- * @param {string} userId - The ID of the user.
- * @returns {Promise<User>} The found user object.
- */
 const getUserById = async (userId) => {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("-password");
+
   if (!user) {
     const error = new Error("User not found");
     error.statusCode = 404;
@@ -57,22 +34,17 @@ const getUserById = async (userId) => {
   return user;
 };
 
-/**
- * Updates a user's profile.
- * @param {string} userId - The ID of the user to update.
- * @param {object} updateData - The data to update (e.g., name, email, profileImage).
- * @returns {Promise<User>} The updated user object.
- */
 const updateUserProfile = async (userId, updateData) => {
-  const user = await getUserById(userId);
+  const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+    new: true,
+    runValidators: true,
+  }).select("-password");
 
-  user.name = updateData.name || user.name;
-  user.email = updateData.email || user.email;
-  if (updateData.profileImage) {
-    user.profileImage = updateData.profileImage;
+  if (!updatedUser) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
   }
-
-  const updatedUser = await user.save();
   return updatedUser;
 };
 

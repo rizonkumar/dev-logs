@@ -3,10 +3,7 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: [true, "Please add a name"],
-    },
+    name: { type: String, required: [true, "Please add a name"] },
     email: {
       type: String,
       required: [true, "Please add an email"],
@@ -26,6 +23,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "https://placehold.co/400x400/7c3aed/ffffff?text=User",
     },
+    title: { type: String, default: "Software Developer" },
+    bio: { type: String, default: "Building the future, one commit at a time" },
+    company: { type: String, default: "" },
+    portfolioUrl: { type: String, default: "" },
+    githubUrl: { type: String, default: "" },
+
+    githubUsername: { type: String, default: "" },
+    githubToken: { type: String, default: "" },
   },
   {
     timestamps: true,
