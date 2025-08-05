@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
   POMODOROS: `${API_BASE_URL}/pomodoros/`,
   REVIEWS: `${API_BASE_URL}/reviews/`,
   USERS: `${API_BASE_URL}/users/`,
+  NOTES: `${API_BASE_URL}/notes/`,
 };
 
 export default API_BASE_URL;
