@@ -45,7 +45,6 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route   GET /api/users/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-  // req.user will be set by our authentication middleware later
   const user = await userService.getUserById(req.user.id);
 
   res.json({
@@ -56,8 +55,35 @@ const getUserProfile = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const updateData = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  if (req.file) {
+    updateData.profileImage = req.file.path;
+  }
+
+  const updatedUser = await userService.updateUserProfile(
+    req.user.id,
+    updateData
+  );
+
+  res.json({
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    profileImage: updatedUser.profileImage,
+  });
+});
+
 module.exports = {
   registerUser,
   loginUser,
   getUserProfile,
+  updateUserProfile,
 };

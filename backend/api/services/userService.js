@@ -57,8 +57,28 @@ const getUserById = async (userId) => {
   return user;
 };
 
+/**
+ * Updates a user's profile.
+ * @param {string} userId - The ID of the user to update.
+ * @param {object} updateData - The data to update (e.g., name, email, profileImage).
+ * @returns {Promise<User>} The updated user object.
+ */
+const updateUserProfile = async (userId, updateData) => {
+  const user = await getUserById(userId);
+
+  user.name = updateData.name || user.name;
+  user.email = updateData.email || user.email;
+  if (updateData.profileImage) {
+    user.profileImage = updateData.profileImage;
+  }
+
+  const updatedUser = await user.save();
+  return updatedUser;
+};
+
 module.exports = {
   createUser,
   authenticateUser,
   getUserById,
+  updateUserProfile,
 };
