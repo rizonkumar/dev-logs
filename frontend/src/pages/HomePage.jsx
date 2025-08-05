@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLogs, fetchLogStats } from "../app/features/logsSlice";
 import { fetchGithubData } from "../app/features/githubSlice";
+import { getUserProfile } from "../app/features/authSlice";
 import {
   Briefcase,
   Hash,
@@ -156,6 +157,7 @@ const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
   </div>
 );
 
+// --- QUICK STATS CARD ---
 const QuickStatsCard = ({ logs, githubData }) => {
   const totalLogs = logs?.length || 0;
   const totalCommits = githubData?.totalContributions || 0;
@@ -285,11 +287,17 @@ function HomePage() {
     error: githubError,
   } = useSelector((state) => state.github);
 
+  // Separate useEffect for initial data loading
   useEffect(() => {
     if (logsStatus === "idle") dispatch(fetchLogs());
     if (githubStatus === "idle") dispatch(fetchGithubData());
     if (statsStatus === "idle") dispatch(fetchLogStats());
   }, [logsStatus, githubStatus, statsStatus, dispatch]);
+
+  // Separate useEffect for user profile
+  useEffect(() => {
+    dispatch(getUserProfile());
+  }, [dispatch]);
 
   const enhancedUserInfo = {
     ...userInfo,

@@ -1,9 +1,17 @@
 const asyncHandler = require("../middleware/asyncHandler");
 const githubService = require("../services/githubService");
+const User = require("../models/userModel");
 
 const getContributions = asyncHandler(async (req, res) => {
-  const username = req.user.githubUsername;
-  const token = req.user.githubToken;
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found.");
+  }
+
+  const username = user.githubUsername;
+  const token = user.githubToken;
 
   if (!username || !token) {
     res.status(400);
