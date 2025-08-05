@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const {
   getTodos,
   createTodo,
@@ -8,9 +7,21 @@ const {
   deleteTodo,
   getTodo,
 } = require("../controllers/todoController");
+const {
+  validateCreateTodo,
+  validateUpdateTodo,
+} = require("../validators/todoValidator");
+const validate = require("../middleware/validationMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
-router.route("/").get(getTodos).post(createTodo);
+router.use(protect);
 
-router.route("/:id").get(getTodo).put(updateTodo).delete(deleteTodo);
+router.route("/").get(getTodos).post(validateCreateTodo, validate, createTodo);
+
+router
+  .route("/:id")
+  .get(getTodo)
+  .put(validateUpdateTodo, validate, updateTodo)
+  .delete(deleteTodo);
 
 module.exports = router;

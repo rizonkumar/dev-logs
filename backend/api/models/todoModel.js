@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const todoSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
     task: {
       type: String,
       required: [true, "Please add a task"],
@@ -34,17 +39,10 @@ const todoSchema = new mongoose.Schema(
           "Each tag must be a non-empty string with maximum 30 characters",
       },
     },
-    // user: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: 'User',
-    // },
   },
   {
     timestamps: true,
   }
 );
 
-const Todo = mongoose.model("Todo", todoSchema);
-
-module.exports = Todo;
+module.exports = mongoose.model("Todo", todoSchema);
