@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const path = require("path");
 
 dotenv.config();
 
@@ -25,11 +26,13 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Dev-Logs API!" });
 });
 
+app.use("/api/users", require("./api/routes/userRoutes"));
 app.use("/api/logs", require("./api/routes/logRoutes"));
 app.use("/api/todos", require("./api/routes/todoRoutes.js"));
 app.use("/api/github", require("./api/routes/githubRoutes"));
 app.use("/api/pomodoros", require("./api/routes/pomodoroRoutes"));
 app.use("/api/reviews", require("./api/routes/reviewRoutes"));
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 const PORT = process.env.PORT || 5001;
 
