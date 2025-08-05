@@ -4,6 +4,7 @@ import logsReducer from "./features/logsSlice";
 import todosReducer from "./features/todosSlice";
 import githubReducer from "./features/githubSlice";
 import pomodoroReducer from "./features/pomodoroSlice";
+import notesReducer from "./features/notesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
     todos: todosReducer,
     github: githubReducer,
     pomodoro: pomodoroReducer,
+    notes: notesReducer,
   },
 });
