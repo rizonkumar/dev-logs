@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 import { API_ENDPOINTS } from "../config/api.js";
 
 const API_URL = API_ENDPOINTS.GITHUB;

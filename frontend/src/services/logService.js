@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 import { API_ENDPOINTS } from "../config/api.js";
 
 const API_URL = API_ENDPOINTS.LOGS;
@@ -9,13 +9,8 @@ const fetchAllLogs = async () => {
 };
 
 const createLog = async (logData) => {
-  try {
-    const response = await axios.post(API_URL, logData);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  const response = await axios.post(API_URL, logData);
+  return response.data;
 };
 
 const deleteLog = async (logId) => {
