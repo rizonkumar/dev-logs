@@ -35,7 +35,6 @@ const MainLayout = ({ children }) => {
 
   return (
     <div className="flex h-screen bg-stone-50 font-sans text-gray-800">
-      {/* Sidebar with a clean, white background and light borders */}
       <aside className="w-64 flex-shrink-0 flex flex-col bg-white border-r border-stone-200">
         <div className="p-4 h-20 flex items-center gap-3 border-b border-stone-200">
           <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg">
