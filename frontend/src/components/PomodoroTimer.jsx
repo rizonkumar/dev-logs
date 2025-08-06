@@ -25,7 +25,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { updateProfile } from "../app/features/authSlice";
 
-// --- Settings Modal (Light Theme) ---
 const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
   const dispatch = useDispatch();
   const [localWork, setLocalWork] = useState(currentWork);
