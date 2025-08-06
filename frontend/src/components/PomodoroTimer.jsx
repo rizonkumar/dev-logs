@@ -54,19 +54,21 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-gray-900/10 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-gray-900/80 border border-white/10 rounded-2xl p-6 w-full max-w-sm"
+            className="bg-white border border-stone-200 rounded-2xl p-6 w-full max-w-sm shadow-xl"
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">Timer Settings</h3>
+              <h3 className="text-xl font-bold text-gray-900">
+                Timer Settings
+              </h3>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-white/10"
+                className="p-2 rounded-full text-gray-500 hover:bg-stone-100 hover:text-gray-800"
               >
                 <X size={20} />
               </button>
@@ -75,7 +77,7 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
               <div>
                 <label
                   htmlFor="work"
-                  className="block text-sm text-gray-400 mb-2"
+                  className="block text-sm font-medium text-gray-600 mb-2"
                 >
                   Work Duration (minutes)
                 </label>
@@ -83,14 +85,14 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
                   type="number"
                   id="work"
                   value={localWork}
-                  onChange={(e) => setLocalWork(e.target.value)}
-                  className="w-full bg-gray-800/50 p-2 rounded-lg border border-gray-700 focus:ring-2 focus:ring-violet-500 focus:outline-none"
+                  onChange={(e) => setLocalWork(Number(e.target.value))}
+                  className="w-full bg-stone-50 p-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
                 <label
                   htmlFor="break"
-                  className="block text-sm text-gray-400 mb-2"
+                  className="block text-sm font-medium text-gray-600 mb-2"
                 >
                   Break Duration (minutes)
                 </label>
@@ -98,15 +100,15 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
                   type="number"
                   id="break"
                   value={localBreak}
-                  onChange={(e) => setLocalBreak(e.target.value)}
-                  className="w-full bg-gray-800/50 p-2 rounded-lg border border-gray-700 focus:ring-2 focus:ring-violet-500 focus:outline-none"
+                  onChange={(e) => setLocalBreak(Number(e.target.value))}
+                  className="w-full bg-stone-50 p-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
             </div>
             <div className="mt-6 flex justify-end">
               <button
                 onClick={handleApply}
-                className="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors"
+                className="px-5 py-2 bg-gray-800 hover:bg-black text-white rounded-lg font-semibold transition-colors"
               >
                 Apply
               </button>
@@ -118,6 +120,7 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
   );
 };
 
+// --- History Panel (Light Theme) ---
 const HistoryPanel = ({ history, isOpen, onClose }) => {
   return (
     <AnimatePresence>
@@ -127,13 +130,13 @@ const HistoryPanel = ({ history, isOpen, onClose }) => {
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="absolute top-0 right-0 h-full w-full max-w-sm bg-gray-900/95 backdrop-blur-lg border-l border-white/10 z-40 flex flex-col"
+          className="absolute top-0 right-0 h-full w-full max-w-sm bg-white/80 backdrop-blur-lg border-l border-stone-200 z-40 flex flex-col"
         >
-          <div className="p-4 border-b border-white/10 flex justify-between items-center flex-shrink-0">
-            <h3 className="text-xl font-bold">Session History</h3>
+          <div className="p-4 border-b border-stone-200 flex justify-between items-center flex-shrink-0">
+            <h3 className="text-xl font-bold text-gray-900">Session History</h3>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-white/10"
+              className="p-2 rounded-full text-gray-600 hover:bg-stone-200 hover:text-gray-900"
             >
               <X size={20} />
             </button>
@@ -141,10 +144,19 @@ const HistoryPanel = ({ history, isOpen, onClose }) => {
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {history.length > 0 ? (
               history.map((session) => (
-                <div key={session._id} className="bg-white/5 p-3 rounded-lg">
-                  <p className="font-semibold">{session.title}</p>
-                  <div className="text-xs text-gray-400 flex items-center justify-between mt-1">
-                    <span>
+                <div
+                  key={session._id}
+                  className="bg-stone-100 p-3 rounded-lg border border-stone-200"
+                >
+                  <p className="font-semibold text-gray-800">{session.title}</p>
+                  <div className="text-xs text-gray-500 flex items-center justify-between mt-1">
+                    <span
+                      className={`font-medium capitalize ${
+                        session.sessionType === "WORK"
+                          ? "text-blue-600"
+                          : "text-green-600"
+                      }`}
+                    >
                       {session.duration} min {session.sessionType.toLowerCase()}
                     </span>
                     <span>
@@ -165,6 +177,7 @@ const HistoryPanel = ({ history, isOpen, onClose }) => {
   );
 };
 
+// --- Main Component (Light Theme) ---
 const PomodoroTimerPage = () => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
@@ -208,7 +221,13 @@ const PomodoroTimerPage = () => {
     dispatch(resetTimer());
   };
 
-  const timerColor = sessionType === "WORK" ? "violet" : "teal";
+  const timerConfig = {
+    WORK: { color: "blue", name: "Work" },
+    BREAK: { color: "green", name: "Break" },
+  };
+
+  const { color: timerColor } = timerConfig[sessionType];
+
   const formatTime = (s) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(
       2,
@@ -224,18 +243,25 @@ const PomodoroTimerPage = () => {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
+  const mainButtonColor = `bg-${timerColor}-600 hover:bg-${timerColor}-700`;
+  const timerTextColor = `text-${timerColor}-600`;
+
+  // These classes need to be fully present for Tailwind's JIT compiler
+  const dummyClasses =
+    "bg-blue-600 hover:bg-blue-700 text-blue-600 bg-green-600 hover:bg-green-700 text-green-600";
+
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center text-white p-4 relative overflow-hidden">
+    <div className="w-full h-full flex flex-col items-center justify-center text-gray-900 p-4 relative overflow-hidden bg-stone-50">
       <div className="absolute top-6 right-6 flex gap-3 z-50">
         <button
           onClick={() => setIsHistoryOpen(true)}
-          className="p-3 bg-gray-800/50 rounded-full hover:bg-gray-700 transition-colors"
+          className="p-3 bg-white rounded-full hover:bg-stone-100 border border-stone-200 text-gray-600 hover:text-gray-800 transition-colors"
         >
           <History size={20} />
         </button>
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="p-3 bg-gray-800/50 rounded-full hover:bg-gray-700 transition-colors"
+          className="p-3 bg-white rounded-full hover:bg-stone-100 border border-stone-200 text-gray-600 hover:text-gray-800 transition-colors"
         >
           <Settings size={20} />
         </button>
@@ -253,13 +279,13 @@ const PomodoroTimerPage = () => {
         onClose={() => setIsHistoryOpen(false)}
       />
 
-      <div className="flex items-center bg-gray-800/50 rounded-lg p-1.5 mb-8">
+      <div className="flex items-center bg-stone-200/70 rounded-lg p-1.5 mb-8">
         <button
           onClick={() => dispatch(setSessionType("WORK"))}
           className={`px-6 py-2 rounded-md text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
             sessionType === "WORK"
-              ? "bg-gray-900 shadow-md text-violet-400"
-              : "text-gray-400 hover:text-white"
+              ? "bg-white shadow-sm text-blue-600"
+              : "text-gray-500 hover:text-gray-800"
           }`}
         >
           <Brain size={16} /> Work
@@ -268,8 +294,8 @@ const PomodoroTimerPage = () => {
           onClick={() => dispatch(setSessionType("BREAK"))}
           className={`px-6 py-2 rounded-md text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
             sessionType === "BREAK"
-              ? "bg-gray-900 shadow-md text-teal-400"
-              : "text-gray-400 hover:text-white"
+              ? "bg-white shadow-sm text-green-600"
+              : "text-gray-500 hover:text-gray-800"
           }`}
         >
           <Coffee size={16} /> Break
@@ -283,27 +309,28 @@ const PomodoroTimerPage = () => {
             cy="150"
             r={radius}
             fill="none"
-            className="stroke-gray-800/50"
-            strokeWidth="8"
+            className="stroke-stone-200"
+            strokeWidth="12"
           />
-          <circle
+          <motion.circle
             cx="150"
             cy="150"
             r={radius}
             fill="none"
-            strokeWidth="8"
-            className={`stroke-current text-${timerColor}-500`}
+            strokeWidth="12"
+            className={`stroke-current ${timerTextColor}`}
             strokeLinecap="round"
             transform="rotate(-90 150 150)"
             style={{
               strokeDasharray: circumference,
-              strokeDashoffset,
-              transition: "stroke-dashoffset 0.3s ease-out",
             }}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset }}
+            transition={{ duration: 1, ease: "linear" }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <p className="text-7xl font-light tracking-widest">
+          <p className="text-7xl font-light tracking-widest text-gray-800">
             {formatTime(timeRemaining)}
           </p>
         </div>
@@ -316,30 +343,32 @@ const PomodoroTimerPage = () => {
             value={currentTitle}
             onChange={(e) => dispatch(setCurrentTitle(e.target.value))}
             placeholder="What are you working on?"
-            className="w-full bg-transparent text-center text-lg placeholder-gray-500 focus:outline-none"
+            className="w-full bg-transparent text-center text-lg placeholder-gray-400 focus:outline-none"
           />
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gray-700"></div>
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/3 h-px bg-stone-300"></div>
         </div>
       </div>
 
       <div className="flex items-center justify-center gap-6">
-        <p className="text-center">
-          <span className="block text-3xl font-bold">
+        <p className="text-center w-24">
+          <span className="block text-3xl font-bold text-gray-800">
             {stats.sessionsToday}
           </span>
-          <span className="text-xs text-gray-400">Sessions Today</span>
+          <span className="text-xs text-gray-500">Sessions Today</span>
         </p>
         <button
           onClick={handleStartPause}
-          className={`w-20 h-20 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-${timerColor}-500 to-${
-            timerColor === "violet" ? "purple" : "cyan"
-          }-600 shadow-${timerColor}-500/30`}
+          className={`w-20 h-20 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300 ${mainButtonColor}`}
         >
-          {isRunning ? <Pause size={32} /> : <Play size={32} />}
+          {isRunning ? (
+            <Pause size={32} fill="currentColor" />
+          ) : (
+            <Play size={32} fill="currentColor" className="ml-1" />
+          )}
         </button>
         <button
           onClick={handleReset}
-          className="w-12 h-12 bg-gray-800/50 text-gray-400 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-700 transition-all duration-300"
+          className="w-12 h-12 bg-stone-200 text-gray-500 rounded-full flex items-center justify-center shadow-sm hover:bg-stone-300 transition-all duration-300"
         >
           <RotateCcw size={20} />
         </button>
