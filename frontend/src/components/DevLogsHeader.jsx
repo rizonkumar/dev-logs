@@ -1,9 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { LayoutDashboard, ScrollText, KanbanSquare } from "lucide-react";
 
 const DevLogsHeader = () => {
   const location = useLocation();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const navigation = [
     {
@@ -28,17 +30,19 @@ const DevLogsHeader = () => {
       <div className="flex flex-col space-y-6">
         <div className="flex items-center">
           <img
-            src="https://i.pravatar.cc/100?u=a042581f4e29026704d"
-            alt="Your Name"
-            className="w-20 h-20 rounded-full border-4 border-white shadow-md"
+            src={
+              userInfo?.profileImage ||
+              `https://i.pravatar.cc/100?u=${userInfo?._id}`
+            }
+            alt={userInfo?.name || "User"}
+            className="w-20 h-20 rounded-full border-4 border-white shadow-md object-cover"
           />
           <div className="ml-4">
             <h1 className="text-2xl font-bold text-gray-900">
-              Rizon Kumar Rahi
+              {userInfo?.name || "Developer"}
             </h1>
             <p className="text-sm text-gray-500">
-              Software Developer<span className="text-blue-600"> | </span>
-              Building products
+              {userInfo?.title || "Software Developer | Building products"}
             </p>
           </div>
         </div>

@@ -11,31 +11,30 @@ function LogActivityChart({
     switch (colorType) {
       case "green":
         return {
-          light: ["#f0f0f0", "#c6f6d5", "#68d391", "#38a169", "#2f855a"],
-          dark: ["hsl(0, 0%, 12%)", "#0f4c3a", "#1a7f5a", "#22c55e", "#4ade80"],
+          light: ["#f0f0f0", "#c6e48b", "#7bc96f", "#239a3b", "#196127"],
         };
       case "purple":
       default:
         return {
-          light: ["#f0f0f0", "#e9d5ff", "#c084fc", "#a855f7", "#7c3aed"],
-          dark: ["hsl(0, 0%, 12%)", "#3c1a78", "#5b21b6", "#7c3aed", "#a855f7"],
+          light: ["#f0f0f0", "#a2d2ff", "#6e9eeb", "#4668d7", "#2542a4"],
         };
     }
   };
 
-  const explicitTheme = getTheme(color);
+  // We only need the light theme now
+  const explicitTheme = getTheme(color).light;
 
   if (compact) {
     return (
       <div className="w-full h-full">
         {title && (
-          <h3 className="text-sm font-bold text-white mb-2">{title}</h3>
+          <h3 className="text-sm font-bold text-gray-800 mb-2">{title}</h3>
         )}
         {data && data.length > 0 ? (
           <div className="w-full">
             <ActivityCalendar
               data={data}
-              theme={explicitTheme}
+              theme={{ light: explicitTheme }}
               blockSize={8}
               blockMargin={2}
               fontSize={10}
@@ -46,7 +45,7 @@ function LogActivityChart({
           </div>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-400 text-xs">No activity data</p>
+            <p className="text-gray-500 text-xs">No activity data</p>
           </div>
         )}
       </div>
@@ -54,19 +53,19 @@ function LogActivityChart({
   }
 
   return (
-    <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700/60 backdrop-blur-sm min-h-[220px]">
-      <h3 className="text-lg font-bold text-white mb-4">{title}</h3>
+    <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm min-h-[220px]">
+      <h3 className="text-lg font-bold text-gray-900 mb-4">{title}</h3>
       {data && data.length > 0 ? (
         <ActivityCalendar
           data={data}
-          theme={explicitTheme}
+          theme={{ light: explicitTheme }}
           blockSize={12}
           blockMargin={3}
           fontSize={14}
         />
       ) : (
         <div className="flex items-center justify-center h-full pt-10">
-          <p className="text-gray-400 text-sm">No activity to display yet.</p>
+          <p className="text-gray-500 text-sm">No activity to display yet.</p>
         </div>
       )}
     </div>

@@ -13,6 +13,7 @@ import {
   Github,
   Info,
   Key,
+  Share2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -106,7 +107,7 @@ const ProfilePage = () => {
     >
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-          <User size={28} /> User Profile
+          <User size={28} className="text-blue-600" /> User Profile
         </h1>
         <p className="text-gray-500 mt-1">
           Manage your account settings and profile information.
@@ -114,9 +115,9 @@ const ProfilePage = () => {
       </header>
 
       <form onSubmit={onSubmit}>
+        {/* Personal Information Card */}
         <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            {/* Profile Picture Section */}
             <div className="md:col-span-1 flex flex-col items-center text-center">
               <div className="relative group w-32 h-32 sm:w-40 sm:h-40 mb-4">
                 <img
@@ -149,18 +150,16 @@ const ProfilePage = () => {
                 Click image to upload a new photo.
               </p>
             </div>
-
-            {/* User Details Section */}
             <div className="md:col-span-2 space-y-6">
               <InputField
-                icon={<User size={20} className="text-gray-400" />}
+                icon={<User size={20} className="text-blue-500" />}
                 label="Full Name"
                 name="name"
                 value={formData.name}
                 onChange={onChange}
               />
               <InputField
-                icon={<AtSign size={20} className="text-gray-400" />}
+                icon={<AtSign size={20} className="text-blue-500" />}
                 label="Email Address"
                 name="email"
                 type="email"
@@ -168,7 +167,7 @@ const ProfilePage = () => {
                 onChange={onChange}
               />
               <InputField
-                icon={<Briefcase size={20} className="text-gray-400" />}
+                icon={<Briefcase size={20} className="text-blue-500" />}
                 label="Title / Role"
                 name="title"
                 value={formData.title}
@@ -176,7 +175,7 @@ const ProfilePage = () => {
                 placeholder="e.g., Software Developer"
               />
               <InputField
-                icon={<Info size={20} className="text-gray-400" />}
+                icon={<Info size={20} className="text-blue-500" />}
                 label="Bio"
                 name="bio"
                 as="textarea"
@@ -189,13 +188,15 @@ const ProfilePage = () => {
           </div>
         </div>
 
+        {/* Social & Links Card */}
         <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <Share2 size={24} className="text-purple-600" />
             Social & Links
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
-              icon={<Briefcase size={20} className="text-gray-400" />}
+              icon={<Briefcase size={20} className="text-purple-500" />}
               label="Company"
               name="company"
               value={formData.company}
@@ -203,7 +204,7 @@ const ProfilePage = () => {
               placeholder="Your company name"
             />
             <InputField
-              icon={<LinkIcon size={20} className="text-gray-400" />}
+              icon={<LinkIcon size={20} className="text-purple-500" />}
               label="Portfolio URL"
               name="portfolioUrl"
               value={formData.portfolioUrl}
@@ -211,7 +212,7 @@ const ProfilePage = () => {
               placeholder="https://example.com"
             />
             <InputField
-              icon={<Github size={20} className="text-gray-400" />}
+              icon={<Github size={20} className="text-purple-500" />}
               label="GitHub Profile URL"
               name="githubUrl"
               value={formData.githubUrl}
@@ -221,8 +222,10 @@ const ProfilePage = () => {
           </div>
         </div>
 
+        {/* GitHub Integration Card */}
         <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 sm:p-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+            <Github size={24} className="text-green-600" />
             GitHub Integration
           </h3>
           <p className="text-sm text-gray-500 mb-6">
@@ -231,7 +234,7 @@ const ProfilePage = () => {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
-              icon={<Github size={20} className="text-gray-400" />}
+              icon={<User size={20} className="text-green-500" />}
               label="GitHub Username"
               name="githubUsername"
               value={formData.githubUsername}
@@ -239,7 +242,7 @@ const ProfilePage = () => {
               placeholder="Your GitHub username"
             />
             <InputField
-              icon={<Key size={20} className="text-gray-400" />}
+              icon={<Key size={20} className="text-green-500" />}
               label="GitHub Personal Access Token"
               name="githubToken"
               type="password"
@@ -274,7 +277,6 @@ const ProfilePage = () => {
   );
 };
 
-// Helper component for consistent input fields
 const InputField = ({ icon, label, name, as = "input", ...props }) => {
   const InputComponent = as;
   return (
@@ -286,7 +288,7 @@ const InputField = ({ icon, label, name, as = "input", ...props }) => {
         {label}
       </label>
       <div className="relative">
-        <div className="absolute left-4 top-3.5 text-gray-400">{icon}</div>
+        <div className="absolute left-4 top-3.5">{icon}</div>
         <InputComponent
           id={name}
           name={name}
