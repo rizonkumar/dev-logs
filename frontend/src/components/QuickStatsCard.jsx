@@ -10,7 +10,9 @@ const getTodayDateString = () => {
 
 const QuickStatsCard = ({ logs }) => {
   const today = getTodayDateString();
-  const todayLogs = logs.filter((log) => log.date === today).length;
+  const todayLogs = logs.filter(
+    (log) => new Date(log.date).toISOString().split("T")[0] === today
+  ).length;
   const thisWeekLogs = logs.filter((log) => {
     const logDate = new Date(log.date);
     const weekAgo = new Date();
