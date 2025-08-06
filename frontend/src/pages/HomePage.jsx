@@ -12,7 +12,6 @@ import {
   Star,
   Clock,
   TrendingUp,
-  ExternalLink,
   Globe,
   AlertCircle,
 } from "lucide-react";
@@ -32,38 +31,38 @@ const ProfileCard = ({ userInfo }) => {
   } = userInfo || {};
 
   return (
-    <div className="bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/20 h-full flex flex-col">
+    <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm h-full flex flex-col">
       <div className="flex items-center space-x-3 mb-3">
         <img
           src={profileImage}
           alt={name}
-          className="w-12 h-12 rounded-full border-2 border-fuchsia-400 object-cover"
+          className="w-12 h-12 rounded-full border-2 border-gray-800 object-cover"
         />
         <div>
-          <h2 className="text-lg font-bold text-white">
+          <h2 className="text-lg font-bold text-gray-900">
             {name || "Your Name"}
           </h2>
-          <p className="text-fuchsia-400 text-sm font-medium">
+          <p className="text-gray-600 text-sm font-medium">
             {title || "Your Title"}
           </p>
         </div>
       </div>
 
-      <div className="mb-4 p-3 bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-blue-500/10 rounded-lg border border-fuchsia-500/20">
-        <p className="text-center text-sm text-gray-300 italic">
+      <div className="mb-4 p-3 bg-stone-100 rounded-lg border border-stone-200">
+        <p className="text-center text-sm text-gray-700 italic">
           "{bio || "Add your bio in the profile section!"}"
         </p>
       </div>
 
       <div className="space-y-2 text-xs mb-4">
         {company && (
-          <div className="flex items-center text-gray-300">
-            <Briefcase size={12} className="mr-2 text-gray-400" />
+          <div className="flex items-center text-gray-600">
+            <Briefcase size={12} className="mr-2 text-gray-500" />
             <span>{company}</span>
           </div>
         )}
-        <div className="flex items-center text-gray-300">
-          <GitBranch size={12} className="mr-2 text-gray-400" />
+        <div className="flex items-center text-gray-600">
+          <GitBranch size={12} className="mr-2 text-gray-500" />
           <span>{publicRepositories || 0} Public Repositories</span>
         </div>
       </div>
@@ -74,14 +73,13 @@ const ProfileCard = ({ userInfo }) => {
             href={portfolioUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 border border-blue-500/30 rounded-lg p-2 transition-all duration-300 flex items-center justify-center space-x-1 text-xs"
+            className="flex-1 bg-white hover:bg-stone-100 text-gray-700 border border-stone-300 rounded-lg p-2 transition-all duration-300 flex items-center justify-center space-x-1 text-xs font-semibold"
           >
             <Globe size={12} />
             <span>Portfolio</span>
-            <ExternalLink size={10} />
           </a>
         ) : (
-          <span className="flex-1 bg-gray-700/20 text-gray-500 border border-gray-700/30 rounded-lg p-2 text-center text-xs">
+          <span className="flex-1 bg-stone-100 text-gray-400 border border-stone-200 rounded-lg p-2 text-center text-xs">
             No Portfolio
           </span>
         )}
@@ -90,14 +88,13 @@ const ProfileCard = ({ userInfo }) => {
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600/50 rounded-lg p-2 transition-all duration-300 flex items-center justify-center space-x-1 text-xs"
+            className="flex-1 bg-gray-800 hover:bg-gray-900 text-white rounded-lg p-2 transition-all duration-300 flex items-center justify-center space-x-1 text-xs font-semibold"
           >
             <Github size={12} />
             <span>GitHub</span>
-            <ExternalLink size={10} />
           </a>
         ) : (
-          <span className="flex-1 bg-gray-700/20 text-gray-500 border border-gray-700/30 rounded-lg p-2 text-center text-xs">
+          <span className="flex-1 bg-stone-100 text-gray-400 border border-stone-200 rounded-lg p-2 text-center text-xs">
             No GitHub
           </span>
         )}
@@ -105,7 +102,7 @@ const ProfileCard = ({ userInfo }) => {
 
       <Link
         to="/profile"
-        className="block w-full text-center bg-fuchsia-500/80 hover:bg-fuchsia-500 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm mt-auto"
+        className="block w-full text-center bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm mt-auto"
       >
         Edit Profile
       </Link>
@@ -114,14 +111,14 @@ const ProfileCard = ({ userInfo }) => {
 };
 
 const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
-  <div className="bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg">
+  <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
     <div className="flex items-center justify-between mb-3">
-      <h3 className="text-sm font-bold text-white flex items-center">
-        <Github size={16} className="mr-2 text-green-400" />
+      <h3 className="text-sm font-bold text-gray-900 flex items-center">
+        <Github size={16} className="mr-2 text-green-600" />
         GitHub Contributions
       </h3>
       {githubStatus === "succeeded" && (
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-500">
           {githubData?.totalContributions || 0} contributions
         </span>
       )}
@@ -133,13 +130,13 @@ const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
         </div>
       )}
       {githubStatus === "failed" && (
-        <div className="flex flex-col items-center justify-center h-full text-center text-sm text-yellow-400 bg-yellow-500/10 p-4 rounded-lg">
+        <div className="flex flex-col items-center justify-center h-full text-center text-sm text-yellow-800 bg-yellow-50 p-4 rounded-lg">
           <AlertCircle size={24} className="mb-2" />
           <p className="font-semibold">Could not fetch GitHub data.</p>
-          <p className="text-xs text-yellow-300/80 mb-3">{githubError}</p>
+          <p className="text-xs text-yellow-700 mb-3">{githubError}</p>
           <Link
             to="/profile"
-            className="text-xs font-bold text-white bg-yellow-500/20 hover:bg-yellow-500/30 px-3 py-1 rounded-md"
+            className="text-xs font-bold text-yellow-900 bg-yellow-100 hover:bg-yellow-200 px-3 py-1 rounded-md"
           >
             Add Credentials
           </Link>
@@ -161,28 +158,30 @@ const QuickStatsCard = ({ logs, githubData }) => {
   const recentLogs = logs?.slice(0, 3) || [];
 
   return (
-    <div className="bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/20 h-full flex flex-col">
-      <h3 className="text-lg font-bold text-white mb-4 flex items-center">
-        <TrendingUp size={18} className="mr-2 text-purple-400" />
+    <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm h-full flex flex-col">
+      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+        <TrendingUp size={18} className="mr-2 text-blue-600" />
         Quick Stats
       </h3>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-4 rounded-xl text-center border border-purple-500/20">
-          <Hash className="w-6 h-6 mx-auto mb-2 text-purple-400" />
-          <p className="text-2xl font-bold text-white mb-1">{totalLogs}</p>
-          <p className="text-purple-300 text-xs font-medium">Dev Logs</p>
+        <div className="bg-stone-100 p-4 rounded-xl text-center border border-stone-200">
+          <Hash className="w-6 h-6 mx-auto mb-2 text-blue-600" />
+          <p className="text-2xl font-bold text-gray-900 mb-1">{totalLogs}</p>
+          <p className="text-blue-700 text-xs font-medium">Dev Logs</p>
         </div>
-        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 p-4 rounded-xl text-center border border-green-500/20">
-          <Github className="w-6 h-6 mx-auto mb-2 text-green-400" />
-          <p className="text-2xl font-bold text-white mb-1">{totalCommits}</p>
-          <p className="text-green-300 text-xs font-medium">Commits</p>
+        <div className="bg-stone-100 p-4 rounded-xl text-center border border-stone-200">
+          <Github className="w-6 h-6 mx-auto mb-2 text-green-600" />
+          <p className="text-2xl font-bold text-gray-900 mb-1">
+            {totalCommits}
+          </p>
+          <p className="text-green-700 text-xs font-medium">Commits</p>
         </div>
       </div>
 
       <div className="flex-1">
-        <p className="text-white text-sm font-semibold flex items-center mb-3">
-          <Clock size={14} className="mr-2 text-purple-400" />
+        <p className="text-gray-800 text-sm font-semibold flex items-center mb-3">
+          <Clock size={14} className="mr-2 text-blue-600" />
           Recent Activity
         </p>
         {recentLogs.length > 0 ? (
@@ -190,9 +189,9 @@ const QuickStatsCard = ({ logs, githubData }) => {
             {recentLogs.map((log) => (
               <div
                 key={log._id}
-                className="p-3 bg-gray-900/40 rounded-lg border border-gray-700/30"
+                className="p-3 bg-stone-100 rounded-lg border border-stone-200"
               >
-                <p className="text-gray-300 text-xs leading-relaxed line-clamp-2">
+                <p className="text-gray-700 text-xs leading-relaxed line-clamp-2">
                   {log.entry}
                 </p>
                 <p className="text-gray-500 text-xs mt-1">
@@ -227,39 +226,41 @@ const DetailedStatsCard = ({ logs, githubData, logStats }) => {
   );
 
   return (
-    <div className="bg-gray-800/60 backdrop-blur-lg p-4 rounded-2xl border border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/20 h-full flex flex-col">
-      <h3 className="text-lg font-bold text-white mb-4 flex items-center">
-        <Star size={18} className="mr-2 text-yellow-400" />
+    <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm h-full flex flex-col">
+      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+        <Star size={18} className="mr-2 text-amber-500" />
         Detailed Insights
       </h3>
       <div className="grid grid-cols-2 gap-4 text-xs mb-6">
         <div className="space-y-3">
           <div>
-            <p className="text-gray-400">This Week</p>
-            <p className="text-lg font-bold text-white">{thisWeekLogs}</p>
-            <p className="text-gray-500">New logs</p>
+            <p className="text-gray-500">This Week</p>
+            <p className="text-lg font-bold text-gray-900">{thisWeekLogs}</p>
+            <p className="text-gray-600">New logs</p>
           </div>
         </div>
         <div className="space-y-3">
           <div>
-            <p className="text-gray-400">GitHub Streak</p>
-            <p className="text-lg font-bold text-white">
+            <p className="text-gray-500">GitHub Streak</p>
+            <p className="text-lg font-bold text-gray-900">
               {githubData?.longestStreak || 0}
             </p>
-            <p className="text-gray-500">Days</p>
+            <p className="text-gray-600">Days</p>
           </div>
         </div>
       </div>
-      <div className="bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 p-4 rounded-xl border border-blue-500/20 mb-4">
+      <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-white">Productivity Score</p>
-          <span className="text-sm font-bold text-blue-400">
+          <p className="text-sm font-semibold text-gray-900">
+            Productivity Score
+          </p>
+          <span className="text-sm font-bold text-blue-600">
             {productivityScore}%
           </span>
         </div>
-        <div className="w-full bg-gray-700/50 rounded-full h-2">
+        <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+            className="bg-blue-600 h-2 rounded-full"
             style={{ width: `${productivityScore}%` }}
           ></div>
         </div>
@@ -299,22 +300,22 @@ function HomePage() {
   };
 
   return (
-    <div className="p-6 relative text-white">
+    <div className="p-6 relative text-gray-900">
       <header className="mb-6 relative z-10">
         <h1 className="text-2xl md:text-3xl font-bold">Developer Dashboard</h1>
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-500 text-sm">
           Welcome back, {userInfo?.name || "Developer"}!
         </p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="col-span-1">
+        <div className="lg:col-span-1">
           <ProfileCard userInfo={enhancedUserInfo} />
         </div>
-        <div className="col-span-1">
+        <div className="lg:col-span-1">
           <QuickStatsCard logs={logs} githubData={githubData} />
         </div>
-        <div className="col-span-1">
+        <div className="lg:col-span-1">
           <DetailedStatsCard
             logs={logs}
             githubData={githubData}
