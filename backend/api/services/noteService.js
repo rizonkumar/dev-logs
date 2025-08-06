@@ -19,6 +19,7 @@ const createNewNote = async (userId, noteData) => {
 };
 
 const updateNoteById = async (userId, noteId, updateData) => {
+  console.log("Update Data", updateData);
   const note = await getNoteById(userId, noteId);
   Object.assign(note, updateData);
   await note.save();

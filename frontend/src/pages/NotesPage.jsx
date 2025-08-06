@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchNotes,
@@ -20,6 +20,8 @@ const NotesPage = () => {
   const [debouncedTitle] = useDebounce(title, 1000);
   const [debouncedContent] = useDebounce(content, 1000);
 
+  const isInitialLoad = useRef(true);
+
   useEffect(() => {
     dispatch(fetchNotes());
   }, [dispatch]);
@@ -28,13 +30,19 @@ const NotesPage = () => {
     if (activeNote) {
       setTitle(activeNote.title);
       setContent(activeNote.content);
+      isInitialLoad.current = true;
     } else {
       setTitle("");
       setContent("");
     }
   }, [activeNote]);
 
-  const handleUpdateNote = useCallback(() => {
+  useEffect(() => {
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false;
+      return;
+    }
+
     if (
       activeNote &&
       (debouncedTitle !== activeNote.title ||
@@ -47,14 +55,10 @@ const NotesPage = () => {
         })
       );
     }
-  }, [activeNote, debouncedTitle, debouncedContent, dispatch]);
-
-  useEffect(() => {
-    handleUpdateNote();
-  }, [debouncedTitle, debouncedContent, handleUpdateNote]);
+  }, [debouncedTitle, debouncedContent, activeNote, dispatch]);
 
   const handleCreateNote = () => {
-    dispatch(createNewNote({ title: "New Note" }));
+    dispatch(createNewNote({ title: "Untitled Note", content: "" }));
   };
 
   const handleDeleteNote = (noteId) => {
