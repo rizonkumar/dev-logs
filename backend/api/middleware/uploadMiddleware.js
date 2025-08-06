@@ -6,26 +6,11 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "dev-dashboard-profiles",
-    allowed_formats: ["jpeg", "jpg", "png", "gif"],
+    allowed_formats: ["jpg", "png", "jpeg", "gif"],
+    transformation: [{ width: 500, height: 500, crop: "limit" }],
   },
 });
 
-function checkFileType(file, cb) {
-  const filetypes = /jpeg|jpg|png|gif/;
-  const mimetype = filetypes.test(file.mimetype);
-  if (mimetype) {
-    return cb(null, true);
-  } else {
-    cb(new Error("Error: Images Only!"));
-  }
-}
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 },
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  },
-});
+const upload = multer({ storage: storage });
 
 module.exports = upload;
