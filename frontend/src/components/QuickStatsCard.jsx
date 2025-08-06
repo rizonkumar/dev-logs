@@ -25,36 +25,36 @@ const QuickStatsCard = ({ logs }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 p-4 rounded-xl border border-green-500/20">
+      <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-green-400 text-sm font-medium">Today</p>
-            <p className="text-2xl font-bold text-white">{todayLogs}</p>
-            <p className="text-gray-400 text-xs">entries</p>
+            <p className="text-sm font-semibold text-green-600">Today</p>
+            <p className="text-2xl font-bold text-gray-900">{todayLogs}</p>
+            <p className="text-gray-500 text-xs">entries</p>
           </div>
-          <Zap className="w-8 h-8 text-green-400" />
+          <Zap className="w-8 h-8 text-green-500" />
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-4 rounded-xl border border-blue-500/20">
+      <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-blue-400 text-sm font-medium">This Week</p>
-            <p className="text-2xl font-bold text-white">{thisWeekLogs}</p>
-            <p className="text-gray-400 text-xs">entries</p>
+            <p className="text-sm font-semibold text-blue-600">This Week</p>
+            <p className="text-2xl font-bold text-gray-900">{thisWeekLogs}</p>
+            <p className="text-gray-500 text-xs">entries</p>
           </div>
-          <Calendar className="w-8 h-8 text-blue-400" />
+          <Calendar className="w-8 h-8 text-blue-500" />
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 p-4 rounded-xl border border-purple-500/20">
+      <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-purple-400 text-sm font-medium">Total Lines</p>
-            <p className="text-2xl font-bold text-white">{totalEntries}</p>
-            <p className="text-gray-400 text-xs">written</p>
+            <p className="text-sm font-semibold text-indigo-600">Total Lines</p>
+            <p className="text-2xl font-bold text-gray-900">{totalEntries}</p>
+            <p className="text-gray-500 text-xs">written</p>
           </div>
-          <Code className="w-8 h-8 text-purple-400" />
+          <Code className="w-8 h-8 text-indigo-500" />
         </div>
       </div>
     </div>
