@@ -28,7 +28,6 @@ const NotesPage = () => {
   const [debouncedContent] = useDebounce(content, 1000);
 
   const [isNoteViewOpen, setIsNoteViewOpen] = useState(false);
-
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
@@ -78,25 +77,18 @@ const NotesPage = () => {
 
   const handleBackToList = () => {
     dispatch(setActiveNote(null));
-    setIsNoteViewOpen(false);
   };
 
   return (
-    <div className="flex h-full text-gray-900 bg-stone-50 overflow-hidden">
-      <motion.div
-        className={`w-full md:w-1/3 md:max-w-sm bg-white border-r border-stone-200 flex flex-col transition-transform duration-300 ease-in-out ${
-          isNoteViewOpen
-            ? "-translate-x-full md:translate-x-0"
-            : "translate-x-0"
-        }`}
-      >
-        <div className="p-4 border-b border-stone-200 flex justify-between items-center">
+    <div className="flex h-full text-gray-900 bg-stone-50 overflow-hidden relative">
+      <div className="w-full h-full md:w-1/3 md:max-w-sm flex-shrink-0 bg-white border-r border-stone-200 flex flex-col">
+        <div className="p-4 border-b border-stone-200 flex justify-between items-center flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
             <Notebook className="text-yellow-500" /> Your Notes
           </h2>
           <button
             onClick={handleCreateNote}
-            className="p-2 rounded-lg bg-gray-800 text-white hover:bg-black transition-colors"
+            className="p-2 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 transition-colors"
           >
             <Plus size={20} />
           </button>
@@ -104,6 +96,23 @@ const NotesPage = () => {
         <div className="flex-1 overflow-y-auto">
           {status === "loading" && notes.length === 0 && (
             <div className="p-4 text-center text-gray-500">Loading...</div>
+          )}
+          {status === "succeeded" && notes.length === 0 && (
+            <div className="text-center p-8 flex flex-col items-center justify-center h-full">
+              <FileText size={48} className="mb-4 text-yellow-400" />
+              <h3 className="text-lg font-semibold text-gray-800">
+                No notes yet
+              </h3>
+              <p className="text-gray-500 text-sm mb-4">
+                Create your first note to get started.
+              </p>
+              <button
+                onClick={handleCreateNote}
+                className="px-4 py-2 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 transition-colors flex items-center gap-2 text-sm font-semibold"
+              >
+                <Plus size={16} /> Create Note
+              </button>
+            </div>
           )}
           {notes.map((note) => (
             <NoteListItem
@@ -115,55 +124,40 @@ const NotesPage = () => {
             />
           ))}
         </div>
-      </motion.div>
+      </div>
 
       <div
-        className={`w-full flex-1 flex flex-col p-4 sm:p-6 md:p-10 absolute md:static inset-0 transition-transform duration-300 ease-in-out ${
-          isNoteViewOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"
+        className={`absolute inset-0 md:static w-full flex-1 flex flex-col bg-stone-50 transition-transform duration-300 ease-in-out ${
+          isNoteViewOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <AnimatePresence mode="wait">
           {activeNote ? (
-            <motion.div
-              key={activeNote._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="w-full h-full flex flex-col"
-            >
-              <div className="flex items-center mb-4">
-                <button
-                  onClick={handleBackToList}
-                  className="md:hidden p-2 mr-2 rounded-full hover:bg-stone-100"
-                >
-                  <ArrowLeft size={20} />
-                </button>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Note Title"
-                  className="w-full bg-transparent text-3xl md:text-4xl font-bold focus:outline-none border-b-2 border-transparent focus:border-yellow-500 transition-colors"
-                />
-              </div>
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Start writing..."
-                className="w-full h-full bg-transparent p-2 text-base md:text-lg text-gray-700 resize-none focus:outline-none leading-relaxed"
-              />
-            </motion.div>
+            <EditorView
+              activeNote={activeNote}
+              title={title}
+              setTitle={setTitle}
+              content={content}
+              setContent={setContent}
+              handleBackToList={handleBackToList}
+            />
           ) : (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center text-gray-400 m-auto"
+              className="text-center text-gray-400 m-auto hidden md:flex flex-col items-center"
             >
               <FileText size={64} className="mx-auto mb-4 text-yellow-400" />
               <h3 className="text-2xl font-semibold text-gray-800">
                 Select a note to get started
               </h3>
               <p className="text-gray-500">Your thoughts are safe here.</p>
+              <button
+                onClick={handleCreateNote}
+                className="mt-4 px-4 py-2 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 transition-colors flex items-center gap-2"
+              >
+                <Plus size={16} /> Create a new note
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -171,6 +165,45 @@ const NotesPage = () => {
     </div>
   );
 };
+
+const EditorView = ({
+  activeNote,
+  title,
+  setTitle,
+  content,
+  setContent,
+  handleBackToList,
+}) => (
+  <motion.div
+    key={activeNote._id}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    className="w-full h-full flex flex-col p-4 sm:p-6 md:p-10"
+  >
+    <div className="flex items-center mb-4 flex-shrink-0">
+      <button
+        onClick={handleBackToList}
+        className="md:hidden p-2 -ml-2 mr-2 rounded-full text-gray-600 hover:bg-stone-200"
+      >
+        <ArrowLeft size={24} />
+      </button>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Note Title"
+        className="w-full bg-transparent text-2xl sm:text-3xl md:text-4xl font-bold focus:outline-none border-b-2 border-transparent focus:border-yellow-500 transition-colors"
+      />
+    </div>
+    <textarea
+      value={content}
+      onChange={(e) => setContent(e.target.value)}
+      placeholder="Start writing..."
+      className="w-full h-full bg-transparent p-2 text-base md:text-lg text-gray-700 resize-none focus:outline-none leading-relaxed"
+    />
+  </motion.div>
+);
 
 const NoteListItem = ({ note, activeNote, dispatch, onDelete }) => {
   const [menuOpen, setMenuOpen] = useState(false);
