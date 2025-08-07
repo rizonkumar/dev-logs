@@ -8,7 +8,14 @@ import {
   setActiveNote,
 } from "../app/features/notesSlice";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, FileText, MoreVertical } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  FileText,
+  MoreVertical,
+  ArrowLeft,
+  Notebook,
+} from "lucide-react";
 import { useDebounce } from "use-debounce";
 
 const NotesPage = () => {
@@ -20,6 +27,8 @@ const NotesPage = () => {
   const [debouncedTitle] = useDebounce(title, 1000);
   const [debouncedContent] = useDebounce(content, 1000);
 
+  const [isNoteViewOpen, setIsNoteViewOpen] = useState(false);
+
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
@@ -30,10 +39,12 @@ const NotesPage = () => {
     if (activeNote) {
       setTitle(activeNote.title);
       setContent(activeNote.content);
-      isInitialLoad.current = true; // Reset for new note selection
+      setIsNoteViewOpen(true);
+      isInitialLoad.current = true;
     } else {
       setTitle("");
       setContent("");
+      setIsNoteViewOpen(false);
     }
   }, [activeNote]);
 
@@ -65,17 +76,24 @@ const NotesPage = () => {
     dispatch(deleteExistingNote(noteId));
   };
 
+  const handleBackToList = () => {
+    dispatch(setActiveNote(null));
+    setIsNoteViewOpen(false);
+  };
+
   return (
-    <div className="flex h-full text-gray-900 bg-stone-50">
-      {/* Sidebar */}
+    <div className="flex h-full text-gray-900 bg-stone-50 overflow-hidden">
       <motion.div
-        initial={{ x: -200, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="w-full md:w-1/3 max-w-sm bg-white border-r border-stone-200 flex flex-col"
+        className={`w-full md:w-1/3 md:max-w-sm bg-white border-r border-stone-200 flex flex-col transition-transform duration-300 ease-in-out ${
+          isNoteViewOpen
+            ? "-translate-x-full md:translate-x-0"
+            : "translate-x-0"
+        }`}
       >
         <div className="p-4 border-b border-stone-200 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Your Notes</h2>
+          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <Notebook className="text-yellow-500" /> Your Notes
+          </h2>
           <button
             onClick={handleCreateNote}
             className="p-2 rounded-lg bg-gray-800 text-white hover:bg-black transition-colors"
@@ -99,8 +117,11 @@ const NotesPage = () => {
         </div>
       </motion.div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-10">
+      <div
+        className={`w-full flex-1 flex flex-col p-4 sm:p-6 md:p-10 absolute md:static inset-0 transition-transform duration-300 ease-in-out ${
+          isNoteViewOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"
+        }`}
+      >
         <AnimatePresence mode="wait">
           {activeNote ? (
             <motion.div
@@ -110,13 +131,21 @@ const NotesPage = () => {
               exit={{ opacity: 0, y: -20 }}
               className="w-full h-full flex flex-col"
             >
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Note Title"
-                className="w-full bg-transparent text-3xl md:text-4xl font-bold p-2 mb-4 focus:outline-none border-b-2 border-stone-200 focus:border-blue-500 transition-colors"
-              />
+              <div className="flex items-center mb-4">
+                <button
+                  onClick={handleBackToList}
+                  className="md:hidden p-2 mr-2 rounded-full hover:bg-stone-100"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Note Title"
+                  className="w-full bg-transparent text-3xl md:text-4xl font-bold focus:outline-none border-b-2 border-transparent focus:border-yellow-500 transition-colors"
+                />
+              </div>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -128,9 +157,9 @@ const NotesPage = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center text-gray-400"
+              className="text-center text-gray-400 m-auto"
             >
-              <FileText size={64} className="mx-auto mb-4" />
+              <FileText size={64} className="mx-auto mb-4 text-yellow-400" />
               <h3 className="text-2xl font-semibold text-gray-800">
                 Select a note to get started
               </h3>
@@ -150,13 +179,13 @@ const NoteListItem = ({ note, activeNote, dispatch, onDelete }) => {
   return (
     <div
       onClick={() => dispatch(setActiveNote(note._id))}
-      className={`p-4 border-b border-stone-200 cursor-pointer transition-colors relative ${
-        isActive ? "bg-blue-100/70" : "hover:bg-stone-100"
+      className={`p-4 border-b border-stone-200 cursor-pointer transition-colors relative group ${
+        isActive ? "bg-yellow-50" : "hover:bg-stone-100"
       }`}
     >
       <h3
         className={`font-semibold truncate ${
-          isActive ? "text-blue-800" : "text-gray-800"
+          isActive ? "text-yellow-800" : "text-gray-800"
         }`}
       >
         {note.title}
@@ -164,7 +193,7 @@ const NoteListItem = ({ note, activeNote, dispatch, onDelete }) => {
       <p className="text-sm text-gray-500 truncate mt-1">
         {note.content || "No content"}
       </p>
-      <div className="absolute top-3 right-3">
+      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={(e) => {
             e.stopPropagation();
