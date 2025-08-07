@@ -96,7 +96,7 @@ const MainLayout = ({ children }) => {
         }`}
       >
         <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-          {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "D"}
+          {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
         </div>
         <h1
           className={`text-xl font-bold text-gray-900 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
@@ -105,7 +105,7 @@ const MainLayout = ({ children }) => {
         >
           {userInfo?.name
             ? `${userInfo.name.split(" ")[0]}'s Board`
-            : "Dev Dashboard"}
+            : "Rizon's Board"}
         </h1>
       </div>
 
@@ -225,7 +225,8 @@ const MainLayout = ({ children }) => {
   );
 
   return (
-    <div className="relative min-h-screen lg:flex bg-stone-50 font-sans text-gray-800">
+    <div className="relative min-h-screen lg:h-screen lg:overflow-hidden lg:flex bg-stone-50 font-sans text-gray-800">
+      {/* Mobile-only overlay */}
       <div
         className={`fixed inset-0 bg-black/60 z-40 lg:hidden transition-opacity ${
           isMobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -264,7 +265,7 @@ const MainLayout = ({ children }) => {
             <h1 className="text-lg font-bold text-gray-900">
               {userInfo?.name
                 ? `${userInfo.name.split(" ")[0]}'s Board`
-                : "Dev Dashboard"}
+                : "Rizon's Board"}
             </h1>
           </div>
         </header>
