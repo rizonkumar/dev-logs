@@ -234,7 +234,6 @@ const MainLayout = ({ children }) => {
         onClick={() => setIsMobileMenuOpen(false)}
       ></div>
 
-      {/* Mobile Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-stone-200 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -243,7 +242,6 @@ const MainLayout = ({ children }) => {
         <SidebarContent isExpanded={true} />
       </aside>
 
-      {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:flex flex-shrink-0 flex-col bg-white border-r border-stone-200 transition-all duration-300 ease-in-out ${
           isDesktopSidebarOpen ? "w-64" : "w-20"
@@ -252,9 +250,7 @@ const MainLayout = ({ children }) => {
         <SidebarContent isExpanded={isDesktopSidebarOpen} />
       </aside>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
-        {/* Mobile Header */}
         <header className="lg:hidden sticky top-0 bg-white/80 backdrop-blur-sm border-b border-stone-200 p-4 flex items-center gap-4 z-30">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
