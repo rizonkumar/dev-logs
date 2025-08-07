@@ -96,7 +96,7 @@ const MainLayout = ({ children }) => {
         }`}
       >
         <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-          {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "D"}
+          {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
         </div>
         <h1
           className={`text-xl font-bold text-gray-900 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
@@ -105,7 +105,7 @@ const MainLayout = ({ children }) => {
         >
           {userInfo?.name
             ? `${userInfo.name.split(" ")[0]}'s Board`
-            : "Dev Dashboard"}
+            : "Rizon's Board"}
         </h1>
       </div>
 
@@ -225,7 +225,8 @@ const MainLayout = ({ children }) => {
   );
 
   return (
-    <div className="relative min-h-screen lg:flex bg-stone-50 font-sans text-gray-800">
+    <div className="relative min-h-screen lg:h-screen lg:overflow-hidden lg:flex bg-stone-50 font-sans text-gray-800">
+      {/* Mobile-only overlay */}
       <div
         className={`fixed inset-0 bg-black/60 z-40 lg:hidden transition-opacity ${
           isMobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -233,6 +234,7 @@ const MainLayout = ({ children }) => {
         onClick={() => setIsMobileMenuOpen(false)}
       ></div>
 
+      {/* Mobile Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-stone-200 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -241,6 +243,7 @@ const MainLayout = ({ children }) => {
         <SidebarContent isExpanded={true} />
       </aside>
 
+      {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:flex flex-shrink-0 flex-col bg-white border-r border-stone-200 transition-all duration-300 ease-in-out ${
           isDesktopSidebarOpen ? "w-64" : "w-20"
@@ -249,7 +252,9 @@ const MainLayout = ({ children }) => {
         <SidebarContent isExpanded={isDesktopSidebarOpen} />
       </aside>
 
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
+        {/* Mobile Header */}
         <header className="lg:hidden sticky top-0 bg-white/80 backdrop-blur-sm border-b border-stone-200 p-4 flex items-center gap-4 z-30">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
@@ -264,7 +269,7 @@ const MainLayout = ({ children }) => {
             <h1 className="text-lg font-bold text-gray-900">
               {userInfo?.name
                 ? `${userInfo.name.split(" ")[0]}'s Board`
-                : "Dev Dashboard"}
+                : "Rizon's Board"}
             </h1>
           </div>
         </header>
