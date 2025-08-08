@@ -414,10 +414,10 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
           </div>
         </div>
 
-        {/* Static milestone chips based on current streak thresholds */}
         {(() => {
-          const current = currentStreak || 0;
-          const milestoneDefs = [
+          const baseClass =
+            "ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800";
+          const milestones = [
             {
               t: 0,
               label: "Start",
@@ -455,48 +455,64 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
               cls: "ring-yellow-300/60 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
             },
           ];
+
+          const best =
+            milestones
+              .filter((m) => (longestStreak || 0) >= m.t)
+              .slice(-1)[0] || milestones[0];
+
+          const next = milestones.find((m) => m.t > (longestStreak || 0));
+
+          const selection = [best, next].filter(Boolean).slice(0, 2);
+
           return (
             <div className="flex flex-wrap items-center gap-1.5">
-              {milestoneDefs.map((m) => (
+              {selection.map((m) => (
                 <MilestoneChip
                   key={m.t}
-                  active={current >= m.t}
+                  active={(longestStreak || 0) >= m.t}
                   icon={m.icon}
                   label={`${m.label} ${m.t}`}
                   activeClass={m.cls}
-                  baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+                  baseClass={baseClass}
                 />
               ))}
             </div>
           );
         })()}
 
-        {/* Achievement badges based on current streak (keep last) */}
         {(() => {
-          const hasWeekly = currentStreak >= 7;
-          const hasDedicated = currentStreak >= 14;
-          const hasHardcore = currentStreak >= 30;
+          const defs = [
+            {
+              threshold: 30,
+              label: "Hard Core",
+              icon: Trophy,
+              cls: "ring-yellow-300/50 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
+            },
+            {
+              threshold: 14,
+              label: "Dev Dedicated",
+              icon: Flame,
+              cls: "ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300",
+            },
+            {
+              threshold: 7,
+              label: "Weekly",
+              icon: CalendarDays,
+              cls: "ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300",
+            },
+          ];
+
+          const best = defs.find((d) => (currentStreak || 0) >= d.threshold);
+          if (!best) return null;
+
           return (
             <div className="flex flex-wrap items-center gap-2">
               <AchievementBadge
-                achieved={hasWeekly}
-                icon={CalendarDays}
-                label="Weekly"
-                achievedClass="ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300"
-                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
-              />
-              <AchievementBadge
-                achieved={hasDedicated}
-                icon={Flame}
-                label="Dev Dedicated"
-                achievedClass="ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300"
-                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
-              />
-              <AchievementBadge
-                achieved={hasHardcore}
-                icon={Trophy}
-                label="Hard Core"
-                achievedClass="ring-yellow-300/50 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300"
+                achieved
+                icon={best.icon}
+                label={best.label}
+                achievedClass={best.cls}
                 baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
               />
             </div>
