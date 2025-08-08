@@ -188,7 +188,7 @@ const updateTransactionById = async (userId, transactionId, updateData) => {
       ? updateData.type === "INCOME"
         ? "INCOME"
         : "EXPENSE"
-      : undefined; // If type is not changing, skip type check here
+      : undefined;
 
     const existing = await FinanceTransaction.findOne({
       _id: transactionId,
