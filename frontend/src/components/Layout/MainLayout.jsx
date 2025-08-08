@@ -13,6 +13,7 @@ import {
   Notebook,
   PanelLeft,
   Menu,
+  Wallet,
 } from "lucide-react";
 import { Moon, Sun } from "lucide-react";
 
@@ -22,6 +23,7 @@ const navItems = [
   { path: "/todos", icon: CheckSquare, label: "Todo", color: "green" },
   { path: "/notes", icon: Notebook, label: "Notes", color: "yellow" },
   { path: "/timer", icon: Timer, label: "Timer", color: "red" },
+  { path: "/finance", icon: Wallet, label: "Finance", color: "indigo" },
   { path: "/profile", icon: User, label: "User Profile", color: "indigo" },
 ];
 
