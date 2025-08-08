@@ -54,21 +54,21 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-gray-900/10 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white border border-stone-200 rounded-2xl p-6 w-full max-w-sm shadow-xl"
+            className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl p-6 w-full max-w-sm shadow-xl"
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 Timer Settings
               </h3>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full text-gray-500 hover:bg-stone-100 hover:text-gray-800"
+                className="p-2 rounded-full text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white"
               >
                 <X size={20} />
               </button>
@@ -77,7 +77,7 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
               <div>
                 <label
                   htmlFor="work"
-                  className="block text-sm font-medium text-gray-600 mb-2"
+                  className="block text-sm font-medium text-gray-600 dark:text-stone-300 mb-2"
                 >
                   Work Duration (minutes)
                 </label>
@@ -86,13 +86,13 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
                   id="work"
                   value={localWork}
                   onChange={(e) => setLocalWork(Number(e.target.value))}
-                  className="w-full bg-stone-50 p-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full bg-stone-50 dark:bg-stone-900 p-2 rounded-lg border border-stone-300 dark:border-stone-700 focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 dark:text-stone-100"
                 />
               </div>
               <div>
                 <label
                   htmlFor="break"
-                  className="block text-sm font-medium text-gray-600 mb-2"
+                  className="block text-sm font-medium text-gray-600 dark:text-stone-300 mb-2"
                 >
                   Break Duration (minutes)
                 </label>
@@ -101,14 +101,14 @@ const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
                   id="break"
                   value={localBreak}
                   onChange={(e) => setLocalBreak(Number(e.target.value))}
-                  className="w-full bg-stone-50 p-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full bg-stone-50 dark:bg-stone-900 p-2 rounded-lg border border-stone-300 dark:border-stone-700 focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 dark:text-stone-100"
                 />
               </div>
             </div>
             <div className="mt-6 flex justify-end">
               <button
                 onClick={handleApply}
-                className="px-5 py-2 bg-gray-800 hover:bg-black text-white rounded-lg font-semibold transition-colors"
+                className="px-5 py-2 bg-gray-800 hover:bg-black dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
               >
                 Apply
               </button>
@@ -137,15 +137,15 @@ const HistoryPanel = ({ history, isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-0 right-0 h-full w-full max-w-sm bg-white/80 backdrop-blur-lg border-l border-stone-200 z-40 flex flex-col"
+            className="fixed top-0 right-0 h-full w-full max-w-sm bg-white/80 dark:bg-stone-900/95 backdrop-blur-lg border-l border-stone-200 dark:border-stone-700 z-40 flex flex-col"
           >
-            <div className="p-4 border-b border-stone-200 flex justify-between items-center flex-shrink-0">
-              <h3 className="text-xl font-bold text-gray-900">
+            <div className="p-4 border-b border-stone-200 dark:border-stone-700 flex justify-between items-center flex-shrink-0">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 Session History
               </h3>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full text-gray-600 hover:bg-stone-200 hover:text-gray-900"
+                className="p-2 rounded-full text-gray-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white"
               >
                 <X size={20} />
               </button>
@@ -155,30 +155,30 @@ const HistoryPanel = ({ history, isOpen, onClose }) => {
                 history.map((session) => (
                   <div
                     key={session._id}
-                    className="bg-stone-100 p-3 rounded-lg border border-stone-200"
+                    className="bg-stone-100 dark:bg-stone-800 p-3 rounded-lg border border-stone-200 dark:border-stone-700"
                   >
-                    <p className="font-semibold text-gray-800">
+                    <p className="font-semibold text-gray-800 dark:text-stone-200">
                       {session.title}
                     </p>
-                    <div className="text-xs text-gray-500 flex items-center justify-between mt-1">
+                    <div className="text-xs text-gray-500 dark:text-stone-400 flex items-center justify-between mt-1">
                       <span
                         className={`font-medium capitalize ${
                           session.sessionType === "WORK"
                             ? "text-blue-600"
-                            : "text-green-600"
+                            : "text-green-500"
                         }`}
                       >
                         {session.duration} min{" "}
                         {session.sessionType.toLowerCase()}
                       </span>
-                      <span>
+                      <span className="dark:text-stone-400">
                         {new Date(session.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-500 mt-8">
+                <p className="text-center text-gray-500 dark:text-stone-400 mt-8">
                   No session history yet.
                 </p>
               )}
@@ -261,7 +261,9 @@ const PomodoroTimerPage = () => {
   return (
     <div className="w-full h-full flex flex-col text-gray-900 dark:text-stone-100 relative bg-stone-50 dark:bg-stone-950">
       <header className="w-full p-4 sm:p-6 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Pomodoro Timer</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          Pomodoro Timer
+        </h2>
         <div className="flex gap-3 z-10">
           <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
@@ -291,7 +293,7 @@ const PomodoroTimerPage = () => {
       />
 
       <main className="flex-1 flex flex-col items-center justify-center p-4">
-        <div className="flex items-center bg-stone-200/70 dark:bg-stone-800 rounded-lg p-1.5 mb-6 sm:mb-8">
+        <div className="flex items-center bg-stone-200/70 dark:bg-stone-800/80 rounded-lg p-1.5 mb-6 sm:mb-8">
           <button
             onClick={() => dispatch(setSessionType("WORK"))}
             className={`px-4 sm:px-6 py-2 rounded-md text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
@@ -321,7 +323,7 @@ const PomodoroTimerPage = () => {
               cy="130"
               r={radius}
               fill="none"
-              className="stroke-stone-200"
+              className="stroke-stone-200 dark:stroke-stone-700"
               strokeWidth="12"
             />
             <motion.circle
@@ -364,7 +366,9 @@ const PomodoroTimerPage = () => {
             <span className="block text-3xl font-bold text-gray-800 dark:text-white">
               {stats.sessionsToday}
             </span>
-            <span className="text-xs text-gray-500 dark:text-stone-400">Sessions Today</span>
+            <span className="text-xs text-gray-500 dark:text-stone-400">
+              Sessions Today
+            </span>
           </p>
           <button
             onClick={handleStartPause}
