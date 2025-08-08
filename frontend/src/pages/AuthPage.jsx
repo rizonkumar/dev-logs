@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login, register, reset } from "../app/features/authSlice";
 import { toast } from "react-toastify";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import {
   LogIn,
   UserPlus,
@@ -18,6 +18,8 @@ import {
   Github,
   Mail,
   TwitterIcon,
+  Moon,
+  Sun,
 } from "lucide-react";
 
 const InputField = ({ icon, ...props }) => (
@@ -33,23 +35,21 @@ const InputField = ({ icon, ...props }) => (
 );
 
 const FeatureCard = ({ icon, title, description, delay }) => (
-  <motion.div
+  <Motion.div
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.5, delay: delay }}
     className="flex items-start gap-4"
   >
-    <div className="w-12 h-12 rounded-lg bg-stone-100 flex-shrink-0 flex items-center justify-center border border-stone-200">
+    <div className="w-12 h-12 rounded-lg bg-stone-100 dark:bg-stone-900 flex-shrink-0 flex items-center justify-center border border-stone-200 dark:border-stone-700">
       {icon}
     </div>
     <div>
-      <h3 className="font-semibold text-gray-800">{title}</h3>
-      <p className="text-sm text-gray-500">{description}</p>
+      <h3 className="font-semibold text-gray-800 dark:text-white">{title}</h3>
+      <p className="text-sm text-gray-500 dark:text-stone-300">{description}</p>
     </div>
-  </motion.div>
+  </Motion.div>
 );
-
-// --- New Footer Component ---
 
 const Footer = () => {
   const socialLinks = [
@@ -76,7 +76,7 @@ const Footer = () => {
   ];
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.8, duration: 0.5 }}
@@ -108,7 +108,7 @@ const Footer = () => {
           Rizon Kumar Rahi
         </a>
       </p>
-    </motion.div>
+    </Motion.div>
   );
 };
 
@@ -123,6 +123,34 @@ const AuthPage = () => {
   });
   const { name, email, password } = formData;
 
+  // Theme toggle for unauthenticated page
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const storedTheme = localStorage.getItem("theme");
+    const shouldUseDark = storedTheme ? storedTheme === "dark" : prefersDark;
+    setIsDark(shouldUseDark);
+    document.documentElement.classList.toggle("dark", shouldUseDark);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    try {
+      localStorage.setItem("theme", next ? "dark" : "light");
+    } catch {
+      console.error("Error setting theme");
+    }
+    window.dispatchEvent(
+      new CustomEvent("themechange", {
+        detail: { theme: next ? "dark" : "light" },
+      })
+    );
+  };
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo, isLoading, isError, isSuccess, message } = useSelector(
@@ -133,11 +161,15 @@ const AuthPage = () => {
     if (isError && message) {
       toast.error(message);
     }
-    if (isSuccess || userInfo) {
-      toast.success(`Welcome ${isLogin ? userInfo?.name || "" : name}!`);
+    if (isSuccess) {
+      toast.success(`Welcome ${isLogin ? userInfo?.name || "" : name}!`, {
+        toastId: "loginSuccess",
+      });
       navigate("/");
     }
-    dispatch(reset());
+    if (isError || isSuccess) {
+      dispatch(reset());
+    }
   }, [
     userInfo,
     isError,
@@ -173,38 +205,47 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 p-4">
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
-        className="w-full max-w-5xl lg:grid lg:grid-cols-2 rounded-2xl shadow-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 overflow-hidden"
+        className="relative w-full max-w-5xl lg:grid lg:grid-cols-2 rounded-2xl shadow-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 overflow-hidden"
       >
-        {/* Left Panel: Feature Showcase */}
-        <div className="hidden lg:flex flex-col justify-between p-12 bg-stone-100/70 relative">
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          className="absolute top-3 right-3 p-2 rounded-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-gray-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800"
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+        <div className="hidden lg:flex flex-col justify-between p-12 bg-stone-100/70 dark:bg-stone-800/40 relative">
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-12">
               <div className="w-12 h-12 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-xl">
                 D
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Dev Dashboard
               </h1>
             </div>
-            <motion.div
+            <Motion.div
               initial="hidden"
               animate="visible"
               transition={{ staggerChildren: 0.1 }}
             >
-              <motion.h2
+              <Motion.h2
                 variants={formVariants}
-                className="text-4xl font-bold text-gray-900 mb-4 leading-tight"
+                className="text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight"
               >
                 A Central Hub for Your Entire Workflow.
-              </motion.h2>
-              <motion.p variants={formVariants} className="text-gray-600 mb-10">
+              </Motion.h2>
+              <Motion.p
+                variants={formVariants}
+                className="text-gray-600 dark:text-stone-300 mb-10"
+              >
                 From logging daily progress to managing complex projects, Dev
                 Dashboard brings all your tools into one cohesive workspace.
-              </motion.p>
+              </Motion.p>
               <div className="space-y-6">
                 <FeatureCard
                   icon={<BookOpen className="text-blue-600" />}
@@ -225,7 +266,7 @@ const AuthPage = () => {
                   delay={0.4}
                 />
               </div>
-            </motion.div>
+            </Motion.div>
           </div>
           <Footer />
         </div>
@@ -233,7 +274,7 @@ const AuthPage = () => {
         {/* Right Panel: Form */}
         <div className="w-full p-8 sm:p-12 flex flex-col justify-center bg-white dark:bg-stone-900">
           <AnimatePresence mode="wait">
-            <motion.div
+            <Motion.div
               key={isLogin ? "login" : "signup"}
               variants={formVariants}
               initial="hidden"
@@ -324,10 +365,10 @@ const AuthPage = () => {
                   </span>
                 </button>
               </div>
-            </motion.div>
+            </Motion.div>
           </AnimatePresence>
         </div>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 };
