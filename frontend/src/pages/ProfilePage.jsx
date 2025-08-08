@@ -14,6 +14,7 @@ import {
   Info,
   Key,
   Share2,
+  Wallet,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -33,6 +34,7 @@ const ProfilePage = () => {
     githubUrl: "",
     githubUsername: "",
     githubToken: "",
+    financeCurrency: "USD",
   });
 
   const [profileImage, setProfileImage] = useState(null);
@@ -62,6 +64,7 @@ const ProfilePage = () => {
         githubUrl: userInfo.githubUrl || "",
         githubUsername: userInfo.githubUsername || "",
         githubToken: userInfo.githubToken || "",
+        financeCurrency: userInfo.financeCurrency || "USD",
       });
       setPreviewImage(userInfo.profileImage);
     }
@@ -219,6 +222,39 @@ const ProfilePage = () => {
               onChange={onChange}
               placeholder="https://github.com/username"
             />
+            <div>
+              <label className="block text-sm font-medium text-gray-600 dark:text-stone-300 mb-2">
+                Preferred Finance Currency
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-3.5">
+                  <Wallet size={20} className="text-purple-500" />
+                </div>
+                <select
+                  name="financeCurrency"
+                  value={formData.financeCurrency}
+                  onChange={onChange}
+                  className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg py-3 pl-12 pr-4 text-gray-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {[
+                    "USD",
+                    "EUR",
+                    "GBP",
+                    "INR",
+                    "AUD",
+                    "CAD",
+                    "JPY",
+                    "CHF",
+                    "SEK",
+                    "NZD",
+                  ].map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 

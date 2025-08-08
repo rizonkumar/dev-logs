@@ -9,6 +9,7 @@ import DevBoardPage from "./pages/DevBoardPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotesPage from "./pages/NotesPage";
+import FinancePage from "./pages/FinancePage";
 import MainLayout from "./components/Layout/MainLayout";
 import PomodoroTimer from "./components/PomodoroTimer";
 import PrivateRoute from "./components/PrivateRoute";
@@ -47,6 +48,7 @@ function App() {
                   <Route path="/logs" element={<DevLogsPage />} />
                   <Route path="/board" element={<DevBoardPage />} />
                   <Route path="/notes" element={<NotesPage />} />
+                  <Route path="/finance" element={<FinancePage />} />
                   <Route path="/timer" element={<PomodoroTimer />} />
                   <Route path="/todos" element={<DevBoardPage />} />
                   <Route path="/profile" element={<ProfilePage />} />

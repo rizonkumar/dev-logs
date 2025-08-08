@@ -25,6 +25,14 @@ export const API_ENDPOINTS = {
   REVIEWS: `${API_BASE_URL}/reviews/`,
   USERS: `${API_BASE_URL}/users/`,
   NOTES: `${API_BASE_URL}/notes/`,
+  FINANCE: `${API_BASE_URL}/finance/`,
+  FINANCE_TRANSACTIONS: `${API_BASE_URL}/finance/transactions/`,
+  FINANCE_CATEGORIES: `${API_BASE_URL}/finance/categories/`,
+  FINANCE_BUDGETS: `${API_BASE_URL}/finance/budgets/`,
+  FINANCE_GOALS: `${API_BASE_URL}/finance/goals/`,
+  FINANCE_PROJECTS: `${API_BASE_URL}/finance/projects/`,
+  FINANCE_DASHBOARD: `${API_BASE_URL}/finance/dashboard/`,
+  FINANCE_CALCULATORS: `${API_BASE_URL}/finance/calculators/`,
 };
 
 export default API_BASE_URL;

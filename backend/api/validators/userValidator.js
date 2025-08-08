@@ -6,6 +6,10 @@ const validateRegistration = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
+  body("financeCurrency")
+    .optional()
+    .isLength({ min: 3, max: 3 })
+    .withMessage("financeCurrency must be a 3-letter ISO code e.g. USD, INR, EUR"),
 ];
 
 const validateLogin = [

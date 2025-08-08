@@ -6,8 +6,13 @@ const {
 } = require("../utils/generateToken");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-  const user = await userService.createUser({ name, email, password });
+  const { name, email, password, financeCurrency } = req.body;
+  const user = await userService.createUser({
+    name,
+    email,
+    password,
+    financeCurrency,
+  });
   if (user) {
     res.status(201).json({
       _id: user._id,
@@ -21,6 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
       githubUrl: user.githubUrl,
       githubUsername: user.githubUsername,
       githubToken: user.githubToken,
+      financeCurrency: user.financeCurrency,
       token: generateAccessToken(user._id),
       refreshToken: generateRefreshToken(user._id),
     });
@@ -45,6 +51,7 @@ const loginUser = asyncHandler(async (req, res) => {
     githubUrl: user.githubUrl,
     githubUsername: user.githubUsername,
     githubToken: user.githubToken,
+    financeCurrency: user.financeCurrency,
     token: generateAccessToken(user._id),
     refreshToken: generateRefreshToken(user._id),
   });
@@ -65,6 +72,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     githubUrl: user.githubUrl,
     githubUsername: user.githubUsername,
     githubToken: user.githubToken,
+    financeCurrency: user.financeCurrency,
   });
 });
 
@@ -92,6 +100,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     githubUrl: updatedUser.githubUrl,
     githubUsername: updatedUser.githubUsername,
     githubToken: updatedUser.githubToken,
+    financeCurrency: updatedUser.financeCurrency,
     token: generateAccessToken(updatedUser._id),
     refreshToken: generateRefreshToken(updatedUser._id),
   });

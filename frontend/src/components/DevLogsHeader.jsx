@@ -23,6 +23,11 @@ const DevLogsHeader = () => {
       href: "/board",
       icon: KanbanSquare,
     },
+    {
+      name: "Finance",
+      href: "/finance",
+      icon: LayoutDashboard,
+    },
   ];
 
   return (
