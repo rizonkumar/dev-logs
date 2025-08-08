@@ -241,6 +241,9 @@ const DevBoardPage = () => {
     if (dateTo) params.to = dateTo;
     if (Object.keys(params).length > 0) {
       dispatch(fetchTodos(params));
+    } else {
+      // When all filters are cleared, refetch the full list so UI restores Today view properly
+      dispatch(fetchTodos());
     }
   }, [debouncedSearch, dateFrom, dateTo, dispatch]);
 
