@@ -394,6 +394,14 @@ const DevBoardPage = () => {
             >
               <Plus size={18} /> Add Task
             </button>
+            {/* Mobile-only Reset placed next to Add Task */}
+            <button
+              onClick={clearFilters}
+              className="sm:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-sm font-semibold cursor-pointer"
+              title="Clear filters"
+            >
+              <RotateCcw size={14} /> Reset
+            </button>
           </div>
         </div>
 
@@ -436,7 +444,7 @@ const DevBoardPage = () => {
             </div>
             <button
               onClick={clearFilters}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-sm font-semibold cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-sm font-semibold cursor-pointer"
               title="Clear filters"
             >
               <RotateCcw size={14} /> Reset
