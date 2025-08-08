@@ -233,12 +233,11 @@ const PomodoroTimerPage = () => {
     dispatch(resetTimer());
   };
 
-  const timerConfig = {
-    WORK: { color: "blue", name: "Work" },
-    BREAK: { color: "green", name: "Break" },
-  };
-
-  const { color: timerColor } = timerConfig[sessionType];
+  const isWork = sessionType === "WORK";
+  const actionButtonBg = isWork
+    ? "bg-blue-600 hover:bg-blue-700 ring-blue-300/30"
+    : "bg-green-600 hover:bg-green-700 ring-green-300/30";
+  const timerStrokeClass = isWork ? "text-blue-600" : "text-green-600";
 
   const formatTime = (s) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(
@@ -255,8 +254,7 @@ const PomodoroTimerPage = () => {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  const mainButtonColor = `bg-${timerColor}-600 hover:bg-${timerColor}-700`;
-  const timerTextColor = `text-${timerColor}-600`;
+  // All classes are static to satisfy Tailwind v4 class scanning
 
   return (
     <div className="w-full h-full flex flex-col text-gray-900 dark:text-stone-100 relative bg-stone-50 dark:bg-stone-950">
@@ -332,7 +330,7 @@ const PomodoroTimerPage = () => {
               r={radius}
               fill="none"
               strokeWidth="12"
-              className={`stroke-current ${timerTextColor}`}
+              className={`stroke-current ${timerStrokeClass}`}
               strokeLinecap="round"
               transform="rotate(-90 130 130)"
               style={{ strokeDasharray: circumference }}
@@ -372,7 +370,8 @@ const PomodoroTimerPage = () => {
           </p>
           <button
             onClick={handleStartPause}
-            className={`w-16 h-16 sm:w-20 sm:h-20 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300 ${mainButtonColor}`}
+            aria-label={isRunning ? "Pause timer" : "Start timer"}
+            className={`w-16 h-16 sm:w-20 sm:h-20 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300 ring-2 ${actionButtonBg}`}
           >
             {isRunning ? (
               <Pause size={32} fill="currentColor" />

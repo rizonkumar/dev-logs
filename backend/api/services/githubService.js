@@ -4,9 +4,11 @@ const getContributionData = async (username, token) => {
   const headers = {
     Authorization: `bearer ${token}`,
   };
-  const body = {
-    query: `query {
-      user(login: "${username}") {
+
+  // Query 1: Contributions calendar and public repo count
+  const contributionsBody = {
+    query: `query ($username: String!) {
+      user(login: $username) {
         repositories(privacy: PUBLIC) {
           totalCount
         }
@@ -23,14 +25,18 @@ const getContributionData = async (username, token) => {
         }
       }
     }`,
+    variables: { username },
   };
 
   try {
-    const response = await axios.post("https://api.github.com/graphql", body, {
-      headers,
-    });
-    const userData = response.data.data.user;
-    const calendar = userData.contributionsCollection.contributionCalendar;
+    const response = await axios.post(
+      "https://api.github.com/graphql",
+      contributionsBody,
+      { headers }
+    );
+    const contributionsUser = response.data.data.user;
+    const calendar =
+      contributionsUser.contributionsCollection.contributionCalendar;
     let contributions = [];
     calendar.weeks.forEach((week) => {
       week.contributionDays.forEach((day) => {
@@ -44,7 +50,7 @@ const getContributionData = async (username, token) => {
       });
     });
 
-    // Calculate longest streak
+    // Calculate longest and current streak
     const sortedContributions = contributions.sort(
       (a, b) => new Date(a.date) - new Date(b.date)
     );
@@ -70,10 +76,40 @@ const getContributionData = async (username, token) => {
     }
     longestStreak = Math.max(longestStreak, currentStreak);
 
+    // Calculate total stars across public repositories (first 100)
+    // Query 2: Paginated star aggregation across all public repositories
+    let totalStars = 0;
+    let hasNextPage = true;
+    let after = null;
+    const starsQuery = `query ($username: String!, $after: String) {
+      user(login: $username) {
+        repositories(privacy: PUBLIC, ownerAffiliations: OWNER, first: 100, after: $after) {
+          pageInfo { hasNextPage endCursor }
+          nodes { stargazerCount }
+        }
+      }
+    }`;
+    while (hasNextPage) {
+      const starsBody = { query: starsQuery, variables: { username, after } };
+      const starsResp = await axios.post(
+        "https://api.github.com/graphql",
+        starsBody,
+        { headers }
+      );
+      const repoConnection = starsResp.data.data.user.repositories;
+      for (const repo of repoConnection.nodes || []) {
+        totalStars += repo?.stargazerCount || 0;
+      }
+      hasNextPage = repoConnection.pageInfo?.hasNextPage || false;
+      after = repoConnection.pageInfo?.endCursor || null;
+    }
+
     return {
       totalContributions: calendar.totalContributions,
-      publicRepositories: userData.repositories.totalCount,
+      publicRepositories: contributionsUser.repositories.totalCount,
       longestStreak: longestStreak,
+      currentStreak: currentStreak,
+      totalStars,
       contributions: contributions,
     };
   } catch (error) {

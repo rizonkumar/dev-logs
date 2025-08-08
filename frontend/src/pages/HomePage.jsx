@@ -15,6 +15,7 @@ import {
   AlertCircle,
   BookOpen,
   Sparkles,
+  Flame,
 } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import Loader from "../components/Loader";
@@ -152,7 +153,7 @@ const QuickStatsCard = ({ logs, githubData }) => {
         Quick Stats
       </h3>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl text-center border border-blue-200 dark:border-blue-900/40">
           <BookOpen className="w-6 h-6 mx-auto mb-2 text-blue-600" />
           <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
@@ -178,9 +179,9 @@ const QuickStatsCard = ({ logs, githubData }) => {
           <Clock size={14} className="mr-2 text-gray-500 dark:text-stone-400" />
           Recent Activity
         </p>
-        {recentLogs.length > 0 ? (
+        {recentLogs.slice(0, 2).length > 0 ? (
           <div className="space-y-2">
-            {recentLogs.map((log) => (
+            {recentLogs.slice(0, 2).map((log) => (
               <div
                 key={log._id}
                 className="p-3 bg-stone-100 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700"
@@ -215,6 +216,7 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
     ).length || 0;
 
   const currentStreak = logStats?.currentStreak || 0;
+  const longestStreak = logStats?.longestStreak || 0;
 
   const productivityScore = Math.min(
     100,
@@ -229,7 +231,7 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
       </h3>
 
       <div className="space-y-4 flex-1">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded-xl border border-purple-200 dark:border-purple-900/40 text-center">
             <p className="text-xs font-semibold text-purple-700 dark:text-purple-300">
               This Week
@@ -239,18 +241,27 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
             </p>
             <p className="text-xs text-gray-500 dark:text-stone-300">logs</p>
           </div>
-          <div className="bg-orange-50 dark:bg-orange-950/20 p-3 rounded-xl border border-orange-200 dark:border-orange-900/40 text-center">
-            <p className="text-xs font-semibold text-orange-700 dark:text-orange-300">
-              Log Streak
+          <div className="bg-orange-50 dark:bg-orange-950/30 p-3 rounded-xl border border-orange-200 dark:border-orange-900/40 text-center">
+            <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 flex items-center justify-center gap-1">
+              <Flame size={18} className="text-orange-500" /> Current Streak
             </p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {currentStreak}
             </p>
             <p className="text-xs text-gray-500 dark:text-stone-300">days</p>
           </div>
+          <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-xl border border-red-200 dark:border-red-900/40 text-center hidden md:block">
+            <p className="text-xs font-semibold text-red-700 dark:text-red-300 flex items-center justify-center gap-1">
+              <Flame size={18} className="text-red-500" /> Longest Streak
+            </p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {longestStreak}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-stone-300">days</p>
+          </div>
         </div>
 
-        <div className="bg-stone-100 dark:bg-stone-800 p-3 rounded-xl border border-stone-200 dark:border-stone-700">
+        <div className="bg-stone-100 dark:bg-stone-800/70 p-3 rounded-xl border border-stone-200 dark:border-stone-700">
           <div className="flex items-center justify-between mb-1">
             <p className="text-sm font-semibold text-gray-800 dark:text-white">
               Productivity Score
