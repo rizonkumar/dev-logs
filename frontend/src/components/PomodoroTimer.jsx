@@ -259,19 +259,19 @@ const PomodoroTimerPage = () => {
   const timerTextColor = `text-${timerColor}-600`;
 
   return (
-    <div className="w-full h-full flex flex-col text-gray-900 relative bg-stone-50">
+    <div className="w-full h-full flex flex-col text-gray-900 dark:text-stone-100 relative bg-stone-50 dark:bg-stone-950">
       <header className="w-full p-4 sm:p-6 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-900">Pomodoro Timer</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Pomodoro Timer</h2>
         <div className="flex gap-3 z-10">
           <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className="p-3 bg-white rounded-full hover:bg-stone-100 border border-stone-200 text-gray-600 hover:text-gray-800 transition-colors"
+            className="p-3 bg-white dark:bg-stone-900 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 text-gray-600 dark:text-stone-300 hover:text-gray-800 dark:hover:text-white transition-colors"
           >
             <History size={20} />
           </button>
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="p-3 bg-white rounded-full hover:bg-stone-100 border border-stone-200 text-gray-600 hover:text-gray-800 transition-colors"
+            className="p-3 bg-white dark:bg-stone-900 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 text-gray-600 dark:text-stone-300 hover:text-gray-800 dark:hover:text-white transition-colors"
           >
             <Settings size={20} />
           </button>
@@ -291,13 +291,13 @@ const PomodoroTimerPage = () => {
       />
 
       <main className="flex-1 flex flex-col items-center justify-center p-4">
-        <div className="flex items-center bg-stone-200/70 rounded-lg p-1.5 mb-6 sm:mb-8">
+        <div className="flex items-center bg-stone-200/70 dark:bg-stone-800 rounded-lg p-1.5 mb-6 sm:mb-8">
           <button
             onClick={() => dispatch(setSessionType("WORK"))}
             className={`px-4 sm:px-6 py-2 rounded-md text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
               sessionType === "WORK"
-                ? "bg-white shadow-sm text-blue-600"
-                : "text-gray-500 hover:text-gray-800"
+                ? "bg-white dark:bg-stone-900 shadow-sm text-blue-600"
+                : "text-gray-500 dark:text-stone-300 hover:text-gray-800 dark:hover:text-white"
             }`}
           >
             <Brain size={16} /> Work
@@ -306,8 +306,8 @@ const PomodoroTimerPage = () => {
             onClick={() => dispatch(setSessionType("BREAK"))}
             className={`px-4 sm:px-6 py-2 rounded-md text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
               sessionType === "BREAK"
-                ? "bg-white shadow-sm text-green-600"
-                : "text-gray-500 hover:text-gray-800"
+                ? "bg-white dark:bg-stone-900 shadow-sm text-green-600"
+                : "text-gray-500 dark:text-stone-300 hover:text-gray-800 dark:hover:text-white"
             }`}
           >
             <Coffee size={16} /> Break
@@ -340,7 +340,7 @@ const PomodoroTimerPage = () => {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-6xl sm:text-7xl font-light tracking-widest text-gray-800">
+            <p className="text-6xl sm:text-7xl font-light tracking-widest text-gray-800 dark:text-stone-100">
               {formatTime(timeRemaining)}
             </p>
           </div>
@@ -353,18 +353,18 @@ const PomodoroTimerPage = () => {
               value={currentTitle}
               onChange={(e) => dispatch(setCurrentTitle(e.target.value))}
               placeholder="What are you working on?"
-              className="w-full bg-transparent text-center text-lg placeholder-gray-400 focus:outline-none"
+              className="w-full bg-transparent text-center text-lg placeholder-gray-400 dark:placeholder-stone-400 focus:outline-none"
             />
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/3 h-px bg-stone-300"></div>
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/3 h-px bg-stone-300 dark:bg-stone-700"></div>
           </div>
         </div>
 
         <div className="flex items-center justify-center gap-4 sm:gap-6">
           <p className="text-center w-20 sm:w-24">
-            <span className="block text-3xl font-bold text-gray-800">
+            <span className="block text-3xl font-bold text-gray-800 dark:text-white">
               {stats.sessionsToday}
             </span>
-            <span className="text-xs text-gray-500">Sessions Today</span>
+            <span className="text-xs text-gray-500 dark:text-stone-400">Sessions Today</span>
           </p>
           <button
             onClick={handleStartPause}
@@ -378,7 +378,7 @@ const PomodoroTimerPage = () => {
           </button>
           <button
             onClick={handleReset}
-            className="w-12 h-12 bg-stone-200 text-gray-500 rounded-full flex items-center justify-center shadow-sm hover:bg-stone-300 transition-all duration-300"
+            className="w-12 h-12 bg-stone-200 dark:bg-stone-800 text-gray-500 dark:text-stone-300 rounded-full flex items-center justify-center shadow-sm hover:bg-stone-300 dark:hover:bg-stone-700 transition-all duration-300"
           >
             <RotateCcw size={20} />
           </button>

@@ -43,14 +43,14 @@ const TodoItem = ({ todo, compact = false }) => {
 
   if (compact) {
     return (
-      <li className="flex items-center justify-between p-2 transition-colors duration-200 rounded-md hover:bg-gray-700/30">
+      <li className="flex items-center justify-between p-2 transition-colors duration-200 rounded-md hover:bg-stone-100 dark:hover:bg-gray-700/30">
         {isEditing ? (
           <div className="flex-grow flex items-center gap-1">
             <input
               type="text"
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="w-full bg-gray-900 px-2 py-1 rounded text-xs border border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+              className="w-full bg-stone-50 dark:bg-gray-900 px-2 py-1 rounded text-xs border border-stone-300 dark:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-400 text-gray-800 dark:text-gray-300"
               autoFocus
             />
             <button
@@ -87,10 +87,10 @@ const TodoItem = ({ todo, compact = false }) => {
               </div>
               <div className="flex-grow">
                 <span
-                  className={`text-xs transition-colors duration-200 ${
+               className={`text-xs transition-colors duration-200 ${
                     todo.isCompleted
                       ? "text-gray-500 line-through"
-                      : "text-gray-200"
+                   : "text-gray-900 dark:text-gray-200"
                   }`}
                 >
                   {todo.task}
@@ -355,7 +355,7 @@ function TodoList({ compact = false }) {
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             placeholder="Add a new task..."
-            className="w-full bg-gray-900/70 px-2 py-1 rounded text-xs border border-gray-600 focus:ring-1 focus:ring-teal-400 focus:outline-none transition-all text-gray-300 placeholder-gray-500"
+            className="w-full bg-stone-50 dark:bg-gray-900/70 px-2 py-1 rounded text-xs border border-stone-300 dark:border-gray-600 focus:ring-1 focus:ring-teal-400 focus:outline-none transition-all text-gray-800 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500"
           />
           <button
             type="submit"
@@ -378,8 +378,8 @@ function TodoList({ compact = false }) {
   }
 
   return (
-    <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700/60 backdrop-blur-sm h-full flex flex-col">
-      <h3 className="text-lg font-bold text-white mb-4">Daily TODOs</h3>
+    <div className="bg-white dark:bg-gray-800/80 p-6 rounded-2xl border border-stone-200 dark:border-gray-700/60 backdrop-blur-sm h-full flex flex-col">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Daily TODOs</h3>
 
       <form onSubmit={handleAddTask} className="flex items-center gap-2 mb-4">
         <input
@@ -387,7 +387,7 @@ function TodoList({ compact = false }) {
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           placeholder="Add a new task..."
-          className="w-full bg-gray-900/70 px-4 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-teal-400 focus:outline-none transition-all text-gray-300 placeholder-gray-500"
+          className="w-full bg-stone-50 dark:bg-gray-900/70 px-4 py-2 rounded-lg border border-stone-300 dark:border-gray-600 focus:ring-2 focus:ring-teal-400 focus:outline-none transition-all text-gray-800 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500"
         />
         <button
           type="submit"

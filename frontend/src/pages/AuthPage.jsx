@@ -26,7 +26,7 @@ const InputField = ({ icon, ...props }) => (
       {icon}
     </div>
     <input
-      className="w-full bg-stone-50 border border-stone-300 rounded-lg py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+      className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg py-3 pl-12 pr-4 text-gray-900 dark:text-stone-100 placeholder-gray-400 dark:placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
       {...props}
     />
   </div>
@@ -172,12 +172,12 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
-        className="w-full max-w-5xl lg:grid lg:grid-cols-2 rounded-2xl shadow-2xl bg-white border border-stone-200 overflow-hidden"
+        className="w-full max-w-5xl lg:grid lg:grid-cols-2 rounded-2xl shadow-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 overflow-hidden"
       >
         {/* Left Panel: Feature Showcase */}
         <div className="hidden lg:flex flex-col justify-between p-12 bg-stone-100/70 relative">
@@ -231,7 +231,7 @@ const AuthPage = () => {
         </div>
 
         {/* Right Panel: Form */}
-        <div className="w-full p-8 sm:p-12 flex flex-col justify-center bg-white">
+        <div className="w-full p-8 sm:p-12 flex flex-col justify-center bg-white dark:bg-stone-900">
           <AnimatePresence mode="wait">
             <motion.div
               key={isLogin ? "login" : "signup"}
@@ -242,10 +242,10 @@ const AuthPage = () => {
               className="w-full max-w-sm mx-auto"
             >
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                   {isLogin ? "Welcome Back" : "Get Started"}
                 </h2>
-                <p className="text-gray-500">
+                <p className="text-gray-500 dark:text-stone-300">
                   {isLogin
                     ? "Login to continue your journey."
                     : "Create an account to unlock your potential."}
@@ -313,12 +313,12 @@ const AuthPage = () => {
               <div className="text-center mt-6">
                 <button
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors group"
+                  className="text-sm text-gray-500 dark:text-stone-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
                 >
                   {isLogin
                     ? "Don't have an account?"
                     : "Already have an account?"}
-                  <span className="font-semibold text-gray-800 group-hover:text-blue-600">
+                  <span className="font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
                     {" "}
                     {isLogin ? "Sign Up" : "Sign In"}
                   </span>

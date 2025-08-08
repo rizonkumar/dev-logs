@@ -13,16 +13,16 @@ const technologies = [
 
 function TechStack() {
   return (
-    <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700/60 backdrop-blur-sm">
-      <h3 className="text-lg font-bold text-white mb-4">My Tech Stack</h3>
+    <div className="bg-white dark:bg-gray-800/80 p-6 rounded-2xl border border-stone-200 dark:border-gray-700/60 backdrop-blur-sm">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">My Tech Stack</h3>
       <div className="flex flex-wrap gap-4">
         {technologies.map((tech) => (
           <div
             key={tech.name}
-            className="flex items-center bg-gray-700/50 py-2 px-3 rounded-lg"
+            className="flex items-center bg-stone-100 dark:bg-gray-700/50 py-2 px-3 rounded-lg"
           >
-            <i className={`${tech.icon} text-2xl text-teal-400`}></i>
-            <span className="ml-2 text-sm font-medium text-gray-300">
+            <i className={`${tech.icon} text-2xl text-teal-600 dark:text-teal-400`}></i>
+            <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               {tech.name}
             </span>
           </div>

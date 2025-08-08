@@ -103,20 +103,20 @@ const ProfilePage = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="p-4 sm:p-6 lg:p-8 bg-stone-50 min-h-full"
+      className="p-4 sm:p-6 lg:p-8 bg-stone-50 dark:bg-stone-950 min-h-full"
     >
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
           <User size={28} className="text-blue-600" /> User Profile
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-gray-500 dark:text-stone-300 mt-1">
           Manage your account settings and profile information.
         </p>
       </header>
 
       <form onSubmit={onSubmit}>
         {/* Personal Information Card */}
-        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             <div className="md:col-span-1 flex flex-col items-center text-center">
               <div className="relative group w-32 h-32 sm:w-40 sm:h-40 mb-4">
@@ -126,7 +126,7 @@ const ProfilePage = () => {
                     `https://i.pravatar.cc/150?u=${userInfo?._id}`
                   }
                   alt="Profile"
-                  className="w-full h-full rounded-full object-cover border-4 border-stone-200 group-hover:border-blue-500 transition-all duration-300"
+                  className="w-full h-full rounded-full object-cover border-4 border-stone-200 dark:border-stone-700 group-hover:border-blue-500 transition-all duration-300"
                 />
                 <button
                   type="button"
@@ -143,10 +143,10 @@ const ProfilePage = () => {
                   accept="image/png, image/jpeg, image/gif"
                 />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 {userInfo?.name}
               </h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-stone-300">
                 Click image to upload a new photo.
               </p>
             </div>
@@ -189,7 +189,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Social & Links Card */}
-        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
           <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <Share2 size={24} className="text-purple-600" />
             Social & Links
@@ -223,12 +223,12 @@ const ProfilePage = () => {
         </div>
 
         {/* GitHub Integration Card */}
-        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 sm:p-8">
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm p-6 sm:p-8">
           <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-3">
             <Github size={24} className="text-green-600" />
             GitHub Integration
           </h3>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-500 dark:text-stone-300 mb-6">
             Provide your GitHub username and a Personal Access Token (PAT) to
             display your contribution stats.
           </p>
@@ -293,7 +293,7 @@ const InputField = ({ icon, label, name, as = "input", ...props }) => {
           id={name}
           name={name}
           {...props}
-          className="w-full bg-stone-50 border border-stone-300 rounded-lg py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg py-3 pl-12 pr-4 text-gray-900 dark:text-stone-100 placeholder-gray-400 dark:placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
         />
       </div>
     </div>

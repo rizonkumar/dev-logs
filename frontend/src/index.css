@@ -3,3 +3,12 @@
 @theme {
   --font-poppins: Poppins, sans-serif;
 }
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
