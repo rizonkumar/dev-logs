@@ -2,7 +2,7 @@ const asyncHandler = require("../middleware/asyncHandler");
 const todoService = require("../services/todoService");
 
 const getTodos = asyncHandler(async (req, res) => {
-  const todos = await todoService.getAllTodos(req.user.id);
+  const todos = await todoService.getAllTodos(req.user.id, req.query || {});
   res.status(200).json(todos);
 });
 

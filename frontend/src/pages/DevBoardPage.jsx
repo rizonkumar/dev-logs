@@ -19,6 +19,9 @@ import {
   X,
   ListTodo,
   ClipboardList,
+  Search,
+  CalendarRange,
+  RotateCcw,
 } from "lucide-react";
 
 const COLUMN_THEME = {
@@ -213,6 +216,10 @@ const DevBoardPage = () => {
   const [viewMode, setViewMode] = useState("today");
   const [modal, setModal] = useState(null);
   const [selectedTodo, setSelectedTodo] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     if (status === "idle") {
@@ -220,13 +227,50 @@ const DevBoardPage = () => {
     }
   }, [status, dispatch]);
 
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 400);
+    return () => clearTimeout(handle);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const params = {};
+    if (debouncedSearch) params.q = debouncedSearch;
+    if (dateFrom) params.from = dateFrom;
+    if (dateTo) params.to = dateTo;
+    if (Object.keys(params).length > 0) {
+      dispatch(fetchTodos(params));
+    } else {
+      // When all filters are cleared, refetch the full list so UI restores Today view properly
+      dispatch(fetchTodos());
+    }
+  }, [debouncedSearch, dateFrom, dateTo, dispatch]);
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDateFrom("");
+    setDateTo("");
+    dispatch(fetchTodos());
+  };
+
   const filteredTodos = useMemo(() => {
-    if (viewMode === "all") return todos;
-    const todayString = new Date().toDateString();
-    return todos.filter(
-      (todo) => new Date(todo.createdAt).toDateString() === todayString
-    );
-  }, [todos, viewMode]);
+    const hasServerFilters = Boolean(debouncedSearch || dateFrom || dateTo);
+    if (viewMode === "all" || hasServerFilters) return todos;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return todos.filter((todo) => {
+      const createdAtDate = new Date(todo.createdAt);
+      const isToday =
+        createdAtDate.getFullYear() === today.getFullYear() &&
+        createdAtDate.getMonth() === today.getMonth() &&
+        createdAtDate.getDate() === today.getDate();
+
+      const isActive = todo.status !== "DONE";
+      return isToday || isActive;
+    });
+  }, [todos, viewMode, debouncedSearch, dateFrom, dateTo]);
 
   const columns = useMemo(() => {
     const initialColumns = {
@@ -307,51 +351,128 @@ const DevBoardPage = () => {
 
   return (
     <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50 dark:bg-stone-950">
-      <header className="mb-6 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <ListTodo size={28} /> Dev Board
-          </h1>
-          <p className="text-gray-500 dark:text-stone-300">
-            Drag & drop to organize your tasks.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <div className="flex items-center bg-stone-200 dark:bg-stone-800 rounded-lg p-1 border border-transparent dark:border-stone-700">
+      {/* Header: two rows on wide screens, stacked on small */}
+      <header className="mb-4">
+        {/* Row 1: title + primary controls */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+              <ListTodo size={28} /> Dev Board
+            </h1>
+            <p className="text-gray-500 dark:text-stone-300">
+              Drag & drop to organize your tasks.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center bg-stone-200 dark:bg-stone-800 rounded-lg p-1 border border-transparent dark:border-stone-700">
+              <button
+                onClick={() => setViewMode("today")}
+                aria-pressed={viewMode === "today"}
+                className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
+                  viewMode === "today"
+                    ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
+                    : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
+                }`}
+              >
+                Today
+              </button>
+              <button
+                onClick={() => setViewMode("all")}
+                aria-pressed={viewMode === "all"}
+                className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
+                  viewMode === "all"
+                    ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
+                    : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
+                }`}
+              >
+                All Tasks
+              </button>
+            </div>
             <button
-              onClick={() => setViewMode("today")}
-              aria-pressed={viewMode === "today"}
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
-                viewMode === "today"
-                  ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
-                  : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
-              }`}
+              onClick={() => setModal("add")}
+              className="flex items-center gap-2 bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white text-white dark:text-stone-900 px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer"
             >
-              Today
+              <Plus size={18} /> Add Task
             </button>
+            {/* Mobile-only Reset placed next to Add Task */}
             <button
-              onClick={() => setViewMode("all")}
-              aria-pressed={viewMode === "all"}
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
-                viewMode === "all"
-                  ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
-                  : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
-              }`}
+              onClick={clearFilters}
+              className="sm:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-sm font-semibold cursor-pointer"
+              title="Clear filters"
             >
-              All Tasks
+              <RotateCcw size={14} /> Reset
             </button>
           </div>
-          <button
-            onClick={() => setModal("add")}
-            className="flex items-center gap-2 bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white text-white dark:text-stone-900 px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer"
-          >
-            <Plus size={18} /> Add Task
-          </button>
+        </div>
+
+        <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="relative w-full sm:max-w-md md:max-w-lg">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500"
+            />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search tasks..."
+              aria-label="Search tasks"
+              className="w-full pl-9 pr-3 py-2 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm text-gray-800 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
+            <div className="flex items-center gap-1">
+              <CalendarRange
+                size={16}
+                className="text-stone-400 dark:text-stone-500"
+              />
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                aria-label="From date"
+                className="px-2 py-1.5 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm text-gray-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-stone-400">–</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                aria-label="To date"
+                className="px-2 py-1.5 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm text-gray-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <button
+              onClick={clearFilters}
+              className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-sm font-semibold cursor-pointer"
+              title="Clear filters"
+            >
+              <RotateCcw size={14} /> Reset
+            </button>
+          </div>
         </div>
       </header>
 
       {filteredTodos.length === 0 && status === "succeeded" ? (
-        <EmptyState onAddTaskClick={() => setModal("add")} />
+        debouncedSearch || dateFrom || dateTo ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center p-8 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl max-w-lg w-full">
+              <div className="mx-auto w-14 h-14 bg-blue-100 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center rounded-2xl mb-4 border border-blue-200 dark:border-blue-900/40">
+                <Search size={24} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                No results
+              </h2>
+              <p className="text-sm text-stone-500 dark:text-stone-300">
+                {debouncedSearch
+                  ? `No tasks found for "${debouncedSearch}"`
+                  : "No tasks found for the selected date range"}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <EmptyState onAddTaskClick={() => setModal("add")} />
+        )
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto">
