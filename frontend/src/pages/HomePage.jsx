@@ -268,7 +268,6 @@ const QuickStatsCard = ({ logs, githubData }) => {
   const totalLogs = logs?.length || 0;
   const totalCommits = githubData?.totalContributions || 0;
   const recentLogs = logs?.slice(0, 2) || [];
-  const recentLogs = logs?.slice(0, 2) || [];
 
   return (
     <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm h-full flex flex-col">
@@ -304,9 +303,7 @@ const QuickStatsCard = ({ logs, githubData }) => {
           Recent Activity
         </p>
         {recentLogs.length > 0 ? (
-        {recentLogs.length > 0 ? (
           <div className="space-y-2">
-            {recentLogs.map((log) => (
             {recentLogs.map((log) => (
               <div
                 key={log._id}
@@ -350,15 +347,6 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
     typeof logStats?.longestStreak === "number"
       ? logStats.longestStreak
       : fallbackStreaks.longestStreak;
-  const fallbackStreaks = computeStreaksFromLogs(logs);
-  const currentStreak =
-    typeof logStats?.currentStreak === "number"
-      ? logStats.currentStreak
-      : fallbackStreaks.currentStreak;
-  const longestStreak =
-    typeof logStats?.longestStreak === "number"
-      ? logStats.longestStreak
-      : fallbackStreaks.longestStreak;
 
   const productivityScore = Math.min(
     100,
@@ -374,7 +362,6 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
 
       <div className="space-y-4 flex-1">
         <div className="grid grid-cols-2 gap-3">
-          {/* Row 1: This Week + GitHub Stars */}
           <StatTile
             icon={CalendarDays}
             title="This Week"
@@ -390,41 +377,6 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
             className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900/30"
             iconWrapClass="ring-yellow-300/40 bg-yellow-500/15 text-yellow-600 dark:text-yellow-300"
           />
-          {/* Row 2: Current Streak + Longest Streak */}
-          <StatTile
-            icon={Flame}
-            title="Current Streak"
-            value={currentStreak}
-            suffix="days"
-            className="bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-900/40"
-            iconWrapClass="ring-orange-300/40 bg-orange-500/15 text-orange-600 dark:text-orange-300"
-          />
-          <StatTile
-            icon={Flame}
-            title="Longest Streak"
-            value={longestStreak}
-            suffix="days"
-            className="bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/40"
-            iconWrapClass="ring-red-300/40 bg-red-500/15 text-red-600 dark:text-red-300"
-          />
-        <div className="grid grid-cols-2 gap-3">
-          {/* Row 1: This Week + GitHub Stars */}
-          <StatTile
-            icon={CalendarDays}
-            title="This Week"
-            value={thisWeekLogs}
-            suffix="logs"
-            className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40"
-            iconWrapClass="ring-purple-300/40 bg-purple-500/15 text-purple-700 dark:text-purple-300"
-          />
-          <StatTile
-            icon={Star}
-            title="GitHub Stars"
-            value={githubData?.totalStars || 0}
-            className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900/30"
-            iconWrapClass="ring-yellow-300/40 bg-yellow-500/15 text-yellow-600 dark:text-yellow-300"
-          />
-          {/* Row 2: Current Streak + Longest Streak */}
           <StatTile
             icon={Flame}
             title="Current Streak"
@@ -443,7 +395,6 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
           />
         </div>
 
-        {/* Achievement badges based on current streak */}
         {(() => {
           const hasWeekly = currentStreak >= 7;
           const hasDedicated = currentStreak >= 14;
