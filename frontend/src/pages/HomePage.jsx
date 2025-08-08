@@ -16,9 +16,132 @@ import {
   BookOpen,
   Sparkles,
   Flame,
+  CalendarDays,
+  Trophy,
+  CalendarCheck,
+  Rocket,
+  Zap,
+  Medal,
+  Crown,
+  Moon,
 } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import Loader from "../components/Loader";
+
+const computeStreaksFromLogs = (logs) => {
+  if (!Array.isArray(logs) || logs.length === 0) {
+    return { currentStreak: 0, longestStreak: 0 };
+  }
+  const toUtcYyyyMmDd = (date) => {
+    const d = new Date(date);
+    const utc = new Date(
+      Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+    );
+    return utc.toISOString().slice(0, 10);
+  };
+  const set = new Set(logs.map((l) => toUtcYyyyMmDd(l.date)));
+  const days = Array.from(set).sort();
+  let longest = 0;
+  let run = 0;
+  let prev = null;
+  for (const ds of days) {
+    const cur = new Date(ds + "T00:00:00.000Z");
+    if (prev) {
+      const diff = Math.round((cur - prev) / (1000 * 60 * 60 * 24));
+      if (diff === 1) run += 1;
+      else {
+        longest = Math.max(longest, run);
+        run = 1;
+      }
+    } else {
+      run = 1;
+    }
+    prev = cur;
+  }
+  longest = Math.max(longest, run);
+  let current = 0;
+  if (days.length > 0) {
+    const cursor = new Date(days[days.length - 1] + "T00:00:00.000Z");
+    while (set.has(cursor.toISOString().slice(0, 10))) {
+      current += 1;
+      cursor.setUTCDate(cursor.getUTCDate() - 1);
+    }
+  }
+  return { currentStreak: current, longestStreak: longest };
+};
+
+const StatTile = ({
+  icon,
+  title,
+  value,
+  suffix,
+  className = "",
+  iconWrapClass = "",
+}) => (
+  <div
+    className={`p-3 rounded-xl border shadow-xs transition-transform hover:-translate-y-[1px] ${className}`}
+  >
+    <div className="flex items-center gap-3 min-h-14">
+      <div
+        className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ring-1 ${iconWrapClass}`}
+      >
+        {(() => {
+          const IconComp = icon;
+          return <IconComp size={20} aria-hidden="true" />;
+        })()}
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] uppercase tracking-wide font-semibold opacity-80 truncate">
+          {title}
+        </p>
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-bold leading-none">{value}</span>
+          {suffix ? <span className="text-xs opacity-70">{suffix}</span> : null}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const AchievementBadge = ({
+  achieved,
+  icon,
+  label,
+  achievedClass = "",
+  baseClass = "",
+}) => {
+  const IconComp = icon;
+  return (
+    <div
+      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ${
+        achieved ? achievedClass : `${baseClass} opacity-70`
+      }`}
+    >
+      <IconComp size={14} aria-hidden="true" />
+      <span>{label}</span>
+    </div>
+  );
+};
+
+const MilestoneChip = ({
+  active,
+  icon,
+  label,
+  activeClass = "",
+  baseClass = "",
+}) => {
+  const IconComp = icon;
+  return (
+    <div
+      className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ring-1 ${
+        active ? activeClass : `${baseClass} opacity-70`
+      }`}
+    >
+      <IconComp size={12} aria-hidden="true" />
+      <span>{label}</span>
+    </div>
+  );
+};
 
 const ProfileCard = ({ userInfo }) => {
   const {
@@ -144,7 +267,7 @@ const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
 const QuickStatsCard = ({ logs, githubData }) => {
   const totalLogs = logs?.length || 0;
   const totalCommits = githubData?.totalContributions || 0;
-  const recentLogs = logs?.slice(0, 3) || [];
+  const recentLogs = logs?.slice(0, 2) || [];
 
   return (
     <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm h-full flex flex-col">
@@ -179,9 +302,9 @@ const QuickStatsCard = ({ logs, githubData }) => {
           <Clock size={14} className="mr-2 text-gray-500 dark:text-stone-400" />
           Recent Activity
         </p>
-        {recentLogs.slice(0, 2).length > 0 ? (
+        {recentLogs.length > 0 ? (
           <div className="space-y-2">
-            {recentLogs.slice(0, 2).map((log) => (
+            {recentLogs.map((log) => (
               <div
                 key={log._id}
                 className="p-3 bg-stone-100 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700"
@@ -215,8 +338,15 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
         new Date(log.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     ).length || 0;
 
-  const currentStreak = logStats?.currentStreak || 0;
-  const longestStreak = logStats?.longestStreak || 0;
+  const fallbackStreaks = computeStreaksFromLogs(logs);
+  const currentStreak =
+    typeof logStats?.currentStreak === "number"
+      ? logStats.currentStreak
+      : fallbackStreaks.currentStreak;
+  const longestStreak =
+    typeof logStats?.longestStreak === "number"
+      ? logStats.longestStreak
+      : fallbackStreaks.longestStreak;
 
   const productivityScore = Math.min(
     100,
@@ -231,34 +361,40 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
       </h3>
 
       <div className="space-y-4 flex-1">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded-xl border border-purple-200 dark:border-purple-900/40 text-center">
-            <p className="text-xs font-semibold text-purple-700 dark:text-purple-300">
-              This Week
-            </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {thisWeekLogs}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-stone-300">logs</p>
-          </div>
-          <div className="bg-orange-50 dark:bg-orange-950/30 p-3 rounded-xl border border-orange-200 dark:border-orange-900/40 text-center">
-            <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 flex items-center justify-center gap-1">
-              <Flame size={18} className="text-orange-500" /> Current Streak
-            </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {currentStreak}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-stone-300">days</p>
-          </div>
-          <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-xl border border-red-200 dark:border-red-900/40 text-center hidden md:block">
-            <p className="text-xs font-semibold text-red-700 dark:text-red-300 flex items-center justify-center gap-1">
-              <Flame size={18} className="text-red-500" /> Longest Streak
-            </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {longestStreak}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-stone-300">days</p>
-          </div>
+        <div className="grid grid-cols-2 gap-3">
+          {/* Row 1: This Week + GitHub Stars */}
+          <StatTile
+            icon={CalendarDays}
+            title="This Week"
+            value={thisWeekLogs}
+            suffix="logs"
+            className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40"
+            iconWrapClass="ring-purple-300/40 bg-purple-500/15 text-purple-700 dark:text-purple-300"
+          />
+          <StatTile
+            icon={Star}
+            title="GitHub Stars"
+            value={githubData?.totalStars || 0}
+            className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900/30"
+            iconWrapClass="ring-yellow-300/40 bg-yellow-500/15 text-yellow-600 dark:text-yellow-300"
+          />
+          {/* Row 2: Current Streak + Longest Streak */}
+          <StatTile
+            icon={Flame}
+            title="Current Streak"
+            value={currentStreak}
+            suffix="days"
+            className="bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-900/40"
+            iconWrapClass="ring-orange-300/40 bg-orange-500/15 text-orange-600 dark:text-orange-300"
+          />
+          <StatTile
+            icon={Flame}
+            title="Longest Streak"
+            value={longestStreak}
+            suffix="days"
+            className="bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/40"
+            iconWrapClass="ring-red-300/40 bg-red-500/15 text-red-600 dark:text-red-300"
+          />
         </div>
 
         <div className="bg-stone-100 dark:bg-stone-800/70 p-3 rounded-xl border border-stone-200 dark:border-stone-700">
@@ -278,19 +414,94 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
           </div>
         </div>
 
-        <div className="bg-yellow-50 dark:bg-yellow-950/20 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-yellow-500 flex-shrink-0 flex items-center justify-center">
-            <Star size={20} className="text-white" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {githubData?.totalStars || 0}
-            </p>
-            <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium">
-              GitHub Stars
-            </p>
-          </div>
-        </div>
+        {/* Static milestone chips based on current streak thresholds */}
+        {(() => {
+          const current = currentStreak || 0;
+          const milestoneDefs = [
+            {
+              t: 0,
+              label: "Start",
+              icon: Moon,
+              cls: "ring-stone-300 bg-stone-100 text-stone-700 dark:ring-stone-700 dark:bg-stone-800 dark:text-stone-200",
+            },
+            {
+              t: 4,
+              label: "Spark",
+              icon: Zap,
+              cls: "ring-cyan-300/50 bg-cyan-500/15 text-cyan-700 dark:text-cyan-300",
+            },
+            {
+              t: 7,
+              label: "Week",
+              icon: CalendarCheck,
+              cls: "ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300",
+            },
+            {
+              t: 10,
+              label: "Lift-off",
+              icon: Rocket,
+              cls: "ring-blue-300/50 bg-blue-500/15 text-blue-700 dark:text-blue-300",
+            },
+            {
+              t: 30,
+              label: "Medal",
+              icon: Medal,
+              cls: "ring-amber-300/50 bg-amber-500/15 text-amber-700 dark:text-amber-300",
+            },
+            {
+              t: 100,
+              label: "Crown",
+              icon: Crown,
+              cls: "ring-yellow-300/60 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
+            },
+          ];
+          return (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {milestoneDefs.map((m) => (
+                <MilestoneChip
+                  key={m.t}
+                  active={current >= m.t}
+                  icon={m.icon}
+                  label={`${m.label} ${m.t}`}
+                  activeClass={m.cls}
+                  baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+                />
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* Achievement badges based on current streak (keep last) */}
+        {(() => {
+          const hasWeekly = currentStreak >= 7;
+          const hasDedicated = currentStreak >= 14;
+          const hasHardcore = currentStreak >= 30;
+          return (
+            <div className="flex flex-wrap items-center gap-2">
+              <AchievementBadge
+                achieved={hasWeekly}
+                icon={CalendarDays}
+                label="Weekly"
+                achievedClass="ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300"
+                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+              />
+              <AchievementBadge
+                achieved={hasDedicated}
+                icon={Flame}
+                label="Dev Dedicated"
+                achievedClass="ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300"
+                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+              />
+              <AchievementBadge
+                achieved={hasHardcore}
+                icon={Trophy}
+                label="Hard Core"
+                achievedClass="ring-yellow-300/50 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300"
+                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+              />
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
