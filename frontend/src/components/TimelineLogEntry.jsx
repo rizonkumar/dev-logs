@@ -105,30 +105,31 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
 
       <li className="group relative">
         <div className="flex">
-          {/* Timeline Marker and Line */}
           <div className="flex flex-col items-center mr-6">
             <div className="relative">
               <div
-                className="w-10 h-10 rounded-xl bg-stone-100 
-                            flex items-center justify-center font-bold text-sm border border-stone-200
+                className="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 
+                            flex items-center justify-center font-bold text-sm border border-stone-200 dark:border-stone-700
                             group-hover:scale-110 transition-transform duration-300"
               >
-                <span className="text-gray-600">{index + 1}</span>
+                <span className="text-gray-600 dark:text-stone-200">
+                  {index + 1}
+                </span>
               </div>
               {index === 0 && (
                 <div className="absolute inset-0 w-10 h-10 rounded-xl bg-blue-500/20 animate-ping" />
               )}
             </div>
             {index < totalLogs - 1 && (
-              <div className="w-px h-full bg-stone-200 mt-4 min-h-[60px]" />
+              <div className="w-px h-full bg-stone-200 dark:bg-stone-700 mt-4 min-h-[60px]" />
             )}
           </div>
 
           {/* Log Content Card */}
           <div className="flex-grow">
             <div
-              className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm
-                        transition-all duration-500 group-hover:border-stone-300"
+              className="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm
+                        transition-all duration-500 group-hover:border-stone-300 dark:group-hover:border-stone-600"
             >
               <div className="relative">
                 {isEditing ? (
@@ -143,14 +144,14 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                       <textarea
                         value={editText}
                         onChange={(e) => setEditText(e.target.value)}
-                        className="w-full bg-stone-50 p-4 rounded-xl border border-stone-300
+                        className="w-full bg-stone-50 dark:bg-stone-900 p-4 rounded-xl border border-stone-300 dark:border-stone-700
                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none 
-                                  transition-all duration-300 text-gray-800 placeholder-gray-400 resize-none
+                                  transition-all duration-300 text-gray-800 dark:text-stone-100 placeholder-gray-400 dark:placeholder-stone-400 resize-none
                                   min-h-[120px]"
                         autoFocus
                         placeholder="Update your log entry..."
                       />
-                      <div className="absolute bottom-3 right-3 text-xs text-gray-400">
+                      <div className="absolute bottom-3 right-3 text-xs text-gray-400 dark:text-stone-400">
                         {editText.length} characters
                       </div>
                     </div>
@@ -158,7 +159,7 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                     <div className="flex justify-end space-x-3">
                       <button
                         onClick={() => setIsEditing(false)}
-                        className="px-4 py-2 text-gray-700 bg-white hover:bg-stone-100 border border-stone-300
+                        className="px-4 py-2 text-gray-700 dark:text-stone-300 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-300 dark:border-stone-700
                                   rounded-lg transition-all duration-300 text-sm font-medium
                                   flex items-center space-x-2"
                       >
@@ -182,13 +183,13 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                       <TagsDisplay tags={log.tags} />
                     </div>
                     <div className="mb-4">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">
+                      <p className="text-gray-700 dark:text-stone-100 leading-relaxed whitespace-pre-wrap text-sm">
                         {log.entry}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-stone-200">
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <div className="flex items-center justify-between pt-4 border-t border-stone-200 dark:border-stone-700">
+                      <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-stone-400">
                         <span className="flex items-center">
                           <Clock size={12} className="mr-1.5" />
                           {createdTime}
@@ -206,14 +207,14 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                       <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <button
                           onClick={() => setIsEditing(true)}
-                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-100 
+                          className="p-2 text-gray-500 dark:text-stone-300 hover:text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-950/30 
                                     rounded-lg transition-all duration-300"
                         >
                           <Edit size={16} />
                         </button>
                         <button
                           onClick={handleDeleteClick}
-                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 
+                          className="p-2 text-gray-500 dark:text-stone-300 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-950/30 
                                     rounded-lg transition-all duration-300"
                         >
                           <Trash2 size={16} />

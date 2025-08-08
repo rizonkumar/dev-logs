@@ -57,7 +57,7 @@ const ProfileCard = ({ userInfo }) => {
 
       <div className="space-y-2 text-sm mb-4">
         {company && (
-          <div className="flex items-center text-gray-600">
+          <div className="flex items-center text-gray-600 dark:text-stone-300">
             <Briefcase size={14} className="mr-3 text-purple-500" />
             <span>{company}</span>
           </div>

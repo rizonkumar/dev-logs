@@ -5,7 +5,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, message }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 transition-opacity p-4">
+    <div className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 transition-opacity p-4">
       <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-8 w-full max-w-md mx-4 border border-stone-200 dark:border-stone-700">
         <div className="flex items-start space-x-4">
           <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center border border-red-200">
@@ -15,7 +15,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, message }) => {
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Delete Entry
             </h3>
-            <p className="text-sm text-gray-600 dark:text-stone-300 leading-relaxed">{message}</p>
+            <p className="text-sm text-gray-600 dark:text-stone-300 leading-relaxed">
+              {message}
+            </p>
           </div>
         </div>
 

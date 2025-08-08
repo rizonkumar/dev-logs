@@ -125,11 +125,11 @@ const DateCard = ({
 
                 <div className="flex items-center space-x-4">
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center border border-blue-200">
+                    <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center border border-blue-200 dark:border-blue-900/40">
                       <Calendar className="w-6 h-6 text-blue-600" />
                     </div>
                     {relativeDate === "Today" && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-stone-900" />
                     )}
                   </div>
 
@@ -195,7 +195,7 @@ const DateCard = ({
             }`}
           >
             <div className="p-6 bg-stone-50/50 dark:bg-stone-900/40">
-              <h4 className="font-semibold text-gray-500 mb-6 flex items-center">
+              <h4 className="font-semibold text-gray-500 dark:text-stone-400 mb-6 flex items-center">
                 <Hash className="w-5 h-5 mr-2 text-blue-600" />
                 {viewMode === "timeline" ? "Timeline View" : "Grid View"}
               </h4>

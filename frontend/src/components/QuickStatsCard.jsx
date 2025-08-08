@@ -31,7 +31,9 @@ const QuickStatsCard = ({ logs }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-green-600">Today</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{todayLogs}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {todayLogs}
+            </p>
             <p className="text-gray-500 dark:text-stone-300 text-xs">entries</p>
           </div>
           <Zap className="w-8 h-8 text-green-500" />
@@ -42,7 +44,9 @@ const QuickStatsCard = ({ logs }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-blue-600">This Week</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{thisWeekLogs}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {thisWeekLogs}
+            </p>
             <p className="text-gray-500 dark:text-stone-300 text-xs">entries</p>
           </div>
           <Calendar className="w-8 h-8 text-blue-500" />
@@ -53,7 +57,9 @@ const QuickStatsCard = ({ logs }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-indigo-600">Total Lines</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalEntries}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {totalEntries}
+            </p>
             <p className="text-gray-500 dark:text-stone-300 text-xs">written</p>
           </div>
           <Code className="w-8 h-8 text-indigo-500" />

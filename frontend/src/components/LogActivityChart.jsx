@@ -69,6 +69,9 @@ function LogActivityChart({
           blockSize={12}
           blockMargin={3}
           fontSize={14}
+          labels={{
+            totalCount: "Total contributions",
+          }}
         />
       ) : (
         <div className="flex items-center justify-center h-full pt-10">

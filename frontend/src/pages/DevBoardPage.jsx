@@ -56,7 +56,6 @@ const COLUMN_THEME = {
   },
 };
 
-// --- MODAL COMPONENTS (Refactored for Light Theme) ---
 const Modal = ({ children, onClose }) => (
   <div className="fixed inset-0 bg-gray-900/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div className="bg-white border border-stone-200 rounded-2xl shadow-xl w-full max-w-md relative p-6">
@@ -148,7 +147,6 @@ const DeleteModal = ({ onClose, onConfirm }) => (
   </Modal>
 );
 
-// --- UI COMPONENTS (Refactored for Light Theme) ---
 const EmptyState = ({ onAddTaskClick }) => (
   <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
     <div className="bg-white border border-stone-200 rounded-2xl p-10 max-w-lg shadow-sm">
@@ -199,7 +197,6 @@ const TaskCard = ({ todo, provided }) => (
   </div>
 );
 
-// --- MAIN COMPONENT ---
 const DevBoardPage = () => {
   const dispatch = useDispatch();
   const { todos, status } = useSelector((state) => state.todos);

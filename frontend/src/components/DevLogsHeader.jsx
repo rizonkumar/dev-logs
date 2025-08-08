@@ -35,7 +35,7 @@ const DevLogsHeader = () => {
               `https://i.pravatar.cc/100?u=${userInfo?._id}`
             }
             alt={userInfo?.name || "User"}
-            className="w-20 h-20 rounded-full border-4 border-white shadow-md object-cover"
+            className="w-20 h-20 rounded-full border-4 border-white dark:border-stone-800 shadow-md object-cover"
           />
           <div className="ml-4">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
