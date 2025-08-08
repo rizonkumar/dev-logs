@@ -16,21 +16,36 @@ const limiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === "OPTIONS",
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
 
-app.use("/api", limiter);
+const isProduction = process.env.NODE_ENV === "production";
+const allowedOrigins = isProduction
+  ? [process.env.FRONTEND_URL, /\.vercel\.app$/]
+  : ["http://localhost:5173"];
 
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? [process.env.FRONTEND_URL, /\.vercel\.app$/]
-      : "http://localhost:5173",
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const isAllowed = allowedOrigins.some((allowed) =>
+      allowed instanceof RegExp ? allowed.test(origin) : allowed === origin
+    );
+    return isAllowed
+      ? callback(null, true)
+      : callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-refresh-token"],
+  optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
+
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
+app.use("/api", limiter);
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Dev-Logs API!" });
@@ -43,6 +58,29 @@ app.use("/api/github", require("./api/routes/githubRoutes"));
 app.use("/api/pomodoros", require("./api/routes/pomodoroRoutes"));
 app.use("/api/reviews", require("./api/routes/reviewRoutes"));
 app.use("/api/notes", require("./api/routes/noteRoutes"));
+// Finance routes
+app.use(
+  "/api/finance/transactions",
+  require("./api/routes/finance/transactionRoutes")
+);
+app.use(
+  "/api/finance/categories",
+  require("./api/routes/finance/categoryRoutes")
+);
+app.use("/api/finance/budgets", require("./api/routes/finance/budgetRoutes"));
+app.use(
+  "/api/finance/goals",
+  require("./api/routes/finance/savingsGoalRoutes")
+);
+app.use("/api/finance/projects", require("./api/routes/finance/projectRoutes"));
+app.use(
+  "/api/finance/dashboard",
+  require("./api/routes/finance/dashboardRoutes")
+);
+app.use(
+  "/api/finance/calculators",
+  require("./api/routes/finance/calculatorRoutes")
+);
 
 const PORT = process.env.PORT || 5001;
 
