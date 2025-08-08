@@ -9,9 +9,9 @@ const initialState = {
 
 export const fetchTodos = createAsyncThunk(
   "todos/fetchTodos",
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      return await todoService.fetchAllTodos();
+      return await todoService.fetchAllTodos(params);
     } catch (error) {
       const message =
         error.response?.data?.message || error.message || error.toString();
@@ -62,7 +62,11 @@ export const deleteTodo = createAsyncThunk(
 export const todosSlice = createSlice({
   name: "todos",
   initialState,
-  reducers: {},
+  reducers: {
+    setTodosFilters: (state, action) => {
+      state.filters = action.payload || {};
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTodos.pending, (state) => {

@@ -3,8 +3,8 @@ import { API_ENDPOINTS } from "../config/api.js";
 
 const API_URL = API_ENDPOINTS.TODOS;
 
-const fetchAllTodos = async () => {
-  const response = await axios.get(API_URL);
+const fetchAllTodos = async (params) => {
+  const response = await axios.get(API_URL, { params });
   return response.data;
 };
 

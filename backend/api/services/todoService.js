@@ -1,7 +1,48 @@
 const Todo = require("../models/todoModel");
 
-const getAllTodos = async (userId) => {
-  return await Todo.find({ user: userId }).sort({ createdAt: -1 });
+const getAllTodos = async (userId, queryParams = {}) => {
+  const { q, status, from, to, includeCompleted } = queryParams;
+  const filter = { user: userId };
+
+  if (q && typeof q === "string" && q.trim().length > 0) {
+    filter.task = { $regex: q.trim(), $options: "i" };
+  }
+
+  if (status) {
+    const statuses = Array.isArray(status)
+      ? status
+      : String(status)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+    if (statuses.length > 0) {
+      filter.status = { $in: statuses };
+    }
+  }
+
+  if (from || to) {
+    filter.createdAt = {};
+    if (from) {
+      const fromDate = new Date(from);
+      if (!isNaN(fromDate)) {
+        fromDate.setHours(0, 0, 0, 0);
+        filter.createdAt.$gte = fromDate;
+      }
+    }
+    if (to) {
+      const toDate = new Date(to);
+      if (!isNaN(toDate)) {
+        toDate.setHours(23, 59, 59, 999);
+        filter.createdAt.$lte = toDate;
+      }
+    }
+  }
+
+  if (includeCompleted === "false" || includeCompleted === false) {
+    filter.isCompleted = { $ne: true };
+  }
+
+  return await Todo.find(filter).sort({ createdAt: -1 });
 };
 
 const createNewTodo = async (userId, todoData) => {
