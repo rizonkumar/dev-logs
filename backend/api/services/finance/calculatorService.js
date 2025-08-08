@@ -1,5 +1,3 @@
-// Contract vs Full-Time Calculator and FIRE Calculator utilities
-
 const computeContractVsFullTime = ({
   contract: {
     dayRate,
@@ -31,17 +29,15 @@ const computeContractVsFullTime = ({
   };
 };
 
-// FIRE Calculator based on simple 4% rule assumptions
 const computeFireProgress = ({
   currentSavings = 0,
   monthlyContribution = 0,
-  expectedReturnRate = 0.05, // 5% annual
-  withdrawalRate = 0.04, // 4% rule
+  expectedReturnRate = 0.05,
+  withdrawalRate = 0.04,
   annualExpenses,
   years = 30,
 }) => {
   const targetNumber = annualExpenses / withdrawalRate;
-  // Future value of a series formula: FV = P*(1+r)^n + PMT*(((1+r)^n - 1)/r)
   const r = expectedReturnRate;
   const n = years;
   const pmt = monthlyContribution * 12;

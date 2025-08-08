@@ -7,6 +7,9 @@ import budgetService from "../services/finance/budgetsService";
 import goalsService from "../services/finance/goalsService";
 import projectsService from "../services/finance/projectsService";
 import calculatorsService from "../services/finance/calculatorsService";
+import TransactionForm from "../components/finance/TransactionForm";
+import GoalForm from "../components/finance/GoalForm";
+import StatCard from "../components/finance/StatCard";
 import {
   CircleDollarSign,
   TrendingDown,
@@ -22,21 +25,7 @@ const Card = ({ children, className = "" }) => (
   </div>
 );
 
-const StatCard = ({ icon: Icon, label, value, color = "" }) => (
-  <Card>
-    <div className="flex items-center gap-3">
-      <div
-        className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}
-      >
-        <Icon className="w-5 h-5" />
-      </div>
-      <div>
-        <p className="text-sm text-stone-500 dark:text-stone-300">{label}</p>
-        <p className="text-xl font-bold">{value}</p>
-      </div>
-    </div>
-  </Card>
-);
+// StatCard imported from components/finance/StatCard
 
 const Tab = ({ id, active, onClick, children }) => (
   <button
@@ -90,13 +79,31 @@ export default function FinancePage() {
   const [filters, setFilters] = useState({ type: "", q: "" });
 
   const [categories, setCategories] = useState([]);
-  const [budgets, setBudgets] = useState([]); // reserved for future display/edit
+  const [budgets, setBudgets] = useState([]);
   const [progress, setProgress] = useState({});
 
   const [goals, setGoals] = useState([]);
 
   const [projects, setProjects] = useState([]);
   const [profit, setProfit] = useState({});
+
+  // Simple create-form states
+  const [categoryForm, setCategoryForm] = useState({
+    name: "",
+    type: "EXPENSE",
+  });
+  const [savingCategory, setSavingCategory] = useState(false);
+
+  const [budgetForm, setBudgetForm] = useState({
+    category: "",
+    month: "",
+    year: "",
+    amount: "",
+  });
+  const [savingBudget, setSavingBudget] = useState(false);
+
+  const [projectForm, setProjectForm] = useState({ name: "", client: "" });
+  const [savingProject, setSavingProject] = useState(false);
 
   const month = useMemo(() => new Date().getMonth() + 1, []);
   const year = useMemo(() => new Date().getFullYear(), []);
@@ -137,6 +144,50 @@ export default function FinancePage() {
       }
     })();
   }, [month, year]);
+
+  const refreshOverview = async () => {
+    try {
+      const ov = await getOverview();
+      setOverview(ov);
+      setRecent(ov.recentTransactions || []);
+    } catch {
+      // noop
+    }
+  };
+
+  const refreshTransactions = async () => {
+    try {
+      setTransactions(await txService.listTransactions({ limit: 50 }));
+      await refreshOverview();
+    } catch (e) {
+      console.error("Failed to refresh transactions", e);
+    }
+  };
+
+  const refreshGoals = async () => {
+    try {
+      setGoals(await goalsService.listGoals());
+      await refreshOverview();
+    } catch (e) {
+      console.error("Failed to refresh goals", e);
+    }
+  };
+
+  const refreshCategories = async () => {
+    try {
+      setCategories(await catService.listCategories());
+    } catch (e) {
+      console.error("Failed to refresh categories", e);
+    }
+  };
+
+  const refreshProjects = async () => {
+    try {
+      setProjects(await projectsService.listProjects());
+    } catch (e) {
+      console.error("Failed to refresh projects", e);
+    }
+  };
 
   const refreshProgress = async (categoryId) => {
     const data = await budgetService.getBudgetProgress({
@@ -287,6 +338,11 @@ export default function FinancePage() {
 
       {activeTab === "transactions" && (
         <div className="grid gap-4">
+          <TransactionForm
+            categories={categories}
+            projects={projects}
+            onCreated={refreshTransactions}
+          />
           <Card>
             <div className="flex flex-col sm:flex-row gap-3">
               <select
@@ -368,6 +424,93 @@ export default function FinancePage() {
 
       {activeTab === "budgets" && (
         <div className="grid gap-4">
+          <Card>
+            <SectionTitle>Create Monthly Budget</SectionTitle>
+            <div className="grid md:grid-cols-4 gap-3">
+              <select
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                value={budgetForm.category}
+                onChange={(e) =>
+                  setBudgetForm({ ...budgetForm, category: e.target.value })
+                }
+              >
+                <option value="">Select Category</option>
+                {categories
+                  .filter((c) => c.type === "EXPENSE")
+                  .map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.name}
+                    </option>
+                  ))}
+              </select>
+              <input
+                type="number"
+                min="1"
+                max="12"
+                placeholder="Month"
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                value={budgetForm.month || month}
+                onChange={(e) =>
+                  setBudgetForm({ ...budgetForm, month: e.target.value })
+                }
+              />
+              <input
+                type="number"
+                min="2000"
+                max="2100"
+                placeholder="Year"
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                value={budgetForm.year || year}
+                onChange={(e) =>
+                  setBudgetForm({ ...budgetForm, year: e.target.value })
+                }
+              />
+              <div className="flex gap-3">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Amount"
+                  className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 flex-1"
+                  value={budgetForm.amount}
+                  onChange={(e) =>
+                    setBudgetForm({ ...budgetForm, amount: e.target.value })
+                  }
+                />
+                <button
+                  className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900"
+                  disabled={
+                    savingBudget || !budgetForm.category || !budgetForm.amount
+                  }
+                  onClick={async () => {
+                    try {
+                      setSavingBudget(true);
+                      await budgetService.createBudget({
+                        category: budgetForm.category,
+                        month: Number(budgetForm.month || month),
+                        year: Number(budgetForm.year || year),
+                        amount: Number(budgetForm.amount),
+                      });
+                      setBudgets(
+                        await budgetService.listBudgets({ month, year })
+                      );
+                      await refreshProgress(budgetForm.category);
+                      setBudgetForm({
+                        category: "",
+                        month: "",
+                        year: "",
+                        amount: "",
+                      });
+                    } finally {
+                      setSavingBudget(false);
+                    }
+                  }}
+                >
+                  {savingBudget ? "Saving..." : "Create"}
+                </button>
+              </div>
+            </div>
+          </Card>
           {categories
             .filter((c) => c.type === "EXPENSE")
             .map((c) => (
@@ -399,11 +542,30 @@ export default function FinancePage() {
           {categories.filter((c) => c.type === "EXPENSE").length === 0 && (
             <p className="text-sm text-stone-500">No expense categories yet.</p>
           )}
+          {budgets.length > 0 && (
+            <Card>
+              <SectionTitle>Existing Budgets (This Month)</SectionTitle>
+              <ul className="text-sm space-y-1">
+                {budgets.map((b) => (
+                  <li key={b._id} className="flex justify-between">
+                    <span>
+                      {categories.find((c) => c._id === b.category)?.name ||
+                        "—"}
+                    </span>
+                    <span>{formatCurrency(b.amount)}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
         </div>
       )}
 
       {activeTab === "goals" && (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="sm:col-span-2 xl:col-span-3">
+            <GoalForm onCreated={refreshGoals} />
+          </div>
           {goals.map((g) => {
             const current = (g.contributions || []).reduce(
               (sum, c) => sum + (c.amount || 0),
@@ -427,6 +589,47 @@ export default function FinancePage() {
 
       {activeTab === "projects" && (
         <div className="grid gap-4">
+          <Card>
+            <div className="grid md:grid-cols-3 gap-3">
+              <input
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                placeholder="Project name"
+                value={projectForm.name}
+                onChange={(e) =>
+                  setProjectForm({ ...projectForm, name: e.target.value })
+                }
+              />
+              <input
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                placeholder="Client (optional)"
+                value={projectForm.client}
+                onChange={(e) =>
+                  setProjectForm({ ...projectForm, client: e.target.value })
+                }
+              />
+              <div className="flex items-center justify-end">
+                <button
+                  className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900"
+                  disabled={savingProject || !projectForm.name}
+                  onClick={async () => {
+                    try {
+                      setSavingProject(true);
+                      await projectsService.createProject({
+                        name: projectForm.name,
+                        client: projectForm.client || undefined,
+                      });
+                      setProjectForm({ name: "", client: "" });
+                      await refreshProjects();
+                    } finally {
+                      setSavingProject(false);
+                    }
+                  }}
+                >
+                  {savingProject ? "Saving..." : "Create"}
+                </button>
+              </div>
+            </div>
+          </Card>
           {projects.map((p) => (
             <Card key={p._id}>
               <div className="flex items-center justify-between">
@@ -467,6 +670,50 @@ export default function FinancePage() {
 
       {activeTab === "categories" && (
         <div className="grid gap-4">
+          <Card>
+            <SectionTitle>Create Category</SectionTitle>
+            <div className="grid md:grid-cols-3 gap-3">
+              <input
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                placeholder="Category name"
+                value={categoryForm.name}
+                onChange={(e) =>
+                  setCategoryForm({ ...categoryForm, name: e.target.value })
+                }
+              />
+              <select
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                value={categoryForm.type}
+                onChange={(e) =>
+                  setCategoryForm({ ...categoryForm, type: e.target.value })
+                }
+              >
+                <option value="INCOME">Income</option>
+                <option value="EXPENSE">Expense</option>
+              </select>
+              <div className="flex items-center justify-end">
+                <button
+                  className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900"
+                  disabled={savingCategory || !categoryForm.name}
+                  onClick={async () => {
+                    try {
+                      setSavingCategory(true);
+                      await catService.createCategory({
+                        name: categoryForm.name.trim(),
+                        type: categoryForm.type,
+                      });
+                      setCategoryForm({ name: "", type: "EXPENSE" });
+                      await refreshCategories();
+                    } finally {
+                      setSavingCategory(false);
+                    }
+                  }}
+                >
+                  {savingCategory ? "Saving..." : "Create"}
+                </button>
+              </div>
+            </div>
+          </Card>
           <Card>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
