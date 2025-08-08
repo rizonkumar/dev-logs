@@ -320,20 +320,22 @@ const DevBoardPage = () => {
           <div className="flex items-center bg-stone-200 dark:bg-stone-800 rounded-lg p-1 border border-transparent dark:border-stone-700">
             <button
               onClick={() => setViewMode("today")}
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-all cursor-pointer ${
+              aria-pressed={viewMode === "today"}
+              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
                 viewMode === "today"
-                  ? "bg-white text-gray-800 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                  : "text-gray-500 dark:text-stone-300 hover:text-gray-700 dark:hover:text-white"
+                  ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
+                  : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
               }`}
             >
               Today
             </button>
             <button
               onClick={() => setViewMode("all")}
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-all cursor-pointer ${
+              aria-pressed={viewMode === "all"}
+              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
                 viewMode === "all"
-                  ? "bg-white text-gray-800 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                  : "text-gray-500 dark:text-stone-300 hover:text-gray-700 dark:hover:text-white"
+                  ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
+                  : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
               }`}
             >
               All Tasks
