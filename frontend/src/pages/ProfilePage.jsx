@@ -190,7 +190,7 @@ const ProfilePage = () => {
 
         {/* Social & Links Card */}
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
             <Share2 size={24} className="text-purple-600" />
             Social & Links
           </h3>
@@ -224,7 +224,7 @@ const ProfilePage = () => {
 
         {/* GitHub Integration Card */}
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm p-6 sm:p-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
             <Github size={24} className="text-green-600" />
             GitHub Integration
           </h3>
@@ -257,7 +257,7 @@ const ProfilePage = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="flex items-center justify-center gap-3 bg-gray-800 hover:bg-black text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-sm disabled:bg-gray-400 disabled:cursor-wait"
+            className="flex items-center justify-center gap-3 bg-gray-800 hover:bg-black dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-sm disabled:bg-gray-400 disabled:cursor-wait"
           >
             {isLoading ? (
               <>
@@ -283,7 +283,7 @@ const InputField = ({ icon, label, name, as = "input", ...props }) => {
     <div>
       <label
         htmlFor={name}
-        className="block text-sm font-medium text-gray-600 mb-2"
+        className="block text-sm font-medium text-gray-600 dark:text-stone-300 mb-2"
       >
         {label}
       </label>
