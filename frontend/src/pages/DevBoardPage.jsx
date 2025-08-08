@@ -222,10 +222,19 @@ const DevBoardPage = () => {
 
   const filteredTodos = useMemo(() => {
     if (viewMode === "all") return todos;
-    const todayString = new Date().toDateString();
-    return todos.filter(
-      (todo) => new Date(todo.createdAt).toDateString() === todayString
-    );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return todos.filter((todo) => {
+      const createdAtDate = new Date(todo.createdAt);
+      const isToday =
+        createdAtDate.getFullYear() === today.getFullYear() &&
+        createdAtDate.getMonth() === today.getMonth() &&
+        createdAtDate.getDate() === today.getDate();
+
+      const isActive = todo.status !== "DONE";
+      return isToday || isActive;
+    });
   }, [todos, viewMode]);
 
   const columns = useMemo(() => {
