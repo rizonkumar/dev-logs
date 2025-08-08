@@ -15,9 +15,133 @@ import {
   AlertCircle,
   BookOpen,
   Sparkles,
+  Flame,
+  CalendarDays,
+  Trophy,
+  CalendarCheck,
+  Rocket,
+  Zap,
+  Medal,
+  Crown,
+  Moon,
 } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import Loader from "../components/Loader";
+
+const computeStreaksFromLogs = (logs) => {
+  if (!Array.isArray(logs) || logs.length === 0) {
+    return { currentStreak: 0, longestStreak: 0 };
+  }
+  const toUtcYyyyMmDd = (date) => {
+    const d = new Date(date);
+    const utc = new Date(
+      Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+    );
+    return utc.toISOString().slice(0, 10);
+  };
+  const set = new Set(logs.map((l) => toUtcYyyyMmDd(l.date)));
+  const days = Array.from(set).sort();
+  let longest = 0;
+  let run = 0;
+  let prev = null;
+  for (const ds of days) {
+    const cur = new Date(ds + "T00:00:00.000Z");
+    if (prev) {
+      const diff = Math.round((cur - prev) / (1000 * 60 * 60 * 24));
+      if (diff === 1) run += 1;
+      else {
+        longest = Math.max(longest, run);
+        run = 1;
+      }
+    } else {
+      run = 1;
+    }
+    prev = cur;
+  }
+  longest = Math.max(longest, run);
+  let current = 0;
+  if (days.length > 0) {
+    const cursor = new Date(days[days.length - 1] + "T00:00:00.000Z");
+    while (set.has(cursor.toISOString().slice(0, 10))) {
+      current += 1;
+      cursor.setUTCDate(cursor.getUTCDate() - 1);
+    }
+  }
+  return { currentStreak: current, longestStreak: longest };
+};
+
+const StatTile = ({
+  icon,
+  title,
+  value,
+  suffix,
+  className = "",
+  iconWrapClass = "",
+}) => (
+  <div
+    className={`p-3 rounded-xl border shadow-xs transition-transform hover:-translate-y-[1px] ${className}`}
+  >
+    <div className="flex items-center gap-3 min-h-14">
+      <div
+        className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ring-1 ${iconWrapClass}`}
+      >
+        {(() => {
+          const IconComp = icon;
+          return <IconComp size={20} aria-hidden="true" />;
+        })()}
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] uppercase tracking-wide font-semibold opacity-80 truncate">
+          {title}
+        </p>
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-bold leading-none">{value}</span>
+          {suffix ? <span className="text-xs opacity-70">{suffix}</span> : null}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const AchievementBadge = ({
+  achieved,
+  icon,
+  label,
+  achievedClass = "",
+  baseClass = "",
+}) => {
+  const IconComp = icon;
+  return (
+    <div
+      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ${
+        achieved ? achievedClass : `${baseClass} opacity-70`
+      }`}
+    >
+      <IconComp size={14} aria-hidden="true" />
+      <span>{label}</span>
+    </div>
+  );
+};
+
+const MilestoneChip = ({
+  active,
+  icon,
+  label,
+  activeClass = "",
+  baseClass = "",
+}) => {
+  const IconComp = icon;
+  return (
+    <div
+      className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ring-1 ${
+        active ? activeClass : `${baseClass} opacity-70`
+      }`}
+    >
+      <IconComp size={12} aria-hidden="true" />
+      <span>{label}</span>
+    </div>
+  );
+};
 
 const ProfileCard = ({ userInfo }) => {
   const {
@@ -32,7 +156,7 @@ const ProfileCard = ({ userInfo }) => {
   } = userInfo || {};
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm h-full flex flex-col">
+    <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm h-full flex flex-col">
       <div className="flex items-center space-x-4 mb-4">
         <img
           src={profileImage || `https://i.pravatar.cc/150?u=${userInfo?._id}`}
@@ -40,7 +164,7 @@ const ProfileCard = ({ userInfo }) => {
           className="w-16 h-16 rounded-full border-4 border-white shadow-md object-cover"
         />
         <div>
-          <h2 className="text-lg font-bold text-gray-900">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">
             {name || "Your Name"}
           </h2>
           <p className="text-blue-600 text-sm font-medium">
@@ -49,20 +173,20 @@ const ProfileCard = ({ userInfo }) => {
         </div>
       </div>
 
-      <div className="mb-4 p-3 bg-stone-100 rounded-lg border border-stone-200">
-        <p className="text-center text-sm text-gray-700 italic">
+      <div className="mb-4 p-3 bg-stone-100 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
+        <p className="text-center text-sm text-gray-700 dark:text-stone-300 italic">
           "{bio || "Add your bio in the profile section!"}"
         </p>
       </div>
 
       <div className="space-y-2 text-sm mb-4">
         {company && (
-          <div className="flex items-center text-gray-600">
+          <div className="flex items-center text-gray-600 dark:text-stone-300">
             <Briefcase size={14} className="mr-3 text-purple-500" />
             <span>{company}</span>
           </div>
         )}
-        <div className="flex items-center text-gray-600">
+        <div className="flex items-center text-gray-600 dark:text-stone-300">
           <GitBranch size={14} className="mr-3 text-green-500" />
           <span>{publicRepositories || 0} Public Repositories</span>
         </div>
@@ -103,14 +227,14 @@ const ProfileCard = ({ userInfo }) => {
 };
 
 const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
-  <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
+  <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm">
     <div className="flex items-center justify-between mb-3">
-      <h3 className="text-base font-bold text-gray-900 flex items-center">
+      <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center">
         <Github size={18} className="mr-2 text-green-600" />
         GitHub Contributions
       </h3>
       {githubStatus === "succeeded" && (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500 dark:text-stone-300">
           {githubData?.totalContributions || 0} contributions
         </span>
       )}
@@ -118,7 +242,7 @@ const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
     <div className="h-60">
       {githubStatus === "loading" && <Loader />}
       {githubStatus === "failed" && (
-        <div className="flex flex-col items-center justify-center h-full text-center text-sm text-yellow-800 bg-yellow-50 p-4 rounded-lg">
+        <div className="flex flex-col items-center justify-center h-full text-center text-sm text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-900/30">
           <AlertCircle size={24} className="mb-2" />
           <p className="font-semibold">Could not fetch GitHub data.</p>
           <p className="text-xs text-yellow-700 mb-3">{githubError}</p>
@@ -143,33 +267,39 @@ const GithubActivityCard = ({ githubData, githubStatus, githubError }) => (
 const QuickStatsCard = ({ logs, githubData }) => {
   const totalLogs = logs?.length || 0;
   const totalCommits = githubData?.totalContributions || 0;
-  const recentLogs = logs?.slice(0, 3) || [];
+  const recentLogs = logs?.slice(0, 2) || [];
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm h-full flex flex-col">
-      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+    <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm h-full flex flex-col">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
         <TrendingUp size={18} className="mr-2 text-blue-600" />
         Quick Stats
       </h3>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-xl text-center border border-blue-200">
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl text-center border border-blue-200 dark:border-blue-900/40">
           <BookOpen className="w-6 h-6 mx-auto mb-2 text-blue-600" />
-          <p className="text-2xl font-bold text-gray-900 mb-1">{totalLogs}</p>
-          <p className="text-blue-700 text-xs font-medium">Dev Logs</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {totalLogs}
+          </p>
+          <p className="text-blue-700 dark:text-blue-300 text-xs font-medium">
+            Dev Logs
+          </p>
         </div>
-        <div className="bg-green-50 p-4 rounded-xl text-center border border-green-200">
+        <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-xl text-center border border-green-200 dark:border-green-900/40">
           <Github className="w-6 h-6 mx-auto mb-2 text-green-600" />
-          <p className="text-2xl font-bold text-gray-900 mb-1">
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
             {totalCommits}
           </p>
-          <p className="text-green-700 text-xs font-medium">Commits</p>
+          <p className="text-green-700 dark:text-green-300 text-xs font-medium">
+            Commits
+          </p>
         </div>
       </div>
 
       <div className="flex-1">
-        <p className="text-gray-800 text-sm font-semibold flex items-center mb-3">
-          <Clock size={14} className="mr-2 text-gray-500" />
+        <p className="text-gray-800 dark:text-white text-sm font-semibold flex items-center mb-3">
+          <Clock size={14} className="mr-2 text-gray-500 dark:text-stone-400" />
           Recent Activity
         </p>
         {recentLogs.length > 0 ? (
@@ -177,12 +307,12 @@ const QuickStatsCard = ({ logs, githubData }) => {
             {recentLogs.map((log) => (
               <div
                 key={log._id}
-                className="p-3 bg-stone-100 rounded-lg border border-stone-200"
+                className="p-3 bg-stone-100 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700"
               >
-                <p className="text-gray-700 text-xs leading-relaxed line-clamp-2">
+                <p className="text-gray-700 dark:text-stone-300 text-xs leading-relaxed line-clamp-2">
                   {log.entry}
                 </p>
-                <p className="text-gray-500 text-xs mt-1">
+                <p className="text-gray-500 dark:text-stone-400 text-xs mt-1">
                   {new Date(log.date).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -201,7 +331,6 @@ const QuickStatsCard = ({ logs, githubData }) => {
   );
 };
 
-// --- DetailedStatsCard (REVAMPED with more info and better UI) ---
 const DetailedStatsCard = ({ logs, logStats, githubData }) => {
   const thisWeekLogs =
     logs?.filter(
@@ -209,8 +338,15 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
         new Date(log.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     ).length || 0;
 
-  const currentStreak = logStats?.currentStreak || 0;
-  const longestStreak = logStats?.longestStreak || 0;
+  const fallbackStreaks = computeStreaksFromLogs(logs);
+  const currentStreak =
+    typeof logStats?.currentStreak === "number"
+      ? logStats.currentStreak
+      : fallbackStreaks.currentStreak;
+  const longestStreak =
+    typeof logStats?.longestStreak === "number"
+      ? logStats.longestStreak
+      : fallbackStreaks.longestStreak;
 
   const productivityScore = Math.min(
     100,
@@ -218,36 +354,88 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
   );
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm h-full flex flex-col">
-      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+    <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm h-full flex flex-col">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
         <Sparkles size={18} className="mr-2 text-purple-600" />
         Detailed Insights
       </h3>
 
       <div className="space-y-4 flex-1">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-purple-50 p-3 rounded-xl border border-purple-200 text-center">
-            <p className="text-xs font-semibold text-purple-700">This Week</p>
-            <p className="text-2xl font-bold text-gray-900">{thisWeekLogs}</p>
-            <p className="text-xs text-gray-500">logs</p>
-          </div>
-          <div className="bg-orange-50 p-3 rounded-xl border border-orange-200 text-center">
-            <p className="text-xs font-semibold text-orange-700">Log Streak</p>
-            <p className="text-2xl font-bold text-gray-900">{currentStreak}</p>
-            <p className="text-xs text-gray-500">days</p>
-          </div>
+        <div className="grid grid-cols-2 gap-3">
+          <StatTile
+            icon={CalendarDays}
+            title="This Week"
+            value={thisWeekLogs}
+            suffix="logs"
+            className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40"
+            iconWrapClass="ring-purple-300/40 bg-purple-500/15 text-purple-700 dark:text-purple-300"
+          />
+          <StatTile
+            icon={Star}
+            title="GitHub Stars"
+            value={githubData?.totalStars || 0}
+            className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900/30"
+            iconWrapClass="ring-yellow-300/40 bg-yellow-500/15 text-yellow-600 dark:text-yellow-300"
+          />
+          <StatTile
+            icon={Flame}
+            title="Current Streak"
+            value={currentStreak}
+            suffix="days"
+            className="bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-900/40"
+            iconWrapClass="ring-orange-300/40 bg-orange-500/15 text-orange-600 dark:text-orange-300"
+          />
+          <StatTile
+            icon={Flame}
+            title="Longest Streak"
+            value={longestStreak}
+            suffix="days"
+            className="bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/40"
+            iconWrapClass="ring-red-300/40 bg-red-500/15 text-red-600 dark:text-red-300"
+          />
         </div>
 
-        <div className="bg-stone-100 p-3 rounded-xl border border-stone-200">
+        {(() => {
+          const hasWeekly = currentStreak >= 7;
+          const hasDedicated = currentStreak >= 14;
+          const hasHardcore = currentStreak >= 30;
+          return (
+            <div className="flex flex-wrap items-center gap-2">
+              <AchievementBadge
+                achieved={hasWeekly}
+                icon={CalendarDays}
+                label="Weekly"
+                achievedClass="ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300"
+                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+              />
+              <AchievementBadge
+                achieved={hasDedicated}
+                icon={Flame}
+                label="Dev Dedicated"
+                achievedClass="ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300"
+                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+              />
+              <AchievementBadge
+                achieved={hasHardcore}
+                icon={Trophy}
+                label="Hard Core"
+                achievedClass="ring-yellow-300/50 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300"
+                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+              />
+            </div>
+          );
+        })()}
+
+        <div className="bg-stone-100 dark:bg-stone-800/70 p-3 rounded-xl border border-stone-200 dark:border-stone-700">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-sm font-semibold text-gray-800">
+            <p className="text-sm font-semibold text-gray-800 dark:text-white">
               Productivity Score
             </p>
             <span className={`text-sm font-bold text-blue-600`}>
               {productivityScore}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-stone-700 rounded-full h-2">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-500"
               style={{ width: `${productivityScore}%` }}
@@ -255,23 +443,115 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
           </div>
         </div>
 
-        <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-yellow-500 flex-shrink-0 flex items-center justify-center">
-            <Star size={20} className="text-white" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-gray-900">
-              {githubData?.totalStars || 0}
-            </p>
-            <p className="text-sm text-yellow-800 font-medium">GitHub Stars</p>
-          </div>
-        </div>
+        {(() => {
+          const baseClass =
+            "ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800";
+          const milestones = [
+            {
+              t: 0,
+              label: "Start",
+              icon: Moon,
+              cls: "ring-stone-300 bg-stone-100 text-stone-700 dark:ring-stone-700 dark:bg-stone-800 dark:text-stone-200",
+            },
+            {
+              t: 4,
+              label: "Spark",
+              icon: Zap,
+              cls: "ring-cyan-300/50 bg-cyan-500/15 text-cyan-700 dark:text-cyan-300",
+            },
+            {
+              t: 7,
+              label: "Week",
+              icon: CalendarCheck,
+              cls: "ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300",
+            },
+            {
+              t: 10,
+              label: "Lift-off",
+              icon: Rocket,
+              cls: "ring-blue-300/50 bg-blue-500/15 text-blue-700 dark:text-blue-300",
+            },
+            {
+              t: 30,
+              label: "Medal",
+              icon: Medal,
+              cls: "ring-amber-300/50 bg-amber-500/15 text-amber-700 dark:text-amber-300",
+            },
+            {
+              t: 100,
+              label: "Crown",
+              icon: Crown,
+              cls: "ring-yellow-300/60 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
+            },
+          ];
+
+          const best =
+            milestones
+              .filter((m) => (longestStreak || 0) >= m.t)
+              .slice(-1)[0] || milestones[0];
+
+          const next = milestones.find((m) => m.t > (longestStreak || 0));
+
+          const selection = [best, next].filter(Boolean).slice(0, 2);
+
+          return (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {selection.map((m) => (
+                <MilestoneChip
+                  key={m.t}
+                  active={(longestStreak || 0) >= m.t}
+                  icon={m.icon}
+                  label={`${m.label} ${m.t}`}
+                  activeClass={m.cls}
+                  baseClass={baseClass}
+                />
+              ))}
+            </div>
+          );
+        })()}
+
+        {(() => {
+          const defs = [
+            {
+              threshold: 30,
+              label: "Hard Core",
+              icon: Trophy,
+              cls: "ring-yellow-300/50 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
+            },
+            {
+              threshold: 14,
+              label: "Dev Dedicated",
+              icon: Flame,
+              cls: "ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300",
+            },
+            {
+              threshold: 7,
+              label: "Weekly",
+              icon: CalendarDays,
+              cls: "ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300",
+            },
+          ];
+
+          const best = defs.find((d) => (currentStreak || 0) >= d.threshold);
+          if (!best) return null;
+
+          return (
+            <div className="flex flex-wrap items-center gap-2">
+              <AchievementBadge
+                achieved
+                icon={best.icon}
+                label={best.label}
+                achievedClass={best.cls}
+                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+              />
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
 };
 
-// --- HomePage MAIN COMPONENT ---
 function HomePage() {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
@@ -303,36 +583,40 @@ function HomePage() {
   };
 
   return (
-    <div className="p-6 relative text-gray-900 bg-stone-50 min-h-full">
-      <header className="mb-6 relative z-10">
-        <h1 className="text-2xl md:text-3xl font-bold">Developer Dashboard</h1>
-        <p className="text-gray-500 text-sm">
-          Welcome back, {userInfo?.name || "Developer"}!
-        </p>
-      </header>
+    <div className="py-8 px-4 sm:px-6 lg:px-8 relative text-gray-900 dark:text-stone-100 bg-stone-50 dark:bg-stone-950 min-h-full">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-6 relative z-10">
+          <h1 className="text-2xl md:text-3xl font-bold">
+            Developer Dashboard
+          </h1>
+          <p className="text-gray-500 dark:text-stone-300 text-sm">
+            Welcome back, {userInfo?.name || "Developer"}!
+          </p>
+        </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-1">
-          <ProfileCard userInfo={enhancedUserInfo} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-1">
+            <ProfileCard userInfo={enhancedUserInfo} />
+          </div>
+          <div className="lg:col-span-1">
+            <QuickStatsCard logs={logs} githubData={githubData} />
+          </div>
+          <div className="lg:col-span-1">
+            <DetailedStatsCard
+              logs={logs}
+              logStats={logStats}
+              githubData={githubData}
+            />
+          </div>
         </div>
-        <div className="lg:col-span-1">
-          <QuickStatsCard logs={logs} githubData={githubData} />
-        </div>
-        <div className="lg:col-span-1">
-          <DetailedStatsCard
-            logs={logs}
-            logStats={logStats}
+
+        <div className="w-full">
+          <GithubActivityCard
             githubData={githubData}
+            githubStatus={githubStatus}
+            githubError={githubError}
           />
         </div>
-      </div>
-
-      <div className="w-full">
-        <GithubActivityCard
-          githubData={githubData}
-          githubStatus={githubStatus}
-          githubError={githubError}
-        />
       </div>
     </div>
   );

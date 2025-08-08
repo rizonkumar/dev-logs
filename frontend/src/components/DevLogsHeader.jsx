@@ -35,13 +35,13 @@ const DevLogsHeader = () => {
               `https://i.pravatar.cc/100?u=${userInfo?._id}`
             }
             alt={userInfo?.name || "User"}
-            className="w-20 h-20 rounded-full border-4 border-white shadow-md object-cover"
+            className="w-20 h-20 rounded-full border-4 border-white dark:border-stone-800 shadow-md object-cover"
           />
           <div className="ml-4">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {userInfo?.name || "Developer"}
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-stone-300">
               {userInfo?.title || "Software Developer | Building products"}
             </p>
           </div>
@@ -58,8 +58,8 @@ const DevLogsHeader = () => {
                     to={item.href}
                     className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium ${
                       isActive
-                        ? "bg-stone-200 text-gray-900"
-                        : "text-gray-500 hover:bg-stone-100 hover:text-gray-800"
+                        ? "bg-stone-200 dark:bg-stone-800 text-gray-900 dark:text-white"
+                        : "text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white"
                     }`}
                   >
                     <Icon className="w-4 h-4" />

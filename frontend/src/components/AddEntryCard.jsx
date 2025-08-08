@@ -52,8 +52,8 @@ const AddEntryCard = ({
 
   return (
     <div className="mb-8">
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm transition-all duration-500">
-        <div className="p-6 border-b border-stone-200">
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm transition-all duration-500">
+        <div className="p-6 border-b border-stone-200 dark:border-stone-700">
           <button
             type="button"
             onClick={handleToggleClick}
@@ -64,10 +64,10 @@ const AddEntryCard = ({
                 <PlusCircle className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                   Add New Entry
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-stone-300">
                   {selectedDate
                     ? `For ${new Date(selectedDate).toLocaleDateString(
                         "en-US",
@@ -90,7 +90,7 @@ const AddEntryCard = ({
             ) : (
               <ChevronRight
                 size={24}
-                className="text-gray-400 group-hover:text-gray-600 transition-all duration-300"
+                className="text-gray-400 dark:text-stone-400 group-hover:text-gray-600 dark:group-hover:text-stone-200 transition-all duration-300"
               />
             )}
           </button>
@@ -115,21 +115,21 @@ const AddEntryCard = ({
                 <textarea
                   value={newEntry}
                   onChange={(e) => setNewEntry(e.target.value)}
-                  className="w-full bg-stone-50 p-4 rounded-xl border border-stone-300
+                  className="w-full bg-stone-50 dark:bg-stone-900 p-4 rounded-xl border border-stone-300 dark:border-stone-700
                             focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none 
-                            transition-all duration-300 text-gray-800 placeholder-gray-400 resize-none
+                            transition-all duration-300 text-gray-800 dark:text-stone-100 placeholder-gray-400 dark:placeholder-stone-400 resize-none
                             min-h-[120px]"
                   placeholder="What did you discover today? Share your coding insights, challenges overcome, or features built..."
                   autoFocus
                 />
-                <div className="absolute bottom-3 right-3 text-xs text-gray-400">
+                <div className="absolute bottom-3 right-3 text-xs text-gray-400 dark:text-stone-400">
                   {newEntry.length} characters
                 </div>
               </div>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700 text-sm flex items-center">
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-lg">
+                  <p className="text-red-700 dark:text-red-300 text-sm flex items-center">
                     <AlertTriangle size={16} className="mr-2" />
                     {error}
                   </p>
@@ -137,7 +137,7 @@ const AddEntryCard = ({
               )}
 
               <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2 text-xs text-gray-500">
+                <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-stone-400">
                   <Calendar size={14} />
                   <span>{selectedDate || getTodayDateString()}</span>
                 </div>
@@ -146,7 +146,7 @@ const AddEntryCard = ({
                   <button
                     type="button"
                     onClick={handleCancelClick}
-                    className="px-4 py-2 text-gray-700 bg-white hover:bg-stone-100 border border-stone-300
+                    className="px-4 py-2 text-gray-700 dark:text-stone-300 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-300 dark:border-stone-700
                               rounded-lg transition-all duration-300 text-sm font-medium
                               flex items-center space-x-2"
                   >
@@ -157,8 +157,8 @@ const AddEntryCard = ({
                   <button
                     type="submit"
                     disabled={!newEntry.trim() || isLoading}
-                    className="bg-gray-800 hover:bg-black
-                              text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300 
+                    className="bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white
+                              text-white dark:text-stone-900 font-semibold py-2 px-6 rounded-lg transition-all duration-300 
                               flex items-center space-x-2 text-sm shadow-sm
                               disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >

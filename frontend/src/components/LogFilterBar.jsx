@@ -33,35 +33,38 @@ function LogFilterBar({ range, setRange }) {
 
   const css = `
     .rdp-button:hover:not([disabled]):not(.rdp-day_selected) { 
-      background-color: #f5f5f4; /* stone-100 */ 
+      background-color: var(--color-stone-100, #f5f5f4);
     }
     .rdp-day_selected, .rdp-day_selected:hover { 
       background-color: #1e293b !important; /* slate-800 */
       color: #fff; 
     }
-    .rdp-caption_label {
-      font-weight: 600;
+    .dark .rdp { color: #e7e5e4; }
+    .dark .rdp-day { color: #e7e5e4; }
+    .dark .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+      background-color: rgba(255,255,255,0.06);
     }
+    .rdp-caption_label { font-weight: 600; }
   `;
 
   return (
-    <div className="bg-white p-3.5 rounded-xl border border-stone-200 shadow-sm mb-8">
+    <div className="bg-white dark:bg-stone-900 p-3.5 rounded-xl border border-stone-200 dark:border-stone-700 shadow-sm mb-8">
       <style>{css}</style>
       <div className="flex flex-wrap items-center gap-4">
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-gray-700 dark:text-stone-200">
           Filter by date range:
         </span>
 
         <div className="relative" ref={fromWrapperRef}>
           <button
             onClick={() => setFromPickerOpen((p) => !p)}
-            className="flex items-center gap-2 bg-white border border-stone-300 rounded-md px-3 py-1.5 text-sm text-gray-800 hover:bg-stone-50"
+            className="flex items-center gap-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-md px-3 py-1.5 text-sm text-gray-800 dark:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800"
           >
             <CalendarIcon size={16} className="text-gray-500" />
             {range.from ? format(range.from, "LLL dd, y") : <span>From</span>}
           </button>
           {fromPickerOpen && (
-            <div className="absolute top-full mt-2 z-10 bg-white border border-stone-300 rounded-lg p-2 shadow-lg">
+            <div className="absolute top-full mt-2 z-10 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg p-2 shadow-lg">
               <DayPicker
                 mode="single"
                 selected={range.from}
@@ -75,18 +78,18 @@ function LogFilterBar({ range, setRange }) {
           )}
         </div>
 
-        <span className="text-gray-400">to</span>
+        <span className="text-gray-400 dark:text-stone-400">to</span>
 
         <div className="relative" ref={toWrapperRef}>
           <button
             onClick={() => setToPickerOpen((p) => !p)}
-            className="flex items-center gap-2 bg-white border border-stone-300 rounded-md px-3 py-1.5 text-sm text-gray-800 hover:bg-stone-50"
+            className="flex items-center gap-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-md px-3 py-1.5 text-sm text-gray-800 dark:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800"
           >
             <CalendarIcon size={16} className="text-gray-500" />
             {range.to ? format(range.to, "LLL dd, y") : <span>To</span>}
           </button>
           {toPickerOpen && (
-            <div className="absolute top-full mt-2 z-10 bg-white border border-stone-300 rounded-lg p-2 shadow-lg">
+            <div className="absolute top-full mt-2 z-10 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg p-2 shadow-lg">
               <DayPicker
                 mode="single"
                 selected={range.to}

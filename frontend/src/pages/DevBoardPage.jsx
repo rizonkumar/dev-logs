@@ -26,43 +26,50 @@ const COLUMN_THEME = {
     title: "To Do",
     icon: Circle,
     color: "blue",
-    headerClasses: "border-blue-500 text-blue-700",
-    iconClasses: "text-blue-500",
-    badgeClasses: "bg-blue-100 text-blue-800",
+    headerClasses:
+      "border-blue-500 text-blue-700 dark:text-blue-300 dark:border-blue-400/60",
+    iconClasses: "text-blue-500 dark:text-blue-400",
+    badgeClasses:
+      "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300",
   },
   IN_PROGRESS: {
     title: "In Progress",
     icon: Clock,
     color: "yellow",
-    headerClasses: "border-yellow-500 text-yellow-700",
-    iconClasses: "text-yellow-500",
-    badgeClasses: "bg-yellow-100 text-yellow-800",
+    headerClasses:
+      "border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-400/60",
+    iconClasses: "text-yellow-500 dark:text-yellow-400",
+    badgeClasses:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-300",
   },
   IN_REVIEW: {
     title: "In Review",
     icon: AlertCircle,
     color: "purple",
-    headerClasses: "border-purple-500 text-purple-700",
-    iconClasses: "text-purple-500",
-    badgeClasses: "bg-purple-100 text-purple-800",
+    headerClasses:
+      "border-purple-500 text-purple-700 dark:text-purple-300 dark:border-purple-400/60",
+    iconClasses: "text-purple-500 dark:text-purple-400",
+    badgeClasses:
+      "bg-purple-100 text-purple-800 dark:bg-purple-950/40 dark:text-purple-300",
   },
   DONE: {
     title: "Done",
     icon: CheckCircle,
     color: "green",
-    headerClasses: "border-green-500 text-green-700",
-    iconClasses: "text-green-500",
-    badgeClasses: "bg-green-100 text-green-800",
+    headerClasses:
+      "border-green-500 text-green-700 dark:text-green-300 dark:border-green-400/60",
+    iconClasses: "text-green-500 dark:text-green-400",
+    badgeClasses:
+      "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300",
   },
 };
 
-// --- MODAL COMPONENTS (Refactored for Light Theme) ---
 const Modal = ({ children, onClose }) => (
-  <div className="fixed inset-0 bg-gray-900/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white border border-stone-200 rounded-2xl shadow-xl w-full max-w-md relative p-6">
+  <div className="fixed inset-0 bg-gray-900/10 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-xl w-full max-w-md relative p-6">
       <button
         onClick={onClose}
-        className="absolute top-3 right-3 p-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-gray-600 hover:text-gray-800 transition-colors"
+        className="absolute top-3 right-3 p-1.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-full text-gray-600 dark:text-stone-300 hover:text-gray-800 dark:hover:text-white transition-colors"
       >
         <X size={18} />
       </button>
@@ -83,7 +90,7 @@ const AddEditModal = ({ todo, onClose, onSave }) => {
 
   return (
     <Modal onClose={onClose}>
-      <h3 className="text-xl font-bold text-gray-900 mb-4">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {isEditing ? "Edit Task" : "Add New Task"}
       </h3>
       <div className="space-y-4">
@@ -91,14 +98,14 @@ const AddEditModal = ({ todo, onClose, onSave }) => {
           value={task}
           onChange={(e) => setTask(e.target.value)}
           placeholder="Enter task description..."
-          className="w-full bg-stone-50 p-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-gray-800"
+          className="w-full bg-stone-50 dark:bg-stone-900 p-3 rounded-lg border border-stone-300 dark:border-stone-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-gray-800 dark:text-stone-100 placeholder-gray-400 dark:placeholder-stone-400"
           rows={3}
           autoFocus
         />
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="w-full bg-stone-50 p-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-gray-800 appearance-none"
+          className="w-full bg-stone-50 dark:bg-stone-900 p-3 rounded-lg border border-stone-300 dark:border-stone-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-gray-800 dark:text-stone-100 appearance-none"
         >
           {Object.keys(COLUMN_THEME).map((statusKey) => (
             <option key={statusKey} value={statusKey}>
@@ -109,13 +116,13 @@ const AddEditModal = ({ todo, onClose, onSave }) => {
         <div className="flex justify-end gap-3 pt-2">
           <button
             onClick={onClose}
-            className="px-5 py-2 text-gray-700 bg-white hover:bg-stone-100 border border-stone-300 rounded-lg font-medium transition-colors"
+            className="px-5 py-2 text-gray-800 dark:text-stone-900 bg-white dark:bg-stone-200 hover:bg-stone-100 dark:hover:bg-stone-100 border border-stone-300 dark:border-stone-300 rounded-lg font-semibold transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-5 py-2 bg-gray-800 hover:bg-black text-white rounded-lg font-semibold transition-colors"
+            className="px-5 py-2 bg-gray-800 hover:bg-black text-white rounded-lg font-semibold transition-colors cursor-pointer dark:bg-stone-900 dark:hover:bg-black"
           >
             {isEditing ? "Save Changes" : "Add Task"}
           </button>
@@ -127,20 +134,22 @@ const AddEditModal = ({ todo, onClose, onSave }) => {
 
 const DeleteModal = ({ onClose, onConfirm }) => (
   <Modal onClose={onClose}>
-    <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Task</h3>
-    <p className="text-gray-500 mb-6">
+    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+      Delete Task
+    </h3>
+    <p className="text-gray-500 dark:text-stone-300 mb-6">
       Are you sure? This action cannot be undone.
     </p>
     <div className="flex justify-end gap-3">
       <button
         onClick={onClose}
-        className="px-5 py-2 text-gray-700 bg-white hover:bg-stone-100 border border-stone-300 rounded-lg font-medium transition-colors"
+        className="px-5 py-2 text-gray-800 dark:text-stone-900 bg-white dark:bg-stone-200 hover:bg-stone-100 dark:hover:bg-stone-100 border border-stone-300 dark:border-stone-300 rounded-lg font-semibold transition-colors cursor-pointer"
       >
         Cancel
       </button>
       <button
         onClick={onConfirm}
-        className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
+        className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors cursor-pointer"
       >
         Delete
       </button>
@@ -148,22 +157,21 @@ const DeleteModal = ({ onClose, onConfirm }) => (
   </Modal>
 );
 
-// --- UI COMPONENTS (Refactored for Light Theme) ---
 const EmptyState = ({ onAddTaskClick }) => (
   <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-    <div className="bg-white border border-stone-200 rounded-2xl p-10 max-w-lg shadow-sm">
-      <div className="mx-auto w-16 h-16 bg-blue-100 text-blue-600 flex items-center justify-center rounded-2xl mb-6 border border-blue-200">
+    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl p-10 max-w-lg shadow-sm">
+      <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center rounded-2xl mb-6 border border-blue-200 dark:border-blue-900/40">
         <ClipboardList size={32} />
       </div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
         Your Board is Clear!
       </h2>
-      <p className="text-gray-500 mb-6">
+      <p className="text-gray-500 dark:text-stone-300 mb-6">
         Get started by adding your first task. Let's make today productive.
       </p>
       <button
         onClick={onAddTaskClick}
-        className="flex items-center mx-auto gap-2 bg-gray-800 hover:bg-black text-white px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-sm"
+        className="flex items-center mx-auto gap-2 bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white text-white dark:text-stone-900 px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-sm"
       >
         <Plus size={18} /> Add Your First Task
       </button>
@@ -199,7 +207,6 @@ const TaskCard = ({ todo, provided }) => (
   </div>
 );
 
-// --- MAIN COMPONENT ---
 const DevBoardPage = () => {
   const dispatch = useDispatch();
   const { todos, status } = useSelector((state) => state.todos);
@@ -299,32 +306,36 @@ const DevBoardPage = () => {
   }
 
   return (
-    <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50">
+    <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50 dark:bg-stone-950">
       <header className="mb-6 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
             <ListTodo size={28} /> Dev Board
           </h1>
-          <p className="text-gray-500">Drag & drop to organize your tasks.</p>
+          <p className="text-gray-500 dark:text-stone-300">
+            Drag & drop to organize your tasks.
+          </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
-          <div className="flex items-center bg-stone-200 rounded-lg p-1">
+          <div className="flex items-center bg-stone-200 dark:bg-stone-800 rounded-lg p-1 border border-transparent dark:border-stone-700">
             <button
               onClick={() => setViewMode("today")}
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-all ${
+              aria-pressed={viewMode === "today"}
+              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
                 viewMode === "today"
-                  ? "bg-white text-gray-800 shadow-sm"
-                  : "text-gray-500"
+                  ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
+                  : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
               }`}
             >
               Today
             </button>
             <button
               onClick={() => setViewMode("all")}
-              className={`px-3 py-1 rounded-md text-sm font-semibold transition-all ${
+              aria-pressed={viewMode === "all"}
+              className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
                 viewMode === "all"
-                  ? "bg-white text-gray-800 shadow-sm"
-                  : "text-gray-500"
+                  ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
+                  : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
               }`}
             >
               All Tasks
@@ -332,7 +343,7 @@ const DevBoardPage = () => {
           </div>
           <button
             onClick={() => setModal("add")}
-            className="flex items-center gap-2 bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+            className="flex items-center gap-2 bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white text-white dark:text-stone-900 px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer"
           >
             <Plus size={18} /> Add Task
           </button>
@@ -350,13 +361,15 @@ const DevBoardPage = () => {
               return (
                 <div
                   key={columnId}
-                  className="flex flex-col bg-stone-100 rounded-xl min-w-[280px]"
+                  className="flex flex-col bg-stone-100 dark:bg-stone-900 rounded-xl min-w-[280px] border border-transparent dark:border-stone-700"
                 >
                   <div
                     className={`flex items-center gap-3 p-4 border-t-4 ${theme.headerClasses}`}
                   >
                     <Icon className={`w-5 h-5 ${theme.iconClasses}`} />
-                    <h2 className="text-lg font-bold">{theme.title}</h2>
+                    <h2 className="text-lg font-bold dark:text-white">
+                      {theme.title}
+                    </h2>
                     <span
                       className={`ml-auto text-sm font-bold ${theme.badgeClasses} px-2.5 py-0.5 rounded-full`}
                     >
@@ -368,8 +381,10 @@ const DevBoardPage = () => {
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`flex-1 p-3 space-y-3 transition-colors ${
-                          snapshot.isDraggingOver ? "bg-stone-200/70" : ""
+                        className={`flex-1 p-3 space-y-3 transition-colors rounded-b-xl ${
+                          snapshot.isDraggingOver
+                            ? "bg-stone-200/70 dark:bg-stone-800/60"
+                            : ""
                         }`}
                       >
                         {tasks.map((todo, index) => (
@@ -382,23 +397,23 @@ const DevBoardPage = () => {
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                className="group relative p-3 rounded-lg bg-white border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 transition-all cursor-pointer"
+                                className="group relative p-3 rounded-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-sm hover:shadow-md hover:border-stone-300 dark:hover:border-stone-600 transition-all cursor-pointer"
                                 onClick={(e) => openEditModal(e, todo)}
                               >
                                 <div className="flex items-start gap-2">
                                   <div
                                     {...provided.dragHandleProps}
                                     onClick={(e) => e.stopPropagation()}
-                                    className="p-1 mt-0.5 text-stone-400 hover:text-stone-600 cursor-grab active:cursor-grabbing"
+                                    className="p-1 mt-0.5 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 cursor-grab active:cursor-grabbing"
                                   >
                                     <GripVertical size={16} />
                                   </div>
                                   <div className="flex-1">
-                                    <p className="text-gray-800 font-medium text-sm">
+                                    <p className="text-gray-800 dark:text-stone-100 font-medium text-sm">
                                       {todo.task}
                                     </p>
                                     <div className="flex items-center justify-between mt-3">
-                                      <p className="text-xs text-stone-500">
+                                      <p className="text-xs text-stone-500 dark:text-stone-400">
                                         {new Date(
                                           todo.createdAt
                                         ).toLocaleDateString("en-US", {
@@ -411,7 +426,7 @@ const DevBoardPage = () => {
                                           onClick={(e) =>
                                             openEditModal(e, todo)
                                           }
-                                          className="p-1 text-gray-500 hover:text-blue-600 rounded hover:bg-blue-100"
+                                          className="p-1 text-gray-500 dark:text-stone-300 hover:text-blue-600 rounded hover:bg-blue-100 dark:hover:bg-blue-950/30 cursor-pointer"
                                         >
                                           <Edit2 size={14} />
                                         </button>
@@ -419,7 +434,7 @@ const DevBoardPage = () => {
                                           onClick={(e) =>
                                             openDeleteModal(e, todo)
                                           }
-                                          className="p-1 text-gray-500 hover:text-red-600 rounded hover:bg-red-100"
+                                          className="p-1 text-gray-500 dark:text-stone-300 hover:text-red-600 rounded hover:bg-red-100 dark:hover:bg-red-950/30 cursor-pointer"
                                         >
                                           <Trash2 size={14} />
                                         </button>

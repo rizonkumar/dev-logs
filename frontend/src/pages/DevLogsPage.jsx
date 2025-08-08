@@ -114,8 +114,10 @@ function DevLogsPage() {
     content = (
       <div className="flex justify-center items-center py-20">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-stone-200 border-t-stone-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading your development journey...</p>
+          <div className="w-12 h-12 border-4 border-stone-200 dark:border-stone-700 border-t-stone-500 dark:border-t-stone-300 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-stone-300">
+            Loading your development journey...
+          </p>
         </div>
       </div>
     );
@@ -136,17 +138,20 @@ function DevLogsPage() {
           ))
         ) : (
           <div className="text-center py-20">
-            <div className="bg-white rounded-2xl p-12 border border-stone-200 shadow-sm">
+            <div className="bg-white dark:bg-stone-900 rounded-2xl p-12 border border-stone-200 dark:border-stone-700 shadow-sm">
               <div
-                className="w-20 h-20 rounded-2xl bg-stone-100 
-                           flex items-center justify-center mx-auto mb-6 border border-stone-200"
+                className="w-20 h-20 rounded-2xl bg-stone-100 dark:bg-stone-800 
+                           flex items-center justify-center mx-auto mb-6 border border-stone-200 dark:border-stone-700"
               >
-                <BookOpen size={32} className="text-gray-400" />
+                <BookOpen
+                  size={32}
+                  className="text-gray-400 dark:text-stone-300"
+                />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                 No entries found
               </h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto leading-relaxed">
+              <p className="text-gray-500 dark:text-stone-300 mb-6 max-w-md mx-auto leading-relaxed">
                 {dateRange.from
                   ? "Try adjusting your date range or start documenting your journey!"
                   : "Begin your development journey by adding your first log entry."}
@@ -154,8 +159,8 @@ function DevLogsPage() {
               {!dateRange.from && (
                 <button
                   onClick={() => setIsFormOpen(true)}
-                  className="bg-gray-800 hover:bg-black 
-                            text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 
+                  className="bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white 
+                            text-white dark:text-stone-900 font-semibold py-3 px-6 rounded-lg transition-all duration-300 
                             shadow-sm flex items-center space-x-2 mx-auto"
                 >
                   <Sparkles size={18} />
@@ -170,23 +175,23 @@ function DevLogsPage() {
   } else if (status === "failed") {
     content = (
       <div className="text-center py-20">
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-12">
+        <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-2xl p-12">
           <X size={48} className="mx-auto mb-4 text-red-500" />
           <h3 className="text-xl font-bold text-red-600 mb-2">
             Something went wrong
           </h3>
-          <p className="text-red-500">{error}</p>
+          <p className="text-red-500 dark:text-red-300">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 text-gray-800">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-gray-800 dark:text-stone-100">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link
           to="/"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 
+          className="inline-flex items-center text-sm text-gray-600 dark:text-stone-300 hover:text-gray-900 dark:hover:text-white 
                     transition-all duration-300 font-semibold mb-8 group"
         >
           <ArrowLeft
@@ -199,10 +204,10 @@ function DevLogsPage() {
         <div className="mb-12">
           <DevLogsHeader />
           <div className="mt-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Development Journal
             </h1>
-            <p className="text-gray-600 text-lg max-w-2xl leading-relaxed">
+            <p className="text-gray-600 dark:text-stone-300 text-lg max-w-2xl leading-relaxed">
               Your personal chronicle of coding adventures, technical
               discoveries, and growth milestones. Every bug fixed and feature
               built tells a story.

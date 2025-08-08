@@ -67,6 +67,8 @@ const getLogStats = async (userId) => {
       totalLogs: 0,
       mostActiveDay: "N/A",
       dayStats: {},
+      currentStreak: 0,
+      longestStreak: 0,
     };
   }
 
@@ -102,6 +104,50 @@ const getLogStats = async (userId) => {
     dayStats[a] > dayStats[b] ? a : b
   );
 
+  const toUtcYyyyMmDd = (date) => {
+    const d = new Date(date);
+    const utc = new Date(
+      Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+    );
+    return utc.toISOString().slice(0, 10);
+  };
+
+  const uniqueDateStringsSet = new Set(logs.map((l) => toUtcYyyyMmDd(l.date)));
+  const uniqueDateStrings = Array.from(uniqueDateStringsSet).sort();
+
+  let longestStreak = 0;
+  let currentRun = 0;
+  let prevDate = null;
+  for (const dateStr of uniqueDateStrings) {
+    const currentDate = new Date(dateStr + "T00:00:00.000Z");
+    if (prevDate) {
+      const diffDays = Math.round(
+        (currentDate - prevDate) / (1000 * 60 * 60 * 24)
+      );
+      if (diffDays === 1) {
+        currentRun += 1;
+      } else {
+        longestStreak = Math.max(longestStreak, currentRun);
+        currentRun = 1;
+      }
+    } else {
+      currentRun = 1;
+    }
+    prevDate = currentDate;
+  }
+  longestStreak = Math.max(longestStreak, currentRun);
+
+  // Current streak up to the latest log date (not strictly today)
+  let currentStreak = 0;
+  if (uniqueDateStrings.length > 0) {
+    const latestDateStr = uniqueDateStrings[uniqueDateStrings.length - 1];
+    const cursor = new Date(latestDateStr + "T00:00:00.000Z");
+    while (uniqueDateStringsSet.has(cursor.toISOString().slice(0, 10))) {
+      currentStreak += 1;
+      cursor.setUTCDate(cursor.getUTCDate() - 1);
+    }
+  }
+
   return {
     totalLogs: logs.length,
     mostActiveDay: dayAbbreviations[mostActiveDay],
@@ -109,6 +155,8 @@ const getLogStats = async (userId) => {
       acc[dayAbbreviations[day]] = dayStats[day];
       return acc;
     }, {}),
+    currentStreak,
+    longestStreak,
   };
 };
 

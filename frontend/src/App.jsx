@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,6 +15,24 @@ import PrivateRoute from "./components/PrivateRoute";
 import "./App.css";
 
 function App() {
+  const [toastTheme, setToastTheme] = useState("dark");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initial = stored ? stored : prefersDark ? "dark" : "light";
+    setToastTheme(initial === "dark" ? "dark" : "light");
+
+    const handler = (e) => {
+      const theme = e?.detail?.theme;
+      if (theme) setToastTheme(theme === "dark" ? "dark" : "light");
+    };
+    window.addEventListener("themechange", handler);
+    return () => window.removeEventListener("themechange", handler);
+  }, []);
+
   return (
     <Router>
       <Routes>
@@ -48,7 +66,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark"
+        theme={toastTheme}
       />
     </Router>
   );
