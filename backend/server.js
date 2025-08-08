@@ -58,6 +58,29 @@ app.use("/api/github", require("./api/routes/githubRoutes"));
 app.use("/api/pomodoros", require("./api/routes/pomodoroRoutes"));
 app.use("/api/reviews", require("./api/routes/reviewRoutes"));
 app.use("/api/notes", require("./api/routes/noteRoutes"));
+// Finance routes
+app.use(
+  "/api/finance/transactions",
+  require("./api/routes/finance/transactionRoutes")
+);
+app.use(
+  "/api/finance/categories",
+  require("./api/routes/finance/categoryRoutes")
+);
+app.use("/api/finance/budgets", require("./api/routes/finance/budgetRoutes"));
+app.use(
+  "/api/finance/goals",
+  require("./api/routes/finance/savingsGoalRoutes")
+);
+app.use("/api/finance/projects", require("./api/routes/finance/projectRoutes"));
+app.use(
+  "/api/finance/dashboard",
+  require("./api/routes/finance/dashboardRoutes")
+);
+app.use(
+  "/api/finance/calculators",
+  require("./api/routes/finance/calculatorRoutes")
+);
 
 const PORT = process.env.PORT || 5001;
 
