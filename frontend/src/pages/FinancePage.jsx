@@ -118,6 +118,54 @@ function InlineBudgetEditor({ initialAmount, onSave }) {
   );
 }
 
+function InlineContributionAdder({ onSave }) {
+  const [editing, setEditing] = React.useState(false);
+  const [value, setValue] = React.useState("");
+  return editing ? (
+    <div className="flex items-center gap-2">
+      <input
+        type="number"
+        min="0"
+        step="0.01"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="px-2 py-1 rounded bg-stone-100 dark:bg-stone-800 w-28"
+        placeholder="Amount"
+        autoFocus
+      />
+      <button
+        className="px-2 py-1 rounded bg-green-600 text-white text-xs cursor-pointer hover:bg-green-700 transition-colors"
+        onClick={async () => {
+          const num = Number(value);
+          if (!Number.isNaN(num) && num > 0) {
+            await onSave(num);
+            setValue("");
+            setEditing(false);
+          }
+        }}
+      >
+        ✓
+      </button>
+      <button
+        className="px-2 py-1 rounded bg-stone-300 dark:bg-stone-700 text-xs cursor-pointer hover:bg-stone-400 dark:hover:bg-stone-600 transition-colors"
+        onClick={() => {
+          setValue("");
+          setEditing(false);
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  ) : (
+    <button
+      className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800 cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+      onClick={() => setEditing(true)}
+    >
+      Add +
+    </button>
+  );
+}
+
 export default function FinancePage() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -256,13 +304,11 @@ export default function FinancePage() {
     }
   };
 
-  const addGoalContribution = async (goalId) => {
-    const input = prompt("Add contribution amount", "0");
-    if (input === null) return;
-    const amount = Number(input);
-    if (Number.isNaN(amount) || amount <= 0) return;
+  const addGoalContribution = async (goalId, amount) => {
+    const num = Number(amount);
+    if (Number.isNaN(num) || num <= 0) return;
     await goalsService.addContribution(goalId, {
-      amount,
+      amount: num,
       date: new Date().toISOString().slice(0, 10),
     });
     await refreshGoals();
@@ -670,20 +716,25 @@ export default function FinancePage() {
               <Card key={g._id}>
                 <SectionTitle
                   right={
-                    <button
-                      className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800"
-                      onClick={() => addGoalContribution(g._id)}
-                    >
-                      Add +
-                    </button>
+                    <InlineContributionAdder
+                      onSave={(amt) => addGoalContribution(g._id, amt)}
+                    />
                   }
                 >
                   {g.name}
                 </SectionTitle>
                 <BudgetBar spent={current} total={g.targetAmount || 0} />
                 <div className="mt-2 text-sm">
-                  {formatCurrencyWith(current, currency)} /{" "}
-                  {formatCurrencyWith(g.targetAmount, currency)}
+                  <span className="text-emerald-700 dark:text-emerald-300 font-medium">
+                    {formatCurrencyWith(current, currency)}
+                  </span>
+                  <span className="text-stone-500 dark:text-stone-400">
+                    {" "}
+                    /{" "}
+                  </span>
+                  <span className="text-sky-700 dark:text-sky-300">
+                    {formatCurrencyWith(g.targetAmount, currency)}
+                  </span>
                 </div>
               </Card>
             );
