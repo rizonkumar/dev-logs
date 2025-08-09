@@ -1,4 +1,5 @@
 const FinanceTransaction = require("../../models/finance/transactionModel");
+const { Types } = require("mongoose");
 
 const getOverview = async (userId) => {
   const now = new Date();
@@ -13,10 +14,12 @@ const getOverview = async (userId) => {
     999
   );
 
+  const userObjectId = new Types.ObjectId(userId);
+
   const [incomeAgg] = await FinanceTransaction.aggregate([
     {
       $match: {
-        user: userId,
+        user: userObjectId,
         type: "INCOME",
         status: "POSTED",
         transactionDate: { $gte: startOfMonth, $lte: endOfMonth },
@@ -28,7 +31,7 @@ const getOverview = async (userId) => {
   const [expenseAgg] = await FinanceTransaction.aggregate([
     {
       $match: {
-        user: userId,
+        user: userObjectId,
         type: "EXPENSE",
         status: "POSTED",
         transactionDate: { $gte: startOfMonth, $lte: endOfMonth },

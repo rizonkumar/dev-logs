@@ -82,6 +82,7 @@ const validateListTransactions = [
   query("to").optional().isISO8601(),
   query("dateField").optional().isIn(["transactionDate", "dueDate"]),
   query("limit").optional().isInt({ min: 1, max: 200 }),
+  query("page").optional().isInt({ min: 1 }),
   query("sort")
     .optional()
     .isIn(["newest", "oldest", "amount_desc", "amount_asc"]),

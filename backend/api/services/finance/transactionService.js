@@ -71,6 +71,7 @@ const getAllTransactions = async (userId, queryParams = {}) => {
     to,
     dateField,
     limit,
+    page,
     sort,
   } = queryParams;
 
@@ -135,8 +136,16 @@ const getAllTransactions = async (userId, queryParams = {}) => {
 
   const lim = Number(limit);
   if (!Number.isNaN(lim) && lim > 0) query.limit(lim);
+  const pageNum = Number(page);
+  if (!Number.isNaN(pageNum) && pageNum > 0 && lim > 0) {
+    query.skip((pageNum - 1) * lim);
+  }
 
-  return await query.exec();
+  const [items, total] = await Promise.all([
+    query.exec(),
+    FinanceTransaction.countDocuments(filter),
+  ]);
+  return { items, total };
 };
 
 const createTransaction = async (userId, data) => {

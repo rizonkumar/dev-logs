@@ -2,11 +2,11 @@ const asyncHandler = require("../../middleware/asyncHandler");
 const transactionService = require("../../services/finance/transactionService");
 
 const listTransactions = asyncHandler(async (req, res) => {
-  const transactions = await transactionService.getAllTransactions(
+  const result = await transactionService.getAllTransactions(
     req.user.id,
     req.query || {}
   );
-  res.status(200).json(transactions);
+  res.status(200).json(result);
 });
 
 const createTransaction = asyncHandler(async (req, res) => {
