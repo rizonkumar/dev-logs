@@ -10,6 +10,9 @@ import calculatorsService from "../services/finance/calculatorsService";
 import TransactionForm from "../components/finance/TransactionForm";
 import GoalForm from "../components/finance/GoalForm";
 import StatCard from "../components/finance/StatCard";
+import TransactionsTable from "../components/finance/TransactionsTable";
+import Loader from "../components/Loader";
+import FinanceCurrencyPicker from "../components/finance/FinanceCurrencyPicker";
 import {
   CircleDollarSign,
   TrendingDown,
@@ -27,24 +30,24 @@ const Card = ({ children, className = "" }) => (
 
 // StatCard imported from components/finance/StatCard
 
-const Tab = ({ id, active, onClick, children }) => (
+const Tab = ({ id, active, onClick, children, icon: Icon }) => (
   <button
     onClick={() => onClick(id)}
-    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border flex items-center gap-2 ${
       active
-        ? "bg-stone-200 dark:bg-stone-800"
-        : "hover:bg-stone-100 dark:hover:bg-stone-800"
+        ? "bg-stone-200 dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+        : "hover:bg-stone-100 dark:hover:bg-stone-800 border-transparent"
     }`}
   >
+    {Icon ? <Icon className="w-4 h-4" /> : null}
     {children}
   </button>
 );
 
-const formatCurrency = (n) =>
-  new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "USD",
-  }).format(n || 0);
+const formatCurrencyWith = (n, currency) =>
+  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
+    n || 0
+  );
 
 const BudgetBar = ({ spent, total }) => {
   const pct = Math.min(100, Math.round(((spent || 0) / (total || 1)) * 100));
@@ -69,6 +72,51 @@ const SectionTitle = ({ children, right }) => (
   </div>
 );
 
+function InlineBudgetEditor({ initialAmount, onSave }) {
+  const [editing, setEditing] = React.useState(false);
+  const [value, setValue] = React.useState(String(initialAmount ?? 0));
+  return editing ? (
+    <div className="flex items-center gap-2">
+      <input
+        type="number"
+        min="0"
+        step="0.01"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="px-2 py-1 rounded bg-stone-100 dark:bg-stone-800 w-28"
+      />
+      <button
+        className="px-2 py-1 rounded bg-green-600 text-white text-xs cursor-pointer hover:bg-green-700 transition-colors"
+        onClick={async () => {
+          const num = Number(value);
+          if (!Number.isNaN(num)) {
+            await onSave(num);
+            setEditing(false);
+          }
+        }}
+      >
+        ✓
+      </button>
+      <button
+        className="px-2 py-1 rounded bg-stone-300 dark:bg-stone-700 text-xs cursor-pointer hover:bg-stone-400 dark:hover:bg-stone-600 transition-colors"
+        onClick={() => {
+          setValue(String(initialAmount ?? 0));
+          setEditing(false);
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  ) : (
+    <button
+      className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800 cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+      onClick={() => setEditing(true)}
+    >
+      Edit Limit
+    </button>
+  );
+}
+
 export default function FinancePage() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -76,6 +124,9 @@ export default function FinancePage() {
   const [recent, setRecent] = useState([]);
 
   const [transactions, setTransactions] = useState([]);
+  const [txTotal, setTxTotal] = useState(0);
+  const [txPage, setTxPage] = useState(1);
+  const [txLimit, setTxLimit] = useState(25);
   const [filters, setFilters] = useState({ type: "", q: "" });
 
   const [categories, setCategories] = useState([]);
@@ -86,6 +137,10 @@ export default function FinancePage() {
 
   const [projects, setProjects] = useState([]);
   const [profit, setProfit] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [currency, setCurrency] = useState(
+    () => JSON.parse(localStorage.getItem("userInfo"))?.financeCurrency || "USD"
+  );
 
   // Simple create-form states
   const [categoryForm, setCategoryForm] = useState({
@@ -101,6 +156,7 @@ export default function FinancePage() {
     amount: "",
   });
   const [savingBudget, setSavingBudget] = useState(false);
+  const [budgetOtherName, setBudgetOtherName] = useState("");
 
   const [projectForm, setProjectForm] = useState({ name: "", client: "" });
   const [savingProject, setSavingProject] = useState(false);
@@ -110,40 +166,61 @@ export default function FinancePage() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const ov = await getOverview();
-        setOverview(ov);
-        setRecent(ov.recentTransactions || []);
-      } catch {
-        console.error("Error fetching overview");
-      }
-      try {
-        setCategories(await catService.listCategories());
-      } catch {
-        console.error("Error fetching categories");
-      }
-      try {
-        setBudgets(await budgetService.listBudgets({ month, year }));
-      } catch {
-        console.error("Error fetching budgets");
-      }
-      try {
-        setGoals(await goalsService.listGoals());
-      } catch {
-        console.error("Error fetching goals");
-      }
-      try {
-        setProjects(await projectsService.listProjects());
-      } catch {
-        console.error("Error fetching projects");
-      }
-      try {
-        setTransactions(await txService.listTransactions({ limit: 50 }));
-      } catch {
-        console.error("Error fetching transactions");
-      }
+      setLoading(true);
+      await Promise.allSettled([
+        (async () => {
+          try {
+            const ov = await getOverview();
+            setOverview(ov);
+            setRecent(ov.recentTransactions || []);
+          } catch (e) {
+            console.error("Error fetching overview", e);
+          }
+        })(),
+        (async () => {
+          try {
+            setCategories(await catService.listCategories());
+          } catch (e) {
+            console.error("Error fetching categories", e);
+          }
+        })(),
+        (async () => {
+          try {
+            setBudgets(await budgetService.listBudgets({ month, year }));
+          } catch (e) {
+            console.error("Error fetching budgets", e);
+          }
+        })(),
+        (async () => {
+          try {
+            setGoals(await goalsService.listGoals());
+          } catch (e) {
+            console.error("Error fetching goals", e);
+          }
+        })(),
+        (async () => {
+          try {
+            setProjects(await projectsService.listProjects());
+          } catch (e) {
+            console.error("Error fetching projects", e);
+          }
+        })(),
+        (async () => {
+          try {
+            const res = await txService.listTransactions({
+              limit: txLimit,
+              page: txPage,
+            });
+            setTransactions(res.items || []);
+            setTxTotal(res.total || 0);
+          } catch (e) {
+            console.error("Error fetching transactions", e);
+          }
+        })(),
+      ]);
+      setLoading(false);
     })();
-  }, [month, year]);
+  }, [month, year, txLimit, txPage]);
 
   const refreshOverview = async () => {
     try {
@@ -157,7 +234,12 @@ export default function FinancePage() {
 
   const refreshTransactions = async () => {
     try {
-      setTransactions(await txService.listTransactions({ limit: 50 }));
+      const res = await txService.listTransactions({
+        limit: txLimit,
+        page: txPage,
+      });
+      setTransactions(res.items || []);
+      setTxTotal(res.total || 0);
       await refreshOverview();
     } catch (e) {
       console.error("Failed to refresh transactions", e);
@@ -171,6 +253,18 @@ export default function FinancePage() {
     } catch (e) {
       console.error("Failed to refresh goals", e);
     }
+  };
+
+  const addGoalContribution = async (goalId) => {
+    const input = prompt("Add contribution amount", "0");
+    if (input === null) return;
+    const amount = Number(input);
+    if (Number.isNaN(amount) || amount <= 0) return;
+    await goalsService.addContribution(goalId, {
+      amount,
+      date: new Date().toISOString().slice(0, 10),
+    });
+    await refreshGoals();
   };
 
   const refreshCategories = async () => {
@@ -222,6 +316,7 @@ export default function FinancePage() {
             id="dashboard"
             active={activeTab === "dashboard"}
             onClick={setActiveTab}
+            icon={Wallet}
           >
             Dashboard
           </Tab>
@@ -229,6 +324,7 @@ export default function FinancePage() {
             id="transactions"
             active={activeTab === "transactions"}
             onClick={setActiveTab}
+            icon={TrendingUp}
           >
             Transactions
           </Tab>
@@ -236,18 +332,17 @@ export default function FinancePage() {
             id="budgets"
             active={activeTab === "budgets"}
             onClick={setActiveTab}
+            icon={CircleDollarSign}
           >
             Budgets
           </Tab>
-          <Tab id="goals" active={activeTab === "goals"} onClick={setActiveTab}>
-            Goals
-          </Tab>
           <Tab
-            id="projects"
-            active={activeTab === "projects"}
+            id="goals"
+            active={activeTab === "goals"}
             onClick={setActiveTab}
+            icon={TrendingUp}
           >
-            Projects
+            Goals
           </Tab>
           <Tab
             id="categories"
@@ -256,35 +351,33 @@ export default function FinancePage() {
           >
             Categories
           </Tab>
-          <Tab
-            id="calculators"
-            active={activeTab === "calculators"}
-            onClick={setActiveTab}
-          >
-            Calculators
-          </Tab>
+          {/* Calculators tab removed */}
         </div>
-        {/* Global theme toggle exists in layout; removed local toggle */}
+        <div className="flex items-center gap-3">
+          <FinanceCurrencyPicker current={currency} onChange={setCurrency} />
+        </div>
       </div>
 
-      {activeTab === "dashboard" && (
+      {loading ? (
+        <Loader label="Loading finance data..." />
+      ) : activeTab === "dashboard" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard
             icon={Wallet}
             label="Balance (Month)"
-            value={formatCurrency(overview?.balance || 0)}
+            value={formatCurrencyWith(overview?.balance || 0, currency)}
             color="bg-stone-200 dark:bg-stone-800"
           />
           <StatCard
             icon={TrendingUp}
             label="Income (Month)"
-            value={formatCurrency(overview?.income || 0)}
+            value={formatCurrencyWith(overview?.income || 0, currency)}
             color="bg-green-200/60 dark:bg-green-900/40"
           />
           <StatCard
             icon={TrendingDown}
             label="Expense (Month)"
-            value={formatCurrency(overview?.expense || 0)}
+            value={formatCurrencyWith(overview?.expense || 0, currency)}
             color="bg-red-200/60 dark:bg-red-900/40"
           />
           <StatCard
@@ -317,7 +410,7 @@ export default function FinancePage() {
                     </span>
                   </div>
                   <div className="text-sm font-semibold">
-                    {formatCurrency(t.amount)}
+                    {formatCurrencyWith(t.amount, currency)}
                   </div>
                 </div>
               ))}
@@ -334,95 +427,37 @@ export default function FinancePage() {
             </p>
           </Card>
         </div>
-      )}
+      ) : null}
 
-      {activeTab === "transactions" && (
+      {!loading && activeTab === "transactions" && (
         <div className="grid gap-4">
           <TransactionForm
             categories={categories}
             projects={projects}
             onCreated={refreshTransactions}
+            onCategoryCreated={refreshCategories}
           />
-          <Card>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <select
-                className="px-3 py-2 rounded-md bg-stone-100 dark:bg-stone-800"
-                value={filters.type}
-                onChange={(e) =>
-                  setFilters({ ...filters, type: e.target.value })
-                }
-              >
-                <option value="">All Types</option>
-                <option value="INCOME">Income</option>
-                <option value="EXPENSE">Expense</option>
-              </select>
-              <input
-                className="px-3 py-2 rounded-md bg-stone-100 dark:bg-stone-800 flex-1"
-                placeholder="Search description..."
-                value={filters.q}
-                onChange={(e) => setFilters({ ...filters, q: e.target.value })}
-              />
-            </div>
-          </Card>
-          <Card>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-stone-500">
-                    <th className="py-2">Date</th>
-                    <th className="py-2">Type</th>
-                    <th className="py-2">Category</th>
-                    <th className="py-2">Description</th>
-                    <th className="py-2 text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTx.map((t) => (
-                    <tr
-                      key={t._id}
-                      className="border-t border-stone-200 dark:border-stone-800"
-                    >
-                      <td className="py-2">
-                        {t.transactionDate
-                          ? new Date(t.transactionDate).toLocaleDateString()
-                          : "—"}
-                      </td>
-                      <td className="py-2">
-                        <span
-                          className={`px-2 py-0.5 rounded text-xs ${
-                            t.type === "INCOME"
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                              : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                          }`}
-                        >
-                          {t.type}
-                        </span>
-                      </td>
-                      <td className="py-2">{t.category?.name || "—"}</td>
-                      <td className="py-2">{t.description || "—"}</td>
-                      <td className="py-2 text-right font-semibold">
-                        {formatCurrency(t.amount)}
-                      </td>
-                    </tr>
-                  ))}
-                  {filteredTx.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="py-4 text-center text-stone-500"
-                      >
-                        No transactions
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <TransactionsTable
+            transactions={filteredTx}
+            currency={currency}
+            filters={filters}
+            onChangeFilters={setFilters}
+            onDelete={async (id) => {
+              await txService.deleteTransaction(id);
+              await refreshTransactions();
+            }}
+            pagination={{
+              page: txPage,
+              limit: txLimit,
+              total: txTotal,
+              onPageChange: setTxPage,
+              onLimitChange: setTxLimit,
+            }}
+          />
         </div>
       )}
 
-      {activeTab === "budgets" && (
+      {!loading && activeTab === "budgets" && (
         <div className="grid gap-4">
           <Card>
             <SectionTitle>Create Monthly Budget</SectionTitle>
@@ -442,7 +477,16 @@ export default function FinancePage() {
                       {c.name}
                     </option>
                   ))}
+                <option value="OTHER">Other…</option>
               </select>
+              {budgetForm.category === "OTHER" && (
+                <input
+                  className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                  placeholder="New expense category name"
+                  value={budgetOtherName}
+                  onChange={(e) => setBudgetOtherName(e.target.value)}
+                />
+              )}
               <input
                 type="number"
                 min="1"
@@ -485,8 +529,19 @@ export default function FinancePage() {
                   onClick={async () => {
                     try {
                       setSavingBudget(true);
+                      let categoryId = budgetForm.category;
+                      if (categoryId === "OTHER") {
+                        const name = (budgetOtherName || "").trim();
+                        if (!name) return;
+                        const createdCat = await catService.createCategory({
+                          name,
+                          type: "EXPENSE",
+                        });
+                        categoryId = createdCat._id;
+                        await refreshCategories();
+                      }
                       await budgetService.createBudget({
-                        category: budgetForm.category,
+                        category: categoryId,
                         month: Number(budgetForm.month || month),
                         year: Number(budgetForm.year || year),
                         amount: Number(budgetForm.amount),
@@ -494,13 +549,14 @@ export default function FinancePage() {
                       setBudgets(
                         await budgetService.listBudgets({ month, year })
                       );
-                      await refreshProgress(budgetForm.category);
+                      await refreshProgress(categoryId);
                       setBudgetForm({
                         category: "",
                         month: "",
                         year: "",
                         amount: "",
                       });
+                      setBudgetOtherName("");
                     } finally {
                       setSavingBudget(false);
                     }
@@ -513,32 +569,68 @@ export default function FinancePage() {
           </Card>
           {categories
             .filter((c) => c.type === "EXPENSE")
-            .map((c) => (
-              <Card key={c._id}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{c.name}</p>
-                    <p className="text-xs text-stone-500">Monthly budget</p>
+            .map((c) => {
+              const currentBudget = budgets.find(
+                (b) => (b.category?._id || b.category) === c._id
+              );
+              return (
+                <Card key={c._id}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{c.name}</p>
+                      <p className="text-xs text-stone-500">Monthly budget</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <InlineBudgetEditor
+                        initialAmount={currentBudget?.amount ?? 0}
+                        onSave={async (newAmount) => {
+                          if (currentBudget) {
+                            await budgetService.updateBudget(
+                              currentBudget._id,
+                              { amount: newAmount }
+                            );
+                          } else {
+                            await budgetService.createBudget({
+                              category: c._id,
+                              month,
+                              year,
+                              amount: newAmount,
+                            });
+                          }
+                          setBudgets(
+                            await budgetService.listBudgets({ month, year })
+                          );
+                          await refreshProgress(c._id);
+                        }}
+                      />
+                      <button
+                        onClick={() => refreshProgress(c._id)}
+                        className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800 cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+                      >
+                        Refresh
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => refreshProgress(c._id)}
-                    className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800"
-                  >
-                    Refresh
-                  </button>
-                </div>
-                <div className="mt-3">
-                  <BudgetBar
-                    spent={progress[c._id]?.spent || 0}
-                    total={progress[c._id]?.budgetAmount || 0}
-                  />
-                  <div className="mt-2 text-xs text-stone-500">
-                    {formatCurrency(progress[c._id]?.spent || 0)} /{" "}
-                    {formatCurrency(progress[c._id]?.budgetAmount || 0)}
+                  <div className="mt-3">
+                    <BudgetBar
+                      spent={progress[c._id]?.spent || 0}
+                      total={progress[c._id]?.budgetAmount || 0}
+                    />
+                    <div className="mt-2 text-xs text-stone-500">
+                      {formatCurrencyWith(
+                        progress[c._id]?.spent || 0,
+                        currency
+                      )}{" "}
+                      /{" "}
+                      {formatCurrencyWith(
+                        progress[c._id]?.budgetAmount || 0,
+                        currency
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           {categories.filter((c) => c.type === "EXPENSE").length === 0 && (
             <p className="text-sm text-stone-500">No expense categories yet.</p>
           )}
@@ -549,10 +641,12 @@ export default function FinancePage() {
                 {budgets.map((b) => (
                   <li key={b._id} className="flex justify-between">
                     <span>
-                      {categories.find((c) => c._id === b.category)?.name ||
-                        "—"}
+                      {typeof b.category === "object"
+                        ? b.category?.name
+                        : categories.find((c) => c._id === b.category)?.name ||
+                          "—"}
                     </span>
-                    <span>{formatCurrency(b.amount)}</span>
+                    <span>{formatCurrencyWith(b.amount, currency)}</span>
                   </li>
                 ))}
               </ul>
@@ -561,7 +655,7 @@ export default function FinancePage() {
         </div>
       )}
 
-      {activeTab === "goals" && (
+      {!loading && activeTab === "goals" && (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
           <div className="sm:col-span-2 xl:col-span-3">
             <GoalForm onCreated={refreshGoals} />
@@ -573,10 +667,22 @@ export default function FinancePage() {
             );
             return (
               <Card key={g._id}>
-                <SectionTitle>{g.name}</SectionTitle>
+                <SectionTitle
+                  right={
+                    <button
+                      className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800"
+                      onClick={() => addGoalContribution(g._id)}
+                    >
+                      Add +
+                    </button>
+                  }
+                >
+                  {g.name}
+                </SectionTitle>
                 <BudgetBar spent={current} total={g.targetAmount || 0} />
                 <div className="mt-2 text-sm">
-                  {formatCurrency(current)} / {formatCurrency(g.targetAmount)}
+                  {formatCurrencyWith(current, currency)} /{" "}
+                  {formatCurrencyWith(g.targetAmount, currency)}
                 </div>
               </Card>
             );
@@ -587,7 +693,8 @@ export default function FinancePage() {
         </div>
       )}
 
-      {activeTab === "projects" && (
+      {/* Projects section removed */}
+      {activeTab === "__removed_projects__" && (
         <div className="grid gap-4">
           <Card>
             <div className="grid md:grid-cols-3 gap-3">
@@ -651,12 +758,16 @@ export default function FinancePage() {
               </div>
               {profit[p._id] && (
                 <div className="mt-3 text-sm">
-                  <div>Income: {formatCurrency(profit[p._id].totalIncome)}</div>
                   <div>
-                    Expense: {formatCurrency(profit[p._id].totalExpense)}
+                    Income:{" "}
+                    {formatCurrencyWith(profit[p._id].totalIncome, currency)}
+                  </div>
+                  <div>
+                    Expense:{" "}
+                    {formatCurrencyWith(profit[p._id].totalExpense, currency)}
                   </div>
                   <div className="font-semibold">
-                    Profit: {formatCurrency(profit[p._id].profit)}
+                    Profit: {formatCurrencyWith(profit[p._id].profit, currency)}
                   </div>
                 </div>
               )}
@@ -668,13 +779,13 @@ export default function FinancePage() {
         </div>
       )}
 
-      {activeTab === "categories" && (
+      {!loading && activeTab === "categories" && (
         <div className="grid gap-4">
           <Card>
             <SectionTitle>Create Category</SectionTitle>
-            <div className="grid md:grid-cols-3 gap-3">
+            <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
               <input
-                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 flex-1"
                 placeholder="Category name"
                 value={categoryForm.name}
                 onChange={(e) =>
@@ -682,7 +793,7 @@ export default function FinancePage() {
                 }
               />
               <select
-                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 w-48"
                 value={categoryForm.type}
                 onChange={(e) =>
                   setCategoryForm({ ...categoryForm, type: e.target.value })
@@ -691,27 +802,25 @@ export default function FinancePage() {
                 <option value="INCOME">Income</option>
                 <option value="EXPENSE">Expense</option>
               </select>
-              <div className="flex items-center justify-end">
-                <button
-                  className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900"
-                  disabled={savingCategory || !categoryForm.name}
-                  onClick={async () => {
-                    try {
-                      setSavingCategory(true);
-                      await catService.createCategory({
-                        name: categoryForm.name.trim(),
-                        type: categoryForm.type,
-                      });
-                      setCategoryForm({ name: "", type: "EXPENSE" });
-                      await refreshCategories();
-                    } finally {
-                      setSavingCategory(false);
-                    }
-                  }}
-                >
-                  {savingCategory ? "Saving..." : "Create"}
-                </button>
-              </div>
+              <button
+                className="px-4 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900 whitespace-nowrap cursor-pointer hover:opacity-90 transition"
+                disabled={savingCategory || !categoryForm.name}
+                onClick={async () => {
+                  try {
+                    setSavingCategory(true);
+                    await catService.createCategory({
+                      name: categoryForm.name.trim(),
+                      type: categoryForm.type,
+                    });
+                    setCategoryForm({ name: "", type: "EXPENSE" });
+                    await refreshCategories();
+                  } finally {
+                    setSavingCategory(false);
+                  }
+                }}
+              >
+                {savingCategory ? "Saving..." : "Create"}
+              </button>
             </div>
           </Card>
           <Card>
@@ -741,7 +850,8 @@ export default function FinancePage() {
         </div>
       )}
 
-      {activeTab === "calculators" && (
+      {/* Calculators section removed */}
+      {activeTab === "__removed_calculators__" && (
         <div className="grid gap-4 max-w-3xl">
           <Card>
             <SectionTitle>Contract vs Full-Time</SectionTitle>
@@ -762,7 +872,9 @@ export default function FinancePage() {
                     taxRate: 0.32,
                   },
                 });
-                alert(`Net diff: ${formatCurrency(res.differenceNet)}`);
+                alert(
+                  `Net diff: ${formatCurrencyWith(res.differenceNet, currency)}`
+                );
               }}
             >
               Run Example
@@ -783,8 +895,9 @@ export default function FinancePage() {
                   years: 25,
                 });
                 alert(
-                  `Projected NW: ${formatCurrency(
-                    res.projectedNetWorth
+                  `Projected NW: ${formatCurrencyWith(
+                    res.projectedNetWorth,
+                    currency
                   )} | Progress: ${(res.progress * 100).toFixed(1)}%`
                 );
               }}
