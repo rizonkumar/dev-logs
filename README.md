@@ -17,6 +17,7 @@ A personal developer productivity dashboard (MERN) for daily activity logging, t
 - **Pomodoro**: Session logging, history, and aggregate stats
 - **Weekly Reviews**: CRUD
 - **GitHub**: Contribution calendar, streaks, stars, total contributions (user-provided PAT)
+- **Finance**: Transactions, budgets, categories, projects, savings goals, a dashboard overview, and public calculators (FIRE, contract vs full-time)
 
 ---
 
@@ -138,6 +139,57 @@ Base URL: `http://localhost:5001/api`
 
 - `GET /github/contributions` — auth required; uses user profile fields `githubUsername` and `githubToken` (GitHub GraphQL PAT)
 
+### Finance
+
+- All endpoints under `/finance/*` unless noted. Auth required for all except calculators.
+
+Transactions (`/finance/transactions`)
+
+- `GET /finance/transactions` — list; query: `type`, `incomeType`, `category`, `project`, `isBusinessExpense`, `status`, `from`, `to`, `dateField` ∈ {`transactionDate`,`dueDate`}, `sort` ∈ {`newest`,`oldest`,`amount_desc`,`amount_asc`}, `page`, `limit`
+- `POST /finance/transactions` — body: `{ type: INCOME|EXPENSE, amount, category, incomeType?, currency?, transactionDate?, status?, dueDate?, description?, project?, isBusinessExpense?, tags? }`
+- `GET /finance/transactions/:id`
+- `PUT /finance/transactions/:id`
+- `DELETE /finance/transactions/:id`
+
+Categories (`/finance/categories`)
+
+- `GET /finance/categories` — query: `type` ∈ {`INCOME`,`EXPENSE`} (optional)
+- `POST /finance/categories` — body: `{ name, type, icon?, color? }`
+- `PUT /finance/categories/:id`
+- `DELETE /finance/categories/:id`
+
+Budgets (`/finance/budgets`)
+
+- `GET /finance/budgets` — query: `category?`, `month?`, `year?`
+- `POST /finance/budgets` — body: `{ category, month, year, amount, currency? }`
+- `PUT /finance/budgets/:id`
+- `DELETE /finance/budgets/:id`
+- `GET /finance/budgets/progress` — query: `categoryId`, `month`, `year`
+
+Projects (`/finance/projects`)
+
+- `GET /finance/projects`
+- `POST /finance/projects` — body: `{ name, client?, description?, status?(ACTIVE|ARCHIVED), startDate?, endDate? }`
+- `PUT /finance/projects/:id`
+- `DELETE /finance/projects/:id`
+- `GET /finance/projects/:id/profitability`
+
+Savings Goals (`/finance/goals`)
+
+- `GET /finance/goals`
+- `POST /finance/goals` — body: `{ name, targetAmount, targetDate? }`
+- `POST /finance/goals/:id/contributions` — body: `{ amount, date?, note?, transaction? }`
+- `DELETE /finance/goals/:id`
+
+Dashboard
+
+- `GET /finance/dashboard/overview`
+
+Calculators (public; no auth)
+
+- `POST /finance/calculators/contract-vs-fulltime`
+- `POST /finance/calculators/fire`
+
 ---
 
 ## Frontend
@@ -168,6 +220,7 @@ Scripts (`backend/package.json`):
 Utilities:
 
 - Reset database (DANGEROUS): `node backend/api/utils/resetDB.js` (uses `backend/.env`)
+- Seed finance demo data: `bash backend/scripts/seed_finance.sh`
 
 ---
 

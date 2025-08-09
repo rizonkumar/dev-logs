@@ -22,7 +22,7 @@ import {
   X,
   History,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import { updateProfile } from "../app/features/authSlice";
 
 const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
@@ -254,6 +254,18 @@ const PomodoroTimerPage = () => {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
+  // Dynamic timer text color based on remaining time
+  const totalSeconds = totalDuration;
+  const remaining = Math.max(0, Math.min(timeRemaining, totalSeconds));
+  const ratioRemaining = totalSeconds > 0 ? remaining / totalSeconds : 0;
+  const nearEndThreshold = Math.min(120, Math.round(totalSeconds * 0.15));
+  const timeColorClass =
+    remaining <= nearEndThreshold
+      ? "text-red-600"
+      : ratioRemaining <= 0.5
+      ? "text-amber-600"
+      : "text-green-600";
+
   // All classes are static to satisfy Tailwind v4 class scanning
 
   return (
@@ -324,7 +336,7 @@ const PomodoroTimerPage = () => {
               className="stroke-stone-200 dark:stroke-stone-700"
               strokeWidth="12"
             />
-            <motion.circle
+            <Motion.circle
               cx="130"
               cy="130"
               r={radius}
@@ -340,7 +352,9 @@ const PomodoroTimerPage = () => {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-6xl sm:text-7xl font-light tracking-widest text-gray-800 dark:text-stone-100">
+            <p
+              className={`text-6xl sm:text-7xl font-light tracking-widest ${timeColorClass}`}
+            >
               {formatTime(timeRemaining)}
             </p>
           </div>
@@ -359,15 +373,17 @@ const PomodoroTimerPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-4 sm:gap-6">
-          <p className="text-center w-20 sm:w-24">
+        <div className="flex items-center justify-between w-full max-w-xs sm:max-w-sm mx-auto">
+          <div className="w-24 text-center">
             <span className="block text-3xl font-bold text-gray-800 dark:text-white">
               {stats.sessionsToday}
             </span>
             <span className="text-xs text-gray-500 dark:text-stone-400">
               Sessions Today
             </span>
-          </p>
+          </div>
+
+          {/* Center Item: Play/Pause Button */}
           <button
             onClick={handleStartPause}
             aria-label={isRunning ? "Pause timer" : "Start timer"}
@@ -379,12 +395,15 @@ const PomodoroTimerPage = () => {
               <Play size={32} fill="currentColor" className="ml-1" />
             )}
           </button>
-          <button
-            onClick={handleReset}
-            className="w-12 h-12 bg-stone-200 dark:bg-stone-800 text-gray-500 dark:text-stone-300 rounded-full flex items-center justify-center shadow-sm hover:bg-stone-300 dark:hover:bg-stone-700 transition-all duration-300"
-          >
-            <RotateCcw size={20} />
-          </button>
+
+          <div className="w-24 flex items-center justify-center">
+            <button
+              onClick={handleReset}
+              className="w-12 h-12 bg-stone-200 dark:bg-stone-800 text-gray-500 dark:text-stone-300 rounded-full flex items-center justify-center shadow-sm hover:bg-stone-300 dark:hover:bg-stone-700 transition-all duration-300"
+            >
+              <RotateCcw size={20} />
+            </button>
+          </div>
         </div>
       </main>
     </div>

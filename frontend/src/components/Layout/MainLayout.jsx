@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, reset } from "../../app/features/authSlice";
+import { setInitialTimes } from "../../app/features/pomodoroSlice";
 import {
   Home,
   BookOpen,
@@ -16,6 +17,8 @@ import {
   Wallet,
 } from "lucide-react";
 import { Moon, Sun } from "lucide-react";
+import PomodoroQuickModal from "../PomodoroQuickModal";
+import { motion as Motion } from "framer-motion";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home", color: "blue" },
@@ -36,6 +39,7 @@ const MainLayout = ({ children }) => {
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [isTimerOpen, setIsTimerOpen] = useState(false);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -72,6 +76,17 @@ const MainLayout = ({ children }) => {
       })
     );
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(
+        setInitialTimes({
+          workMinutes: userInfo.pomodoroWorkMinutes,
+          breakMinutes: userInfo.pomodoroBreakMinutes,
+        })
+      );
+    }
+  }, [dispatch, userInfo]);
 
   const colorConfig = {
     blue: {
@@ -336,6 +351,26 @@ const MainLayout = ({ children }) => {
         </header>
 
         <main className="flex-1 overflow-y-auto">{children}</main>
+
+        {/* Global floating timer button (draggable) + modal */}
+        <Motion.div
+          className="fixed bottom-6 right-6 z-40"
+          drag
+          dragMomentum={false}
+          dragElastic={0.05}
+        >
+          <button
+            onClick={() => setIsTimerOpen(true)}
+            className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center"
+            aria-label="Open Pomodoro timer"
+          >
+            <Timer size={22} />
+          </button>
+        </Motion.div>
+        <PomodoroQuickModal
+          isOpen={isTimerOpen}
+          onClose={() => setIsTimerOpen(false)}
+        />
       </div>
     </div>
   );

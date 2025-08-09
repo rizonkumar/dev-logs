@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchLogs, fetchLogStats } from "../app/features/logsSlice";
 import { fetchGithubData } from "../app/features/githubSlice";
 import { getUserProfile } from "../app/features/authSlice";
+import { setInitialTimes } from "../app/features/pomodoroSlice";
 import {
   Briefcase,
   GitBranch,
@@ -576,6 +577,17 @@ function HomePage() {
   useEffect(() => {
     dispatch(getUserProfile());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(
+        setInitialTimes({
+          workMinutes: userInfo.pomodoroWorkMinutes,
+          breakMinutes: userInfo.pomodoroBreakMinutes,
+        })
+      );
+    }
+  }, [dispatch, userInfo]);
 
   const enhancedUserInfo = {
     ...userInfo,
