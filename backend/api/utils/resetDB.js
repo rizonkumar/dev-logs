@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const path = require("path"); // Import the 'path' module
+const path = require("path");
 const connectDB = require("../../config/db");
 
 const User = require("../models/userModel");

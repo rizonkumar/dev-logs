@@ -16,7 +16,6 @@ const protect = [
       const clerkUser = await clerkClient.users.getUser(clerkUserId);
       const primaryEmail = clerkUser.emailAddresses?.[0]?.emailAddress || "";
 
-      // Try to link existing local user by email to new Clerk account
       const existingByEmail = primaryEmail
         ? await User.findOne({ email: primaryEmail }).select("-password")
         : null;
@@ -30,7 +29,7 @@ const protect = [
           clerkId: clerkUserId,
           name: clerkUser.firstName || clerkUser.username || "User",
           email: primaryEmail,
-          password: Math.random().toString(36).slice(2) + "_CLERK", // never used
+          password: Math.random().toString(36).slice(2) + "_CLERK",
         });
         user = await User.findById(created._id).select("-password");
       }
