@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, reset } from "../../app/features/authSlice";
 import { setInitialTimes } from "../../app/features/pomodoroSlice";
 import {
   Home,
@@ -10,7 +9,6 @@ import {
   Timer,
   User,
   LogIn,
-  LogOut,
   Notebook,
   PanelLeft,
   Menu,
@@ -19,6 +17,13 @@ import {
 import { Moon, Sun } from "lucide-react";
 import PomodoroQuickModal from "../PomodoroQuickModal";
 import { motion as Motion } from "framer-motion";
+import {
+  SignedIn,
+  SignedOut,
+  UserButton,
+  SignInButton,
+  SignUpButton,
+} from "@clerk/clerk-react";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home", color: "blue" },
@@ -31,9 +36,8 @@ const navItems = [
 ];
 
 const MainLayout = ({ children }) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const location = useLocation();
+  const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
 
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
@@ -45,11 +49,7 @@ const MainLayout = ({ children }) => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const onLogout = () => {
-    dispatch(logout());
-    dispatch(reset());
-    navigate("/auth");
-  };
+  // Logout handled by Clerk's <UserButton> now
 
   useEffect(() => {
     const prefersDark =
@@ -258,39 +258,37 @@ const MainLayout = ({ children }) => {
           </span>
         </button>
 
-        {userInfo ? (
-          <button
-            onClick={onLogout}
-            className={`w-full flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-colors cursor-pointer ${
-              !isExpanded && "justify-center"
-            }`}
-          >
-            <LogOut size={20} className="flex-shrink-0" />
-            <span
-              className={`transition-opacity duration-200 whitespace-nowrap ${
-                isExpanded ? "opacity-100" : "opacity-0 hidden"
-              }`}
-            >
-              Logout
-            </span>
-          </button>
-        ) : (
-          <NavLink
-            to="/auth"
-            className={`w-full flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white transition-colors ${
-              !isExpanded && "justify-center"
-            }`}
-          >
-            <LogIn size={20} className="flex-shrink-0" />
-            <span
-              className={`transition-opacity duration-200 whitespace-nowrap ${
-                isExpanded ? "opacity-100" : "opacity-0 hidden"
-              }`}
-            >
-              Login
-            </span>
-          </NavLink>
-        )}
+        <div className={`${!isExpanded && "justify-center"}`}>
+          <SignedIn>
+            <div className="flex items-center gap-4 px-2">
+              <UserButton afterSignOutUrl="/" />
+              {isExpanded && (
+                <span className="text-sm text-gray-600 dark:text-stone-300">
+                  Account
+                </span>
+              )}
+            </div>
+          </SignedIn>
+          <SignedOut>
+            <div className="flex items-center gap-3 px-2">
+              <SignInButton mode="modal">
+                <button
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white transition-colors`}
+                >
+                  <LogIn size={20} />
+                  {isExpanded && <span>Login</span>}
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white transition-colors`}
+                >
+                  <span className="text-sm">Sign Up</span>
+                </button>
+              </SignUpButton>
+            </div>
+          </SignedOut>
+        </div>
       </div>
     </>
   );
@@ -352,7 +350,6 @@ const MainLayout = ({ children }) => {
 
         <main className="flex-1 overflow-y-auto">{children}</main>
 
-        {/* Global floating timer button (draggable) + modal */}
         <Motion.button
           className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center cursor-grab"
           style={{ cursor: "grab" }}
@@ -360,7 +357,6 @@ const MainLayout = ({ children }) => {
           dragMomentum={false}
           dragElastic={0.05}
           onDragStart={(event) => {
-            // Guard against null targets in some browsers
             const target = event?.currentTarget;
             if (target) target.style.cursor = "grabbing";
           }}

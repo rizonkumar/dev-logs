@@ -1,58 +1,44 @@
-const jwt = require("jsonwebtoken");
 const asyncHandler = require("./asyncHandler");
+const { clerkClient, requireAuth } = require("@clerk/express");
 const User = require("../models/userModel");
-const { generateAccessToken } = require("../utils/generateToken");
 
-const protect = asyncHandler(async (req, res, next) => {
-  let token;
-  let refreshToken;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-    refreshToken = req.headers["x-refresh-token"];
-  }
-
-  if (!token) {
-    res.status(401);
-    throw new Error("Not authorized, no token");
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select("-password");
-    next();
-  } catch (error) {
-    if (error.name === "TokenExpiredError" && refreshToken) {
-      try {
-        const decoded = jwt.verify(
-          refreshToken,
-          process.env.JWT_REFRESH_SECRET
-        );
-        const user = await User.findById(decoded.id).select("-password");
-
-        if (!user) {
-          res.status(401);
-          throw new Error("Not authorized, user not found");
-        }
-
-        const newAccessToken = generateAccessToken(user._id);
-
-        res.setHeader("x-new-access-token", newAccessToken);
-
-        req.user = user;
-        next();
-      } catch (refreshError) {
-        res.status(401);
-        throw new Error("Not authorized, invalid refresh token");
-      }
-    } else {
+const protect = [
+  requireAuth(),
+  asyncHandler(async (req, res, next) => {
+    const clerkUserId = req.auth.userId;
+    if (!clerkUserId) {
       res.status(401);
-      throw new Error("Not authorized, token failed");
+      throw new Error("Not authorized");
     }
-  }
-});
+
+    let user = await User.findOne({ clerkId: clerkUserId }).select("-password");
+    if (!user) {
+      const clerkUser = await clerkClient.users.getUser(clerkUserId);
+      const primaryEmail = clerkUser.emailAddresses?.[0]?.emailAddress || "";
+
+      // Try to link existing local user by email to new Clerk account
+      const existingByEmail = primaryEmail
+        ? await User.findOne({ email: primaryEmail }).select("-password")
+        : null;
+
+      if (existingByEmail) {
+        existingByEmail.clerkId = clerkUserId;
+        await existingByEmail.save();
+        user = existingByEmail;
+      } else {
+        const created = await User.create({
+          clerkId: clerkUserId,
+          name: clerkUser.firstName || clerkUser.username || "User",
+          email: primaryEmail,
+          password: Math.random().toString(36).slice(2) + "_CLERK", // never used
+        });
+        user = await User.findById(created._id).select("-password");
+      }
+    }
+
+    req.user = user;
+    next();
+  }),
+];
 
 module.exports = { protect };

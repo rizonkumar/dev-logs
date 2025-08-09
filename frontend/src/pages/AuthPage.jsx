@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { login, register, reset } from "../app/features/authSlice";
-import { toast } from "react-toastify";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import {
-  LogIn,
-  UserPlus,
-  AtSign,
-  Lock,
-  User,
   BookOpen,
   CheckSquare,
   GitBranch,
@@ -20,19 +12,19 @@ import {
   TwitterIcon,
   Moon,
   Sun,
+  Timer,
+  Wallet,
 } from "lucide-react";
+import {
+  SignedIn,
+  SignedOut,
+  SignIn,
+  SignUp,
+  UserButton,
+} from "@clerk/clerk-react";
+import { dark } from "@clerk/themes";
 
-const InputField = ({ icon, ...props }) => (
-  <div className="relative">
-    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-      {icon}
-    </div>
-    <input
-      className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg py-3 pl-12 pr-4 text-gray-900 dark:text-stone-100 placeholder-gray-400 dark:placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-      {...props}
-    />
-  </div>
-);
+// removed old email/password inputs
 
 const FeatureCard = ({ icon, title, description, delay }) => (
   <Motion.div
@@ -82,28 +74,31 @@ const Footer = () => {
       transition={{ delay: 0.8, duration: 0.5 }}
       className="relative z-10 mt-12 text-center"
     >
-      <div className="flex justify-center items-center gap-4 mb-3">
+      <div className="flex justify-center items-center gap-3 mb-4">
         {socialLinks.map((link, index) => (
           <a
             key={index}
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className={`p-2 rounded-full bg-stone-200 text-gray-600 transition-colors ${link.color}`}
+            className={`p-2 rounded-full border shadow-sm transition-colors
+              bg-stone-200 text-gray-600 border-stone-300 hover:bg-stone-100 hover:text-gray-800
+              dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700 dark:hover:text-white
+              ${link.color}`}
           >
             {link.icon}
           </a>
         ))}
       </div>
-      <p className="text-sm text-gray-500 flex items-center justify-center gap-1.5">
-        Made with{" "}
+      <p className="text-sm text-gray-500 dark:text-stone-400 flex items-center justify-center gap-1.5">
+        Made with
         <Heart size={16} className="text-red-500" fill="currentColor" /> in
-        India, by
+        India by
         <a
           href="https://rizonkumarrahi.in"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-semibold text-gray-700 hover:text-blue-600"
+          className="font-semibold text-gray-700 hover:text-blue-600 dark:text-stone-200 dark:hover:text-blue-400"
         >
           Rizon Kumar Rahi
         </a>
@@ -115,13 +110,8 @@ const Footer = () => {
 // --- Main AuthPage Component ---
 
 const AuthPage = () => {
+  // Clerk-only auth page
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const { name, email, password } = formData;
 
   // Theme toggle for unauthenticated page
   const [isDark, setIsDark] = useState(false);
@@ -152,46 +142,14 @@ const AuthPage = () => {
   };
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { userInfo, isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.auth
-  );
 
   useEffect(() => {
-    if (isError && message) {
-      toast.error(message);
-    }
-    if (isSuccess) {
-      toast.success(`Welcome ${isLogin ? userInfo?.name || "" : name}!`, {
-        toastId: "loginSuccess",
-      });
-      navigate("/");
-    }
-    if (isError || isSuccess) {
-      dispatch(reset());
-    }
-  }, [
-    userInfo,
-    isError,
-    isSuccess,
-    message,
-    name,
-    isLogin,
-    navigate,
-    dispatch,
-  ]);
-
-  const onChange = (e) =>
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (isLogin) {
-      dispatch(login({ email, password }));
-    } else {
-      dispatch(register({ name, email, password }));
-    }
-  };
+    // If already signed in via Clerk, redirect away from auth page
+    try {
+      const clerkState = window?.Clerk?.user;
+      if (clerkState) navigate("/", { replace: true });
+    } catch {}
+  }, [navigate]);
 
   const formVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -202,6 +160,26 @@ const AuthPage = () => {
     },
     exit: { opacity: 0, y: -30, transition: { duration: 0.3, ease: "easeIn" } },
   };
+
+  // Clerk theming
+  const clerkAppearance = isDark
+    ? {
+        baseTheme: dark,
+        variables: { colorPrimary: "#2563eb" },
+        elements: {
+          card: "bg-stone-900/70 backdrop-blur border border-stone-800 shadow-none",
+          headerTitle: "text-white",
+          headerSubtitle: "text-stone-300",
+          formButtonPrimary: "bg-blue-600 hover:bg-blue-700",
+          socialButtonsBlockButton:
+            "bg-stone-800 border-stone-700 text-stone-100 hover:bg-stone-700",
+          formFieldInput:
+            "bg-stone-900 text-stone-100 border-stone-700 placeholder:text-stone-400",
+        },
+      }
+    : {
+        variables: { colorPrimary: "#1f2937" },
+      };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 p-4">
@@ -243,8 +221,9 @@ const AuthPage = () => {
                 variants={formVariants}
                 className="text-gray-600 dark:text-stone-300 mb-10"
               >
-                From logging daily progress to managing complex projects, Dev
-                Dashboard brings all your tools into one cohesive workspace.
+                From logging daily progress and Kanban boards to Pomodoro timers
+                and personal finance tracking, Dev Dashboard brings your tools
+                into one cohesive workspace.
               </Motion.p>
               <div className="space-y-6">
                 <FeatureCard
@@ -265,17 +244,29 @@ const AuthPage = () => {
                   description="Monitor your contribution activity and repository stats directly from your dashboard."
                   delay={0.4}
                 />
+                <FeatureCard
+                  icon={<Timer className="text-red-600" />}
+                  title="Pomodoro Timer"
+                  description="Stay focused with built-in Pomodoro sessions, stats, and history."
+                  delay={0.5}
+                />
+                <FeatureCard
+                  icon={<Wallet className="text-emerald-600" />}
+                  title="Finance Management"
+                  description="Track transactions, budgets, categories, goals, and project profitability."
+                  delay={0.6}
+                />
               </div>
             </Motion.div>
           </div>
           <Footer />
         </div>
 
-        {/* Right Panel: Form */}
+        {/* Right Panel: Clerk Auth */}
         <div className="w-full p-8 sm:p-12 flex flex-col justify-center bg-white dark:bg-stone-900">
           <AnimatePresence mode="wait">
             <Motion.div
-              key={isLogin ? "login" : "signup"}
+              key={isLogin ? "clerk-signin" : "clerk-signup"}
               variants={formVariants}
               initial="hidden"
               animate="visible"
@@ -293,78 +284,54 @@ const AuthPage = () => {
                 </p>
               </div>
 
-              <form onSubmit={onSubmit} className="space-y-5">
-                {!isLogin && (
-                  <InputField
-                    icon={<User size={18} className="text-gray-400" />}
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={name}
-                    placeholder="Name"
-                    onChange={onChange}
-                    required
-                  />
-                )}
-                <InputField
-                  icon={<AtSign size={18} className="text-gray-400" />}
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={email}
-                  placeholder="Email"
-                  onChange={onChange}
-                  required
-                />
-                <InputField
-                  icon={<Lock size={18} className="text-gray-400" />}
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={password}
-                  placeholder="Password"
-                  onChange={onChange}
-                  required
-                />
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-3 bg-gray-800 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 shadow-sm disabled:bg-gray-400 disabled:cursor-wait"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Processing...</span>
-                    </>
-                  ) : isLogin ? (
-                    <>
-                      <LogIn size={20} />
-                      <span>Sign In</span>
-                    </>
+              <SignedOut>
+                <div className="space-y-6">
+                  {isLogin ? (
+                    <SignIn
+                      routing="virtual"
+                      afterSignInUrl="/"
+                      appearance={clerkAppearance}
+                    />
                   ) : (
-                    <>
-                      <UserPlus size={20} />
-                      <span>Create Account</span>
-                    </>
+                    <SignUp
+                      routing="virtual"
+                      afterSignUpUrl="/"
+                      appearance={clerkAppearance}
+                    />
                   )}
-                </button>
-              </form>
+                  <div className="text-center">
+                    <button
+                      onClick={() => setIsLogin((v) => !v)}
+                      className="text-sm text-gray-500 dark:text-stone-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
+                      {isLogin ? (
+                        <>
+                          Don't have an account?{" "}
+                          <span className="font-semibold">Sign Up</span>
+                        </>
+                      ) : (
+                        <>
+                          Already have an account?{" "}
+                          <span className="font-semibold">Sign In</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </SignedOut>
+              <SignedIn>
+                <div className="flex items-center justify-center gap-3">
+                  <UserButton afterSignOutUrl="/" />
+                  <button
+                    onClick={() => navigate("/", { replace: true })}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Continue to dashboard
+                  </button>
+                </div>
+              </SignedIn>
 
-              <div className="text-center mt-6">
-                <button
-                  onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-gray-500 dark:text-stone-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
-                >
-                  {isLogin
-                    ? "Don't have an account?"
-                    : "Already have an account?"}
-                  <span className="font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                    {" "}
-                    {isLogin ? "Sign Up" : "Sign In"}
-                  </span>
-                </button>
-              </div>
+              {/* Social links footer remains on the left section */}
             </Motion.div>
           </AnimatePresence>
         </div>

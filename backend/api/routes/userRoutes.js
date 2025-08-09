@@ -14,9 +14,9 @@ const validate = require("../middleware/validationMiddleware");
 const { protect } = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 
-// Public routes
-router.post("/register", validateRegistration, validate, registerUser);
-router.post("/login", validateLogin, validate, loginUser);
+// Public routes (disabled with Clerk; keep endpoints returning 405)
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
 // Private routes
 router

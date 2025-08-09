@@ -22,7 +22,7 @@ import {
   X,
   History,
 } from "lucide-react";
-import { motion as Motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { updateProfile } from "../app/features/authSlice";
 
 const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
@@ -259,6 +259,7 @@ const PomodoroTimerPage = () => {
   const remaining = Math.max(0, Math.min(timeRemaining, totalSeconds));
   const ratioRemaining = totalSeconds > 0 ? remaining / totalSeconds : 0;
   const nearEndThreshold = Math.min(120, Math.round(totalSeconds * 0.15));
+  // Keep consistent with quick modal: red (near end), amber (mid), green (early)
   const timeColorClass =
     remaining <= nearEndThreshold
       ? "text-red-600"
@@ -336,7 +337,7 @@ const PomodoroTimerPage = () => {
               className="stroke-stone-200 dark:stroke-stone-700"
               strokeWidth="12"
             />
-            <Motion.circle
+            <motion.circle
               cx="130"
               cy="130"
               r={radius}
