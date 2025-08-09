@@ -77,7 +77,9 @@ const Tab = ({ id, active, onClick, children, icon: Icon, variant }) => {
         active
           ? colors.active ||
             "bg-stone-200 dark:bg-stone-800 text-gray-900 dark:text-white border-stone-300 dark:border-stone-700"
-          : `${colors.hover || "hover:bg-stone-100 dark:hover:bg-stone-800"} border-transparent text-stone-700 dark:text-stone-300`
+          : `${
+              colors.hover || "hover:bg-stone-100 dark:hover:bg-stone-800"
+            } border-transparent text-stone-700 dark:text-stone-300`
       }`}
     >
       {Icon ? <Icon className={`w-4 h-4 ${colors.icon || ""}`} /> : null}
