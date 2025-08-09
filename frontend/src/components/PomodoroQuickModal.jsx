@@ -95,12 +95,13 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
   const remaining = Math.max(0, Math.min(timeRemaining, totalWorkSeconds));
   const ratioRemaining = remaining / totalWorkSeconds;
   const nearEndThreshold = Math.min(120, Math.round(totalWorkSeconds * 0.15));
+  // Match main Pomodoro page color logic: red (near end) → amber (mid) → green (early)
   const colorClass =
     remaining <= nearEndThreshold
-      ? "text-green-600"
+      ? "text-red-600"
       : ratioRemaining <= 0.5
       ? "text-amber-600"
-      : "text-red-600";
+      : "text-green-600";
 
   if (!isOpen) return null;
 

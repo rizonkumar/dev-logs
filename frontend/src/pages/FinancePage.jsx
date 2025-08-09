@@ -29,8 +29,6 @@ const Card = ({ children, className = "" }) => (
   </div>
 );
 
-// StatCard imported from components/finance/StatCard
-
 const Tab = ({ id, active, onClick, children, icon: Icon, variant }) => {
   const colorStyles = {
     dashboard: {

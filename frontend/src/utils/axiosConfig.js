@@ -7,13 +7,15 @@ const instance = axios.create({
   },
 });
 
-// Add a request interceptor
 instance.interceptors.request.use(
-  (config) => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    if (userInfo?.token) {
-      config.headers.Authorization = `Bearer ${userInfo.token}`;
-      config.headers["x-refresh-token"] = userInfo.refreshToken;
+  async (config) => {
+    try {
+      const token = await window?.Clerk?.session?.getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (err) {
+      // ignore
     }
     return config;
   },
@@ -22,10 +24,8 @@ instance.interceptors.request.use(
   }
 );
 
-// Add a response interceptor
 instance.interceptors.response.use(
   (response) => {
-    // Check if there's a new access token in the response headers
     const newAccessToken = response.headers["x-new-access-token"];
     if (newAccessToken) {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));

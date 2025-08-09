@@ -1,60 +1,12 @@
 const asyncHandler = require("../middleware/asyncHandler");
 const userService = require("../services/userService");
-const {
-  generateAccessToken,
-  generateRefreshToken,
-} = require("../utils/generateToken");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, financeCurrency } = req.body;
-  const user = await userService.createUser({
-    name,
-    email,
-    password,
-    financeCurrency,
-  });
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      profileImage: user.profileImage,
-      title: user.title,
-      bio: user.bio,
-      company: user.company,
-      portfolioUrl: user.portfolioUrl,
-      githubUrl: user.githubUrl,
-      githubUsername: user.githubUsername,
-      githubToken: user.githubToken,
-      financeCurrency: user.financeCurrency,
-      token: generateAccessToken(user._id),
-      refreshToken: generateRefreshToken(user._id),
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user data");
-  }
+  res.status(405).json({ message: "Registration handled by Clerk" });
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  const user = await userService.authenticateUser(email, password);
-  res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    profileImage: user.profileImage,
-    title: user.title,
-    bio: user.bio,
-    company: user.company,
-    portfolioUrl: user.portfolioUrl,
-    githubUrl: user.githubUrl,
-    githubUsername: user.githubUsername,
-    githubToken: user.githubToken,
-    financeCurrency: user.financeCurrency,
-    token: generateAccessToken(user._id),
-    refreshToken: generateRefreshToken(user._id),
-  });
+  res.status(405).json({ message: "Login handled by Clerk" });
 });
 
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -101,8 +53,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     githubUsername: updatedUser.githubUsername,
     githubToken: updatedUser.githubToken,
     financeCurrency: updatedUser.financeCurrency,
-    token: generateAccessToken(updatedUser._id),
-    refreshToken: generateRefreshToken(updatedUser._id),
   });
 });
 
