@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLogs, fetchLogStats } from "../app/features/logsSlice";
 import { fetchGithubData } from "../app/features/githubSlice";
 import { getUserProfile } from "../app/features/authSlice";
+import { setInitialTimes } from "../app/features/pomodoroSlice";
 import {
   Briefcase,
   GitBranch,
@@ -24,9 +25,11 @@ import {
   Medal,
   Crown,
   Moon,
+  Timer as TimerIcon,
 } from "lucide-react";
 import LogActivityChart from "../components/LogActivityChart";
 import Loader from "../components/Loader";
+import PomodoroQuickModal from "../components/PomodoroQuickModal";
 
 const computeStreaksFromLogs = (logs) => {
   if (!Array.isArray(logs) || logs.length === 0) {
@@ -554,6 +557,7 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
 
 function HomePage() {
   const dispatch = useDispatch();
+  const [isTimerOpen, setIsTimerOpen] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
   const {
     logs,
@@ -577,6 +581,17 @@ function HomePage() {
     dispatch(getUserProfile());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(
+        setInitialTimes({
+          workMinutes: userInfo.pomodoroWorkMinutes,
+          breakMinutes: userInfo.pomodoroBreakMinutes,
+        })
+      );
+    }
+  }, [dispatch, userInfo]);
+
   const enhancedUserInfo = {
     ...userInfo,
     publicRepositories: githubData?.publicRepositories,
@@ -584,6 +599,21 @@ function HomePage() {
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 relative text-gray-900 dark:text-stone-100 bg-stone-50 dark:bg-stone-950 min-h-full">
+      {/* Floating Timer Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          onClick={() => setIsTimerOpen(true)}
+          className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center"
+          aria-label="Open Pomodoro timer"
+        >
+          <TimerIcon size={22} />
+        </button>
+      </div>
+
+      <PomodoroQuickModal
+        isOpen={isTimerOpen}
+        onClose={() => setIsTimerOpen(false)}
+      />
       <div className="max-w-6xl mx-auto">
         <header className="mb-6 relative z-10">
           <h1 className="text-2xl md:text-3xl font-bold">
