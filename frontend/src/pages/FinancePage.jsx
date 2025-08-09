@@ -18,6 +18,7 @@ import {
   TrendingDown,
   TrendingUp,
   Wallet,
+  Tag,
 } from "lucide-react";
 
 const Card = ({ children, className = "" }) => (
@@ -824,27 +825,89 @@ export default function FinancePage() {
             </div>
           </Card>
           <Card>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <SectionTitle>Income Categories</SectionTitle>
-                <ul className="text-sm space-y-1">
-                  {categories
-                    .filter((c) => c.type === "INCOME")
-                    .map((c) => (
-                      <li key={c._id}>{c.name}</li>
-                    ))}
-                </ul>
-              </div>
-              <div>
-                <SectionTitle>Expense Categories</SectionTitle>
-                <ul className="text-sm space-y-1">
-                  {categories
-                    .filter((c) => c.type === "EXPENSE")
-                    .map((c) => (
-                      <li key={c._id}>{c.name}</li>
-                    ))}
-                </ul>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {(() => {
+                const incomeCats = categories.filter(
+                  (c) => c.type === "INCOME"
+                );
+                const expenseCats = categories.filter(
+                  (c) => c.type === "EXPENSE"
+                );
+                const incomePalette = [
+                  "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+                  "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
+                  "bg-lime-100 text-lime-700 dark:bg-lime-900/40 dark:text-lime-300",
+                ];
+                const expensePalette = [
+                  "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
+                  "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+                  "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
+                ];
+                return (
+                  <>
+                    <div>
+                      <SectionTitle
+                        right={
+                          <span className="text-xs text-stone-500">
+                            {incomeCats.length} total
+                          </span>
+                        }
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <Tag className="w-4 h-4" /> Income Categories
+                        </span>
+                      </SectionTitle>
+                      <div className="flex flex-wrap gap-2">
+                        {incomeCats.map((c, idx) => (
+                          <span
+                            key={c._id}
+                            className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${
+                              incomePalette[idx % incomePalette.length]
+                            }`}
+                          >
+                            {c.name}
+                          </span>
+                        ))}
+                        {incomeCats.length === 0 && (
+                          <p className="text-sm text-stone-500">
+                            No income categories
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <SectionTitle
+                        right={
+                          <span className="text-xs text-stone-500">
+                            {expenseCats.length} total
+                          </span>
+                        }
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <Tag className="w-4 h-4" /> Expense Categories
+                        </span>
+                      </SectionTitle>
+                      <div className="flex flex-wrap gap-2">
+                        {expenseCats.map((c, idx) => (
+                          <span
+                            key={c._id}
+                            className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${
+                              expensePalette[idx % expensePalette.length]
+                            }`}
+                          >
+                            {c.name}
+                          </span>
+                        ))}
+                        {expenseCats.length === 0 && (
+                          <p className="text-sm text-stone-500">
+                            No expense categories
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </Card>
         </div>
