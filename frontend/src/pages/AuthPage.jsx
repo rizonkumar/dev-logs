@@ -12,6 +12,8 @@ import {
   TwitterIcon,
   Moon,
   Sun,
+  Timer,
+  Wallet,
 } from "lucide-react";
 import {
   SignedIn,
@@ -20,6 +22,7 @@ import {
   SignUp,
   UserButton,
 } from "@clerk/clerk-react";
+import { dark } from "@clerk/themes";
 
 // removed old email/password inputs
 
@@ -71,28 +74,31 @@ const Footer = () => {
       transition={{ delay: 0.8, duration: 0.5 }}
       className="relative z-10 mt-12 text-center"
     >
-      <div className="flex justify-center items-center gap-4 mb-3">
+      <div className="flex justify-center items-center gap-3 mb-4">
         {socialLinks.map((link, index) => (
           <a
             key={index}
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className={`p-2 rounded-full bg-stone-200 text-gray-600 transition-colors ${link.color}`}
+            className={`p-2 rounded-full border shadow-sm transition-colors
+              bg-stone-200 text-gray-600 border-stone-300 hover:bg-stone-100 hover:text-gray-800
+              dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700 dark:hover:text-white
+              ${link.color}`}
           >
             {link.icon}
           </a>
         ))}
       </div>
-      <p className="text-sm text-gray-500 flex items-center justify-center gap-1.5">
-        Made with{" "}
+      <p className="text-sm text-gray-500 dark:text-stone-400 flex items-center justify-center gap-1.5">
+        Made with
         <Heart size={16} className="text-red-500" fill="currentColor" /> in
-        India, by
+        India by
         <a
           href="https://rizonkumarrahi.in"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-semibold text-gray-700 hover:text-blue-600"
+          className="font-semibold text-gray-700 hover:text-blue-600 dark:text-stone-200 dark:hover:text-blue-400"
         >
           Rizon Kumar Rahi
         </a>
@@ -155,6 +161,26 @@ const AuthPage = () => {
     exit: { opacity: 0, y: -30, transition: { duration: 0.3, ease: "easeIn" } },
   };
 
+  // Clerk theming
+  const clerkAppearance = isDark
+    ? {
+        baseTheme: dark,
+        variables: { colorPrimary: "#2563eb" },
+        elements: {
+          card: "bg-stone-900/70 backdrop-blur border border-stone-800 shadow-none",
+          headerTitle: "text-white",
+          headerSubtitle: "text-stone-300",
+          formButtonPrimary: "bg-blue-600 hover:bg-blue-700",
+          socialButtonsBlockButton:
+            "bg-stone-800 border-stone-700 text-stone-100 hover:bg-stone-700",
+          formFieldInput:
+            "bg-stone-900 text-stone-100 border-stone-700 placeholder:text-stone-400",
+        },
+      }
+    : {
+        variables: { colorPrimary: "#1f2937" },
+      };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 p-4">
       <Motion.div
@@ -195,8 +221,9 @@ const AuthPage = () => {
                 variants={formVariants}
                 className="text-gray-600 dark:text-stone-300 mb-10"
               >
-                From logging daily progress to managing complex projects, Dev
-                Dashboard brings all your tools into one cohesive workspace.
+                From logging daily progress and Kanban boards to Pomodoro timers
+                and personal finance tracking, Dev Dashboard brings your tools
+                into one cohesive workspace.
               </Motion.p>
               <div className="space-y-6">
                 <FeatureCard
@@ -216,6 +243,18 @@ const AuthPage = () => {
                   title="GitHub Insights"
                   description="Monitor your contribution activity and repository stats directly from your dashboard."
                   delay={0.4}
+                />
+                <FeatureCard
+                  icon={<Timer className="text-red-600" />}
+                  title="Pomodoro Timer"
+                  description="Stay focused with built-in Pomodoro sessions, stats, and history."
+                  delay={0.5}
+                />
+                <FeatureCard
+                  icon={<Wallet className="text-emerald-600" />}
+                  title="Finance Management"
+                  description="Track transactions, budgets, categories, goals, and project profitability."
+                  delay={0.6}
                 />
               </div>
             </Motion.div>
@@ -248,9 +287,17 @@ const AuthPage = () => {
               <SignedOut>
                 <div className="space-y-6">
                   {isLogin ? (
-                    <SignIn routing="virtual" afterSignInUrl="/" />
+                    <SignIn
+                      routing="virtual"
+                      afterSignInUrl="/"
+                      appearance={clerkAppearance}
+                    />
                   ) : (
-                    <SignUp routing="virtual" afterSignUpUrl="/" />
+                    <SignUp
+                      routing="virtual"
+                      afterSignUpUrl="/"
+                      appearance={clerkAppearance}
+                    />
                   )}
                   <div className="text-center">
                     <button
