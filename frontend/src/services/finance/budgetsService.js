@@ -13,6 +13,16 @@ export const createBudget = async (payload) => {
   return response.data;
 };
 
+export const updateBudget = async (id, payload) => {
+  const response = await axios.put(`${BASE}${id}`, payload);
+  return response.data;
+};
+
+export const deleteBudget = async (id) => {
+  const response = await axios.delete(`${BASE}${id}`);
+  return response.data;
+};
+
 export const getBudgetProgress = async ({ categoryId, month, year }) => {
   const response = await axios.get(`${BASE}progress`, {
     params: { categoryId, month, year },
@@ -20,4 +30,4 @@ export const getBudgetProgress = async ({ categoryId, month, year }) => {
   return response.data;
 };
 
-export default { listBudgets, createBudget, getBudgetProgress };
+export default { listBudgets, createBudget, updateBudget, deleteBudget, getBudgetProgress };

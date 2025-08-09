@@ -18,4 +18,9 @@ export const addContribution = async (goalId, payload) => {
   return response.data;
 };
 
-export default { listGoals, createGoal, addContribution };
+export const deleteGoal = async (id) => {
+  const response = await axios.delete(`${BASE}${id}`);
+  return response.data;
+};
+
+export default { listGoals, createGoal, addContribution, deleteGoal };
