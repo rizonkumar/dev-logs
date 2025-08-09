@@ -10,7 +10,15 @@ import {
   setWorkMinutes,
   fetchStats,
 } from "../app/features/pomodoroSlice";
-import { X, Play, Pause, Plus, Minus, Tag as TagIcon } from "lucide-react";
+import {
+  X,
+  Play,
+  Pause,
+  Plus,
+  Minus,
+  RotateCcw,
+  Tag as TagIcon,
+} from "lucide-react";
 import { motion as Motion } from "framer-motion";
 
 const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
@@ -104,12 +112,12 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-4 sm:p-5">
-          {/* Time + primary control row */}
-          <div className="flex items-center gap-3">
+          {/* Time + primary controls (aligned) */}
+          <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 flex-1 bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-xl p-2">
               <button
                 onClick={() => handleAdjust(-1)}
-                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50"
+                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50 flex items-center justify-center"
                 disabled={isRunning}
                 aria-label="Decrease minutes"
               >
@@ -122,7 +130,7 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
               </div>
               <button
                 onClick={() => handleAdjust(1)}
-                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50"
+                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50 flex items-center justify-center"
                 disabled={isRunning}
                 aria-label="Increase minutes"
               >
@@ -131,14 +139,18 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
             </div>
             <button
               onClick={handleStartPause}
-              className="h-12 w-12 rounded-full text-white shadow-lg ring-2 ring-blue-300/30 bg-blue-600 hover:bg-blue-700 transition-transform hover:scale-105 shrink-0"
+              className="h-10 w-10 rounded-full text-white shadow-lg ring-2 ring-blue-300/30 bg-blue-600 hover:bg-blue-700 transition-transform hover:scale-105 shrink-0 flex items-center justify-center"
               aria-label={isRunning ? "Pause timer" : "Start timer"}
             >
-              {isRunning ? (
-                <Pause size={24} />
-              ) : (
-                <Play size={24} className="ml-0.5" />
-              )}
+              {isRunning ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+            <button
+              onClick={handleReset}
+              className="h-10 w-10 rounded-full bg-white dark:bg-stone-950 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-900 shrink-0 flex items-center justify-center"
+              aria-label="Reset timer"
+              title="Reset timer"
+            >
+              <RotateCcw size={18} />
             </button>
           </div>
 
@@ -165,26 +177,7 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="mt-5 flex items-center justify-between">
-            <button
-              onClick={handleReset}
-              className="px-3 py-2 rounded-lg border border-red-200 dark:border-red-900 text-red-600 dark:text-red-300 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-sm font-semibold"
-            >
-              Reset
-            </button>
-            <button
-              onClick={handleStartPause}
-              className="h-12 w-12 rounded-full text-white shadow-lg ring-2 ring-blue-300/30 bg-blue-600 hover:bg-blue-700 transition-transform hover:scale-105"
-              aria-label={isRunning ? "Pause timer" : "Start timer"}
-            >
-              {isRunning ? (
-                <Pause size={24} />
-              ) : (
-                <Play size={24} className="ml-0.5" />
-              )}
-            </button>
-          </div>
+          {/* No bottom actions; controls are beside the timer */}
         </div>
       </div>
     </Motion.div>
