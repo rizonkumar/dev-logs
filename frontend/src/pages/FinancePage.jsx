@@ -31,19 +31,60 @@ const Card = ({ children, className = "" }) => (
 
 // StatCard imported from components/finance/StatCard
 
-const Tab = ({ id, active, onClick, children, icon: Icon }) => (
-  <button
-    onClick={() => onClick(id)}
-    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border flex items-center gap-2 ${
-      active
-        ? "bg-stone-200 dark:bg-stone-800 border-stone-300 dark:border-stone-700"
-        : "hover:bg-stone-100 dark:hover:bg-stone-800 border-transparent"
-    }`}
-  >
-    {Icon ? <Icon className="w-4 h-4" /> : null}
-    {children}
-  </button>
-);
+const Tab = ({ id, active, onClick, children, icon: Icon, variant }) => {
+  const colorStyles = {
+    dashboard: {
+      active:
+        "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800",
+      hover:
+        "hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-200",
+      icon: "text-indigo-600 dark:text-indigo-300",
+    },
+    transactions: {
+      active:
+        "bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-200 border-sky-200 dark:border-sky-800",
+      hover:
+        "hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-700 dark:hover:text-sky-200",
+      icon: "text-sky-600 dark:text-sky-300",
+    },
+    budgets: {
+      active:
+        "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-200 border-amber-200 dark:border-amber-800",
+      hover:
+        "hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-200",
+      icon: "text-amber-600 dark:text-amber-300",
+    },
+    goals: {
+      active:
+        "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800",
+      hover:
+        "hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-200",
+      icon: "text-emerald-600 dark:text-emerald-300",
+    },
+    categories: {
+      active:
+        "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 border-violet-200 dark:border-violet-800",
+      hover:
+        "hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-700 dark:hover:text-violet-200",
+      icon: "text-violet-600 dark:text-violet-300",
+    },
+  };
+  const colors = colorStyles[variant] || {};
+  return (
+    <button
+      onClick={() => onClick(id)}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border flex items-center gap-2 ${
+        active
+          ? colors.active ||
+            "bg-stone-200 dark:bg-stone-800 text-gray-900 dark:text-white border-stone-300 dark:border-stone-700"
+          : `${colors.hover || "hover:bg-stone-100 dark:hover:bg-stone-800"} border-transparent text-stone-700 dark:text-stone-300`
+      }`}
+    >
+      {Icon ? <Icon className={`w-4 h-4 ${colors.icon || ""}`} /> : null}
+      {children}
+    </button>
+  );
+};
 
 const formatCurrencyWith = (n, currency) =>
   new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
@@ -110,7 +151,7 @@ function InlineBudgetEditor({ initialAmount, onSave }) {
     </div>
   ) : (
     <button
-      className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800 cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+      className="text-xs px-3 py-1 rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 cursor-pointer hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors"
       onClick={() => setEditing(true)}
     >
       Edit Limit
@@ -129,12 +170,12 @@ function InlineContributionAdder({ onSave }) {
         step="0.01"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="px-2 py-1 rounded bg-stone-100 dark:bg-stone-800 w-28"
+        className="px-2 py-1 rounded bg-stone-100 dark:bg-stone-800 w-28 border border-stone-300 dark:border-stone-700"
         placeholder="Amount"
         autoFocus
       />
       <button
-        className="px-2 py-1 rounded bg-green-600 text-white text-xs cursor-pointer hover:bg-green-700 transition-colors"
+        className="px-2 py-1 rounded bg-emerald-600 text-white text-xs cursor-pointer hover:bg-emerald-700 transition-colors"
         onClick={async () => {
           const num = Number(value);
           if (!Number.isNaN(num) && num > 0) {
@@ -147,7 +188,7 @@ function InlineContributionAdder({ onSave }) {
         ✓
       </button>
       <button
-        className="px-2 py-1 rounded bg-stone-300 dark:bg-stone-700 text-xs cursor-pointer hover:bg-stone-400 dark:hover:bg-stone-600 transition-colors"
+        className="px-2 py-1 rounded bg-rose-600 text-white text-xs cursor-pointer hover:bg-rose-700 transition-colors"
         onClick={() => {
           setValue("");
           setEditing(false);
@@ -158,7 +199,7 @@ function InlineContributionAdder({ onSave }) {
     </div>
   ) : (
     <button
-      className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800 cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+      className="text-xs px-3 py-1 rounded bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 cursor-pointer hover:bg-sky-200 dark:hover:bg-sky-800 transition-colors"
       onClick={() => setEditing(true)}
     >
       Add +
@@ -364,6 +405,7 @@ export default function FinancePage() {
             active={activeTab === "dashboard"}
             onClick={setActiveTab}
             icon={Wallet}
+            variant="dashboard"
           >
             Dashboard
           </Tab>
@@ -372,6 +414,7 @@ export default function FinancePage() {
             active={activeTab === "transactions"}
             onClick={setActiveTab}
             icon={TrendingUp}
+            variant="transactions"
           >
             Transactions
           </Tab>
@@ -380,6 +423,7 @@ export default function FinancePage() {
             active={activeTab === "budgets"}
             onClick={setActiveTab}
             icon={CircleDollarSign}
+            variant="budgets"
           >
             Budgets
           </Tab>
@@ -388,6 +432,7 @@ export default function FinancePage() {
             active={activeTab === "goals"}
             onClick={setActiveTab}
             icon={TrendingUp}
+            variant="goals"
           >
             Goals
           </Tab>
@@ -395,10 +440,10 @@ export default function FinancePage() {
             id="categories"
             active={activeTab === "categories"}
             onClick={setActiveTab}
+            variant="categories"
           >
             Categories
           </Tab>
-          {/* Calculators tab removed */}
         </div>
         <div className="flex items-center gap-3">
           <FinanceCurrencyPicker current={currency} onChange={setCurrency} />
@@ -652,7 +697,7 @@ export default function FinancePage() {
                       />
                       <button
                         onClick={() => refreshProgress(c._id)}
-                        className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800 cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+                        className="text-xs px-3 py-1 rounded bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 cursor-pointer hover:bg-sky-200 dark:hover:bg-sky-800 transition-colors"
                       >
                         Refresh
                       </button>
@@ -716,9 +761,11 @@ export default function FinancePage() {
               <Card key={g._id}>
                 <SectionTitle
                   right={
-                    <InlineContributionAdder
-                      onSave={(amt) => addGoalContribution(g._id, amt)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <InlineContributionAdder
+                        onSave={(amt) => addGoalContribution(g._id, amt)}
+                      />
+                    </div>
                   }
                 >
                   {g.name}
