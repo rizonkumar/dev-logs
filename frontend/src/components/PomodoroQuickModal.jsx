@@ -56,13 +56,14 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
   };
 
   const handleAdjust = (delta) => {
-    if (isRunning) return; // prevent changes mid-run
+    if (isRunning) return;
     const next = clamp(minutes + delta, 1, 180);
     dispatch(setWorkMinutes(next));
   };
 
   const handleReset = () => {
     dispatch(pauseTimerThunk());
+    dispatch(setSessionType("WORK"));
     dispatch(resetTimer());
   };
 
@@ -72,7 +73,6 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
       "0"
     )}`;
 
-  // Dynamic timer color: start red, halfway turns amber, near-end turns green
   const totalWorkSeconds = Math.max(1, workMinutes * 60);
   const remaining = Math.max(0, Math.min(timeRemaining, totalWorkSeconds));
   const ratioRemaining = remaining / totalWorkSeconds;
@@ -104,7 +104,7 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-900 text-stone-600 dark:text-stone-300"
+            className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-900 text-stone-600 dark:text-stone-300 cursor-pointer"
             aria-label="Close timer"
           >
             <X size={18} />
@@ -112,12 +112,11 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-4 sm:p-5">
-          {/* Time + primary controls (aligned) */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 flex-1 bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-xl p-2">
               <button
                 onClick={() => handleAdjust(-1)}
-                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50 flex items-center justify-center"
+                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer"
                 disabled={isRunning}
                 aria-label="Decrease minutes"
               >
@@ -130,7 +129,7 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
               </div>
               <button
                 onClick={() => handleAdjust(1)}
-                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50 flex items-center justify-center"
+                className="h-10 w-10 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer"
                 disabled={isRunning}
                 aria-label="Increase minutes"
               >
@@ -139,14 +138,14 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
             </div>
             <button
               onClick={handleStartPause}
-              className="h-10 w-10 rounded-full text-white shadow-lg ring-2 ring-blue-300/30 bg-blue-600 hover:bg-blue-700 transition-transform hover:scale-105 shrink-0 flex items-center justify-center"
+              className="h-10 w-10 rounded-full text-white shadow-lg ring-2 ring-blue-300/30 bg-blue-600 hover:bg-blue-700 transition-transform hover:scale-105 shrink-0 flex items-center justify-center cursor-pointer"
               aria-label={isRunning ? "Pause timer" : "Start timer"}
             >
               {isRunning ? <Pause size={20} /> : <Play size={20} />}
             </button>
             <button
               onClick={handleReset}
-              className="h-10 w-10 rounded-full bg-white dark:bg-stone-950 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-900 shrink-0 flex items-center justify-center"
+              className="h-10 w-10 rounded-full bg-white dark:bg-stone-950 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-900 shrink-0 flex items-center justify-center cursor-pointer"
               aria-label="Reset timer"
               title="Reset timer"
             >
@@ -154,7 +153,6 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Meta inputs */}
           <div className="mt-4 grid grid-cols-1 gap-3">
             <input
               type="text"
@@ -176,8 +174,6 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
               />
             </div>
           </div>
-
-          {/* No bottom actions; controls are beside the timer */}
         </div>
       </div>
     </Motion.div>

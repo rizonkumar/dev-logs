@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Moon, Sun } from "lucide-react";
 import PomodoroQuickModal from "../PomodoroQuickModal";
+import { motion as Motion } from "framer-motion";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home", color: "blue" },
@@ -351,8 +352,13 @@ const MainLayout = ({ children }) => {
 
         <main className="flex-1 overflow-y-auto">{children}</main>
 
-        {/* Global floating timer button + modal */}
-        <div className="fixed bottom-6 right-6 z-40">
+        {/* Global floating timer button (draggable) + modal */}
+        <Motion.div
+          className="fixed bottom-6 right-6 z-40"
+          drag
+          dragMomentum={false}
+          dragElastic={0.05}
+        >
           <button
             onClick={() => setIsTimerOpen(true)}
             className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center"
@@ -360,7 +366,7 @@ const MainLayout = ({ children }) => {
           >
             <Timer size={22} />
           </button>
-        </div>
+        </Motion.div>
         <PomodoroQuickModal
           isOpen={isTimerOpen}
           onClose={() => setIsTimerOpen(false)}
