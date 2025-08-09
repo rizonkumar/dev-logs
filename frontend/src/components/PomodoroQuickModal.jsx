@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   startTimerThunk,
@@ -25,6 +25,8 @@ const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
 
 const PomodoroQuickModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
+  // Keep all hooks unconditionally called on every render to avoid hook order issues
+  const [isDragging, setIsDragging] = useState(false);
   const {
     timeRemaining,
     isRunning,
@@ -35,13 +37,14 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
     stats,
   } = useSelector((state) => state.pomodoro);
 
+  const [isEditingMinutes, setIsEditingMinutes] = useState(false);
+  const [editMinutesValue, setEditMinutesValue] = useState(String(workMinutes));
+
   useEffect(() => {
     if (isOpen) {
       dispatch(fetchStats());
     }
   }, [dispatch, isOpen]);
-
-  if (!isOpen) return null;
 
   const isWork = sessionType === "WORK";
   const minutes = workMinutes; // work-only modal
@@ -59,6 +62,21 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
     if (isRunning) return;
     const next = clamp(minutes + delta, 1, 180);
     dispatch(setWorkMinutes(next));
+  };
+
+  const beginEditMinutes = () => {
+    if (isRunning) return;
+    setEditMinutesValue(String(workMinutes));
+    setIsEditingMinutes(true);
+  };
+
+  const commitEditMinutes = () => {
+    const parsed = parseInt(editMinutesValue, 10);
+    if (!isNaN(parsed)) {
+      const next = clamp(parsed, 1, 180);
+      dispatch(setWorkMinutes(next));
+    }
+    setIsEditingMinutes(false);
   };
 
   const handleReset = () => {
@@ -84,12 +102,17 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
       ? "text-amber-600"
       : "text-red-600";
 
+  if (!isOpen) return null;
+
   return (
     <Motion.div
-      className="fixed bottom-6 right-6 z-50"
+      className="fixed bottom-6 right-6 z-50 cursor-grab"
+      style={{ cursor: isDragging ? "grabbing" : "grab" }}
       drag
       dragMomentum={false}
       dragElastic={0.05}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={() => setIsDragging(false)}
       initial={{ opacity: 0, scale: 0.95, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
     >
@@ -122,10 +145,34 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
               >
                 <Minus size={18} />
               </button>
-              <div
-                className={`flex-1 text-center text-5xl font-light tracking-widest tabular-nums ${colorClass}`}
-              >
-                {formatTime(timeRemaining)}
+              <div className="flex-1">
+                {isEditingMinutes ? (
+                  <input
+                    type="number"
+                    min={1}
+                    max={180}
+                    value={editMinutesValue}
+                    onChange={(e) => setEditMinutesValue(e.target.value)}
+                    onBlur={commitEditMinutes}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitEditMinutes();
+                      if (e.key === "Escape") setIsEditingMinutes(false);
+                    }}
+                    onPointerDownCapture={(e) => e.stopPropagation()}
+                    className="w-full text-center text-5xl font-light tracking-widest tabular-nums bg-white dark:bg-stone-950 focus:outline-hidden focus:ring-2 focus:ring-blue-500 rounded-md px-1"
+                    aria-label="Work minutes"
+                    autoFocus
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={beginEditMinutes}
+                    className={`w-full text-center text-5xl font-light tracking-widest tabular-nums ${colorClass} bg-transparent cursor-text`}
+                    aria-label="Edit work minutes"
+                  >
+                    {formatTime(timeRemaining)}
+                  </button>
+                )}
               </div>
               <button
                 onClick={() => handleAdjust(1)}

@@ -353,20 +353,26 @@ const MainLayout = ({ children }) => {
         <main className="flex-1 overflow-y-auto">{children}</main>
 
         {/* Global floating timer button (draggable) + modal */}
-        <Motion.div
-          className="fixed bottom-6 right-6 z-40"
+        <Motion.button
+          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center cursor-grab"
+          style={{ cursor: "grab" }}
           drag
           dragMomentum={false}
           dragElastic={0.05}
+          onDragStart={(event) => {
+            // Guard against null targets in some browsers
+            const target = event?.currentTarget;
+            if (target) target.style.cursor = "grabbing";
+          }}
+          onDragEnd={(event) => {
+            const target = event?.currentTarget;
+            if (target) target.style.cursor = "grab";
+          }}
+          onClick={() => setIsTimerOpen(true)}
+          aria-label="Open Pomodoro timer"
         >
-          <button
-            onClick={() => setIsTimerOpen(true)}
-            className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center"
-            aria-label="Open Pomodoro timer"
-          >
-            <Timer size={22} />
-          </button>
-        </Motion.div>
+          <Timer size={22} />
+        </Motion.button>
         <PomodoroQuickModal
           isOpen={isTimerOpen}
           onClose={() => setIsTimerOpen(false)}

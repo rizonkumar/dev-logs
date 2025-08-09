@@ -4,7 +4,9 @@ import SectionTitle from "./SectionTitle";
 import calculatorsService from "../../services/finance/calculatorsService";
 
 const formatCurrency = (n, currency = "USD") =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(n || 0);
+  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
+    n || 0
+  );
 
 export default function CalculatorsPanel({ currency }) {
   return (
@@ -12,11 +14,21 @@ export default function CalculatorsPanel({ currency }) {
       <Card>
         <SectionTitle>Contract vs Full-Time</SectionTitle>
         <button
-          className="px-3 py-2 rounded bg-stone-200 dark:bg-stone-800 text-sm"
+          className="px-3 py-2 rounded bg-stone-200 dark:bg-stone-800 text-sm hover:bg-stone-300 dark:hover:bg-stone-700"
           onClick={async () => {
             const res = await calculatorsService.contractVsFullTime({
-              contract: { dayRate: 600, daysPerWeek: 5, weeks: 46, taxRate: 0.35 },
-              fullTime: { salary: 150000, bonus: 10000, stockValue: 15000, taxRate: 0.32 },
+              contract: {
+                dayRate: 600,
+                daysPerWeek: 5,
+                weeks: 46,
+                taxRate: 0.35,
+              },
+              fullTime: {
+                salary: 150000,
+                bonus: 10000,
+                stockValue: 15000,
+                taxRate: 0.32,
+              },
             });
             alert(`Net diff: ${formatCurrency(res.differenceNet, currency)}`);
           }}
@@ -28,7 +40,7 @@ export default function CalculatorsPanel({ currency }) {
       <Card>
         <SectionTitle>FIRE Calculator</SectionTitle>
         <button
-          className="px-3 py-2 rounded bg-stone-200 dark:bg-stone-800 text-sm"
+          className="px-3 py-2 rounded bg-stone-200 dark:bg-stone-800 text-sm hover:bg-stone-300 dark:hover:bg-stone-700"
           onClick={async () => {
             const res = await calculatorsService.fire({
               currentSavings: 50000,
@@ -38,7 +50,12 @@ export default function CalculatorsPanel({ currency }) {
               annualExpenses: 60000,
               years: 25,
             });
-            alert(`Projected NW: ${formatCurrency(res.projectedNetWorth, currency)} | Progress: ${(res.progress * 100).toFixed(1)}%`);
+            alert(
+              `Projected NW: ${formatCurrency(
+                res.projectedNetWorth,
+                currency
+              )} | Progress: ${(res.progress * 100).toFixed(1)}%`
+            );
           }}
         >
           Run Example
@@ -47,5 +64,3 @@ export default function CalculatorsPanel({ currency }) {
     </div>
   );
 }
-
-

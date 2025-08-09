@@ -2,12 +2,32 @@ import React, { useMemo, useState } from "react";
 import Card from "./Card";
 import SectionTitle from "./SectionTitle";
 import txService from "../../services/finance/transactionsService";
+import catService from "../../services/finance/categoriesService";
 
-export default function TransactionForm({ categories, projects, onCreated }) {
-  const incomeCategories = useMemo(() => categories.filter((c) => c.type === "INCOME"), [categories]);
-  const expenseCategories = useMemo(() => categories.filter((c) => c.type === "EXPENSE"), [categories]);
-  const [form, setForm] = useState({ type: "EXPENSE", amount: "", transactionDate: new Date().toISOString().slice(0, 10), category: "", description: "", project: "" });
+export default function TransactionForm({
+  categories,
+  projects,
+  onCreated,
+  onCategoryCreated,
+}) {
+  const incomeCategories = useMemo(
+    () => categories.filter((c) => c.type === "INCOME"),
+    [categories]
+  );
+  const expenseCategories = useMemo(
+    () => categories.filter((c) => c.type === "EXPENSE"),
+    [categories]
+  );
+  const [form, setForm] = useState({
+    type: "EXPENSE",
+    amount: "",
+    transactionDate: new Date().toISOString().slice(0, 10),
+    category: "",
+    description: "",
+    project: "",
+  });
   const [loading, setLoading] = useState(false);
+  const [otherCategoryName, setOtherCategoryName] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -15,9 +35,26 @@ export default function TransactionForm({ categories, projects, onCreated }) {
     try {
       const payload = { ...form, amount: Number(form.amount) };
       if (!payload.category) return;
+      if (!payload.project) {
+        delete payload.project;
+      }
+      if (payload.type === "INCOME" && !payload.incomeType) {
+        payload.incomeType = "OTHER";
+      }
+      if (payload.category === "OTHER") {
+        const name = otherCategoryName.trim();
+        if (!name) return;
+        const created = await catService.createCategory({
+          name,
+          type: payload.type,
+        });
+        payload.category = created._id;
+        onCategoryCreated?.();
+      }
       await txService.createTransaction(payload);
       onCreated?.();
       setForm((f) => ({ ...f, amount: "", description: "" }));
+      setOtherCategoryName("");
     } finally {
       setLoading(false);
     }
@@ -26,28 +63,90 @@ export default function TransactionForm({ categories, projects, onCreated }) {
   return (
     <Card>
       <SectionTitle>Add Transaction</SectionTitle>
-      <form onSubmit={onSubmit} className="grid md:grid-cols-2 gap-3">
-        <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800">
+      <form
+        onSubmit={onSubmit}
+        className="grid gap-3 md:grid-cols-2 lg:grid-cols-3"
+      >
+        <select
+          value={form.type}
+          onChange={(e) =>
+            setForm({ ...form, type: e.target.value, category: "" })
+          }
+          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+        >
           <option value="EXPENSE">Expense</option>
           <option value="INCOME">Income</option>
         </select>
-        <input type="number" min="0" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800" placeholder="Amount" required />
-        <input type="date" value={form.transactionDate} onChange={(e) => setForm({ ...form, transactionDate: e.target.value })} className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800" />
-        <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800" required>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value={form.amount}
+          onChange={(e) => setForm({ ...form, amount: e.target.value })}
+          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+          placeholder="Amount"
+          required
+        />
+        <input
+          type="date"
+          value={form.transactionDate}
+          onChange={(e) =>
+            setForm({ ...form, transactionDate: e.target.value })
+          }
+          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+        />
+        <select
+          value={form.category}
+          onChange={(e) => setForm({ ...form, category: e.target.value })}
+          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+          required
+        >
           <option value="">Select Category</option>
-          {(form.type === "INCOME" ? incomeCategories : expenseCategories).map((c) => (
-            <option key={c._id} value={c._id}>{c.name}</option>
-          ))}
+          {(form.type === "INCOME" ? incomeCategories : expenseCategories).map(
+            (c) => (
+              <option key={c._id} value={c._id}>
+                {c.name}
+              </option>
+            )
+          )}
+          <option value="OTHER">Other…</option>
         </select>
-        <select value={form.project} onChange={(e) => setForm({ ...form, project: e.target.value })} className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800">
-          <option value="">No Project</option>
-          {projects.map((p) => (
-            <option key={p._id} value={p._id}>{p.name}</option>
-          ))}
-        </select>
-        <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 md:col-span-2" placeholder="Description (optional)" />
-        <div className="md:col-span-2 flex justify-end">
-          <button type="submit" disabled={loading} className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900">
+        {form.category === "OTHER" ? (
+          <input
+            value={otherCategoryName}
+            onChange={(e) => setOtherCategoryName(e.target.value)}
+            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+            placeholder={`New ${form.type.toLowerCase()} category`}
+            required
+          />
+        ) : (
+          <select
+            value={form.project}
+            onChange={(e) => setForm({ ...form, project: e.target.value })}
+            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+          >
+            <option value="">No Project</option>
+            {projects.map((p) => (
+              <option key={p._id} value={p._id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        )}
+        <div className="lg:col-span-2">
+          <input
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 w-full"
+            placeholder="Description (optional)"
+          />
+        </div>
+        <div className="flex justify-end items-center">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer hover:opacity-90 transition"
+          >
             {loading ? "Saving..." : "Add"}
           </button>
         </div>
@@ -55,5 +154,3 @@ export default function TransactionForm({ categories, projects, onCreated }) {
     </Card>
   );
 }
-
-

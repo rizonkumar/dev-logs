@@ -1,6 +1,7 @@
 const FinanceBudget = require("../../models/finance/budgetModel");
 const FinanceCategory = require("../../models/finance/categoryModel");
 const FinanceTransaction = require("../../models/finance/transactionModel");
+const { Types } = require("mongoose");
 
 const ensureCategoryOwnership = async (userId, categoryId) => {
   const category = await FinanceCategory.findOne({
@@ -64,9 +65,9 @@ const deleteBudget = async (userId, id) => {
 
 const getBudgetProgress = async (userId, { month, year, categoryId }) => {
   const filter = {
-    user: userId,
+    user: new Types.ObjectId(userId),
     type: "EXPENSE",
-    category: categoryId,
+    category: new Types.ObjectId(categoryId),
     transactionDate: {
       $gte: new Date(year, month - 1, 1, 0, 0, 0),
       $lte: new Date(year, month, 0, 23, 59, 59, 999),
