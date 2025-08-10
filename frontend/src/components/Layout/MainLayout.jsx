@@ -23,6 +23,7 @@ import {
   UserButton,
   SignInButton,
   SignUpButton,
+  SignOutButton,
 } from "@clerk/clerk-react";
 
 const navItems = [
@@ -260,12 +261,23 @@ const MainLayout = ({ children }) => {
 
         <div className={`${!isExpanded && "justify-center"}`}>
           <SignedIn>
-            <div className="flex items-center gap-4 px-2">
+            <div
+              className={`w-full flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors ${
+                !isExpanded && "justify-center"
+              }`}
+            >
               <UserButton afterSignOutUrl="/" />
               {isExpanded && (
-                <span className="text-sm text-gray-600 dark:text-stone-300">
-                  Account
-                </span>
+                <>
+                  <span className="text-sm">Account</span>
+                  <div className="ml-auto">
+                    <SignOutButton signOutOptions={{ redirectUrl: "/" }}>
+                      <button className="text-sm font-semibold text-red-600 hover:text-red-700">
+                        Logout
+                      </button>
+                    </SignOutButton>
+                  </div>
+                </>
               )}
             </div>
           </SignedIn>
