@@ -22,7 +22,7 @@ import {
   X,
   History,
 } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { updateProfile } from "../app/features/authSlice";
 
 const SettingsModal = ({ isOpen, onClose, currentWork, currentBreak }) => {
