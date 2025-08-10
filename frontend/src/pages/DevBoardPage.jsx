@@ -323,9 +323,17 @@ const DevBoardPage = () => {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto" onDragOver={(e)=>{
-             const edge=80;const x=e.clientX;const w=window.innerWidth; if(x<edge) window.scrollBy({left:-20,behavior:'smooth'}); else if(w-x<edge) window.scrollBy({left:20,behavior:'smooth'});
-           }}>
+          <div
+            className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto"
+            onDragOver={(e) => {
+              const edge = 80;
+              const x = e.clientX;
+              const w = window.innerWidth;
+              if (x < edge) window.scrollBy({ left: -20, behavior: "smooth" });
+              else if (w - x < edge)
+                window.scrollBy({ left: 20, behavior: "smooth" });
+            }}
+          >
             {Object.entries(columns).map(([columnId, tasks]) => (
               <KanbanColumn
                 key={columnId}

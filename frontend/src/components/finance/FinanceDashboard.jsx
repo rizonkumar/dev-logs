@@ -9,6 +9,7 @@ import {
   Wallet,
   LayoutDashboard,
   BarChart3 as BarChartIcon,
+  ChevronDown,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -50,6 +51,46 @@ export default function FinanceDashboard({
   const [view, setView] = useState("summary");
   const [txChartType, setTxChartType] = useState("area"); // area | line | bar
   const [catChartType, setCatChartType] = useState("radial"); // pie | radial | radar
+  const [txMenuOpen, setTxMenuOpen] = useState(false);
+  const [catMenuOpen, setCatMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  // Keep grid/tick colors readable in both themes
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const compute = () => {
+      const prefersDark =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setIsDark(
+        document.documentElement.classList.contains("dark") || prefersDark
+      );
+    };
+    compute();
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    const listener = () => compute();
+    try {
+      mql.addEventListener("change", listener);
+    } catch {
+      mql.addListener(listener);
+    }
+    const mo = new MutationObserver(compute);
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => {
+      try {
+        mql.removeEventListener("change", listener);
+      } catch {
+        mql.removeListener(listener);
+      }
+      mo.disconnect();
+    };
+  }, []);
+
+  const gridStroke = isDark ? "#334155" : "#e5e7eb"; // slate-700 : gray-200
+  const tickColor = isDark ? "#cbd5e1" : "#475569"; // slate-300 : slate-600
 
   const incomeVsExpenseData = useMemo(
     () => [
@@ -312,27 +353,52 @@ export default function FinanceDashboard({
             <Card className="xl:col-span-8">
               <div className="flex items-center justify-between">
                 <SectionTitle>Transactions</SectionTitle>
-                <div className="relative">
+                <div
+                  className="relative"
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget))
+                      setTxMenuOpen(false);
+                  }}
+                >
                   <button
                     className="inline-flex items-center gap-2 rounded-md border border-stone-200 dark:border-stone-700 px-3 py-1.5 text-xs sm:text-sm hover:bg-stone-50 dark:hover:bg-stone-800"
                     onClick={(e) => {
                       e.preventDefault();
-                      const next =
-                        txChartType === "area"
-                          ? "line"
-                          : txChartType === "line"
-                          ? "bar"
-                          : "area";
-                      setTxChartType(next);
+                      setTxMenuOpen((v) => !v);
                     }}
-                    title="Toggle chart type"
+                    title="Select chart type"
                   >
                     {txChartType === "area"
                       ? "Area chart"
                       : txChartType === "line"
                       ? "Line chart"
                       : "Bar chart"}
+                    <ChevronDown className="w-3.5 h-3.5" />
                   </button>
+                  {txMenuOpen && (
+                    <div className="absolute right-0 z-10 mt-2 w-40 rounded-md border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-sm p-1">
+                      {[
+                        { id: "area", label: "Area chart" },
+                        { id: "line", label: "Line chart" },
+                        { id: "bar", label: "Bar chart" },
+                      ].map((opt) => (
+                        <button
+                          key={opt.id}
+                          className={`w-full text-left px-2 py-1.5 rounded-md text-xs sm:text-sm ${
+                            txChartType === opt.id
+                              ? "bg-stone-100 dark:bg-stone-800 font-medium"
+                              : "hover:bg-stone-50 dark:hover:bg-stone-800"
+                          }`}
+                          onClick={() => {
+                            setTxChartType(opt.id);
+                            setTxMenuOpen(false);
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="w-full h-[240px] sm:h-[300px] lg:h-[340px]">
@@ -380,9 +446,16 @@ export default function FinanceDashboard({
                           />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke={gridStroke}
+                      />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12, fill: tickColor }}
+                      />
                       <YAxis
+                        tick={{ fill: tickColor }}
                         tickFormatter={(v) => formatCurrency(v, currency)}
                         width={80}
                       />
@@ -408,9 +481,16 @@ export default function FinanceDashboard({
                       data={netByDayData}
                       margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke={gridStroke}
+                      />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12, fill: tickColor }}
+                      />
                       <YAxis
+                        tick={{ fill: tickColor }}
                         tickFormatter={(v) => formatCurrency(v, currency)}
                         width={80}
                       />
@@ -436,9 +516,16 @@ export default function FinanceDashboard({
                       data={netByDayData}
                       margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke={gridStroke}
+                      />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12, fill: tickColor }}
+                      />
                       <YAxis
+                        tick={{ fill: tickColor }}
                         tickFormatter={(v) => formatCurrency(v, currency)}
                         width={80}
                       />
@@ -463,26 +550,53 @@ export default function FinanceDashboard({
             <Card className="xl:col-span-4">
               <div className="flex items-center justify-between">
                 <SectionTitle>Categories</SectionTitle>
-                <button
-                  className="inline-flex items-center gap-2 rounded-md border border-stone-200 dark:border-stone-700 px-3 py-1.5 text-xs sm:text-sm hover:bg-stone-50 dark:hover:bg-stone-800"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const next =
-                      catChartType === "radial"
-                        ? "pie"
-                        : catChartType === "pie"
-                        ? "radar"
-                        : "radial";
-                    setCatChartType(next);
+                <div
+                  className="relative"
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget))
+                      setCatMenuOpen(false);
                   }}
-                  title="Toggle chart type"
                 >
-                  {catChartType === "pie"
-                    ? "Pie chart"
-                    : catChartType === "radar"
-                    ? "Radar chart"
-                    : "Radial chart"}
-                </button>
+                  <button
+                    className="inline-flex items-center gap-2 rounded-md border border-stone-200 dark:border-stone-700 px-3 py-1.5 text-xs sm:text-sm hover:bg-stone-50 dark:hover:bg-stone-800"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCatMenuOpen((v) => !v);
+                    }}
+                    title="Select chart type"
+                  >
+                    {catChartType === "pie"
+                      ? "Pie chart"
+                      : catChartType === "radar"
+                      ? "Radar chart"
+                      : "Radial chart"}
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                  {catMenuOpen && (
+                    <div className="absolute right-0 z-10 mt-2 w-40 rounded-md border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-sm p-1">
+                      {[
+                        { id: "radial", label: "Radial chart" },
+                        { id: "pie", label: "Pie chart" },
+                        { id: "radar", label: "Radar chart" },
+                      ].map((opt) => (
+                        <button
+                          key={opt.id}
+                          className={`w-full text-left px-2 py-1.5 rounded-md text-xs sm:text-sm ${
+                            catChartType === opt.id
+                              ? "bg-stone-100 dark:bg-stone-800 font-medium"
+                              : "hover:bg-stone-50 dark:hover:bg-stone-800"
+                          }`}
+                          onClick={() => {
+                            setCatChartType(opt.id);
+                            setCatMenuOpen(false);
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 items-center">
                 <div className="w-full h-[220px]">
