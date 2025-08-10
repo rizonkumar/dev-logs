@@ -81,6 +81,7 @@ app.use(
   "/api/finance/calculators",
   require("./api/routes/finance/calculatorRoutes")
 );
+app.use("/api/finance/advisor", require("./api/routes/finance/advisorRoutes"));
 
 const PORT = process.env.PORT || 5001;
 
