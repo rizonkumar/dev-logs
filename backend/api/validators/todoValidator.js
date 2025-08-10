@@ -14,7 +14,8 @@ const validateCreateTodo = [
     .custom((value) => {
       if (Array.isArray(value)) {
         return value.every(
-          (tag) => typeof tag === "string" && tag.trim().length > 0 && tag.length <= 30
+          (tag) =>
+            typeof tag === "string" && tag.trim().length > 0 && tag.length <= 30
         );
       }
       if (typeof value === "string") {
@@ -27,7 +28,9 @@ const validateCreateTodo = [
       }
       return false;
     })
-    .withMessage("Tags must be an array of non-empty strings or a comma-separated string"),
+    .withMessage(
+      "Tags must be an array of non-empty strings or a comma-separated string"
+    ),
 ];
 
 const validateUpdateTodo = [
@@ -52,7 +55,8 @@ const validateUpdateTodo = [
     .custom((value) => {
       if (Array.isArray(value)) {
         return value.every(
-          (tag) => typeof tag === "string" && tag.trim().length > 0 && tag.length <= 30
+          (tag) =>
+            typeof tag === "string" && tag.trim().length > 0 && tag.length <= 30
         );
       }
       if (typeof value === "string") {
@@ -64,7 +68,9 @@ const validateUpdateTodo = [
       }
       return false;
     })
-    .withMessage("Tags must be an array of non-empty strings or a comma-separated string"),
+    .withMessage(
+      "Tags must be an array of non-empty strings or a comma-separated string"
+    ),
 ];
 
 module.exports = {

@@ -87,7 +87,11 @@ const BoardHeader = ({
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
           <div className="w-full sm:w-auto">
-            <TagInput compact selectedTags={selectedTags} onTagsChange={setSelectedTags} />
+            <TagInput
+              compact
+              selectedTags={selectedTags}
+              onTagsChange={setSelectedTags}
+            />
           </div>
           <div className="flex items-center gap-1">
             <CalendarRange

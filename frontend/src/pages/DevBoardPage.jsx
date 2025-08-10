@@ -27,6 +27,7 @@ const DevBoardPage = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [tagsFilter, setTagsFilter] = useState([]);
   const searchRef = useRef(null);
   const liveRef = useRef(null);
   const announce = (message) => {
@@ -46,6 +47,8 @@ const DevBoardPage = () => {
     if (dateFrom) params.set("from", dateFrom);
     if (dateTo) params.set("to", dateTo);
     if (viewMode) params.set("view", viewMode);
+    if (tagsFilter && tagsFilter.length > 0)
+      params.set("tags", tagsFilter.join(","));
     const url = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState({}, "", url);
     try {
@@ -56,10 +59,11 @@ const DevBoardPage = () => {
           from: dateFrom,
           to: dateTo,
           view: viewMode,
+          tags: tagsFilter,
         })
       );
     } catch {}
-  }, [searchQuery, dateFrom, dateTo, viewMode]);
+  }, [searchQuery, dateFrom, dateTo, viewMode, tagsFilter]);
 
   useEffect(() => {
     // hydrate on mount
@@ -71,6 +75,17 @@ const DevBoardPage = () => {
       setDateFrom(searchParams.get("from") ?? saved.from ?? "");
       setDateTo(searchParams.get("to") ?? saved.to ?? "");
       setViewMode(searchParams.get("view") ?? saved.view ?? "today");
+      const tagsFromQuery = searchParams.get("tags");
+      if (tagsFromQuery) {
+        setTagsFilter(
+          tagsFromQuery
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        );
+      } else if (Array.isArray(saved.tags)) {
+        setTagsFilter(saved.tags.filter((t) => typeof t === "string"));
+      }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -87,18 +102,20 @@ const DevBoardPage = () => {
     if (debouncedSearch) params.q = debouncedSearch;
     if (dateFrom) params.from = dateFrom;
     if (dateTo) params.to = dateTo;
+    if (tagsFilter && tagsFilter.length > 0) params.tags = tagsFilter.join(",");
     if (Object.keys(params).length > 0) {
       dispatch(fetchTodos(params));
     } else {
       // When all filters are cleared, refetch the full list so UI restores Today view properly
       dispatch(fetchTodos());
     }
-  }, [debouncedSearch, dateFrom, dateTo, dispatch]);
+  }, [debouncedSearch, dateFrom, dateTo, tagsFilter, dispatch]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setDateFrom("");
     setDateTo("");
+    setTagsFilter([]);
     dispatch(fetchTodos());
   };
 
@@ -130,7 +147,9 @@ const DevBoardPage = () => {
   }, [clearFilters]);
 
   const filteredTodos = useMemo(() => {
-    const hasServerFilters = Boolean(debouncedSearch || dateFrom || dateTo);
+    const hasServerFilters = Boolean(
+      debouncedSearch || dateFrom || dateTo || (tagsFilter && tagsFilter.length)
+    );
     if (viewMode === "all" || hasServerFilters) return todos;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -145,7 +164,7 @@ const DevBoardPage = () => {
       const isActive = todo.status !== "DONE";
       return isToday || isActive;
     });
-  }, [todos, viewMode, debouncedSearch, dateFrom, dateTo]);
+  }, [todos, viewMode, debouncedSearch, dateFrom, dateTo, tagsFilter]);
 
   const columns = useMemo(() => {
     const initialColumns = {
@@ -191,6 +210,7 @@ const DevBoardPage = () => {
       task: data.task,
       status: data.status,
       isCompleted: data.status === "DONE",
+      tags: Array.isArray(data.tags) ? data.tags : [],
     };
     if (modal === "edit" && selectedTodo) {
       dispatch(
@@ -222,6 +242,7 @@ const DevBoardPage = () => {
                     task: removed.task,
                     status: removed.status,
                     isCompleted: removed.isCompleted,
+                    tags: Array.isArray(removed.tags) ? removed.tags : [],
                   })
                 );
                 toast.dismiss(id);
@@ -273,6 +294,8 @@ const DevBoardPage = () => {
         clearFilters={clearFilters}
         onAddTask={() => setModal("add")}
         searchInputRef={searchRef}
+        selectedTags={tagsFilter}
+        setSelectedTags={setTagsFilter}
       />
 
       {filteredTodos.length === 0 && status === "succeeded" ? (
