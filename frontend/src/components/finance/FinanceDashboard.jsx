@@ -92,8 +92,8 @@ export default function FinanceDashboard({
     };
   }, []);
 
-  const gridStroke = isDark ? "#374151" : "#e5e7eb"; // darker in dark for subtle grid
-  const tickColor = isDark ? "#e5e7eb" : "#475569"; // brighter ticks in dark
+  const gridStroke = isDark ? "#374151" : "#e5e7eb";
+  const tickColor = isDark ? "#f3f4f6" : "#111827";
 
   const formatCompactCurrency = (n, cur = "USD") =>
     new Intl.NumberFormat(undefined, {
@@ -102,8 +102,6 @@ export default function FinanceDashboard({
       notation: "compact",
       maximumFractionDigits: 1,
     }).format(n || 0);
-
-  // removed unused incomeVsExpenseData – we compute per-chart as needed
 
   const expenseByCategoryData = useMemo(() => {
     const map = new Map();
@@ -159,19 +157,16 @@ export default function FinanceDashboard({
     return items;
   }, [recent]);
 
-  const PIE_COLORS = [
-    "#16a34a", // green-600
-    "#dc2626", // red-600
-  ];
+  const PIE_COLORS = ["#16a34a", "#dc2626"];
   const CATEGORY_COLORS = [
-    "#2563eb", // blue-600
-    "#06b6d4", // cyan-500
-    "#f59e0b", // amber-500
-    "#ef4444", // red-500
-    "#10b981", // emerald-500
-    "#a855f7", // purple-500
-    "#84cc16", // lime-500
-    "#fb7185", // rose-400
+    "#2563eb",
+    "#06b6d4",
+    "#f59e0b",
+    "#ef4444",
+    "#10b981",
+    "#a855f7",
+    "#84cc16",
+    "#fb7185",
   ];
 
   const CustomPieTooltip = ({ active, payload }) => {
@@ -501,13 +496,21 @@ export default function FinanceDashboard({
                       />
                       <XAxis
                         dataKey="date"
-                        tick={{ fontSize: 12, fill: tickColor }}
+                        tick={{
+                          fontSize: 13,
+                          fill: tickColor,
+                          fontWeight: 600,
+                        }}
                         tickMargin={10}
                         tickLine={false}
                         axisLine={{ stroke: gridStroke }}
                       />
                       <YAxis
-                        tick={{ fill: tickColor }}
+                        tick={{
+                          fill: tickColor,
+                          fontSize: 13,
+                          fontWeight: 600,
+                        }}
                         tickFormatter={(v) =>
                           formatCompactCurrency(v, currency)
                         }
@@ -543,13 +546,21 @@ export default function FinanceDashboard({
                       />
                       <XAxis
                         dataKey="date"
-                        tick={{ fontSize: 12, fill: tickColor }}
+                        tick={{
+                          fontSize: 13,
+                          fill: tickColor,
+                          fontWeight: 600,
+                        }}
                         tickMargin={10}
                         tickLine={false}
                         axisLine={{ stroke: gridStroke }}
                       />
                       <YAxis
-                        tick={{ fill: tickColor }}
+                        tick={{
+                          fill: tickColor,
+                          fontSize: 13,
+                          fontWeight: 600,
+                        }}
                         tickFormatter={(v) =>
                           formatCompactCurrency(v, currency)
                         }
@@ -585,13 +596,21 @@ export default function FinanceDashboard({
                       />
                       <XAxis
                         dataKey="date"
-                        tick={{ fontSize: 12, fill: tickColor }}
+                        tick={{
+                          fontSize: 13,
+                          fill: tickColor,
+                          fontWeight: 600,
+                        }}
                         tickMargin={10}
                         tickLine={false}
                         axisLine={{ stroke: gridStroke }}
                       />
                       <YAxis
-                        tick={{ fill: tickColor }}
+                        tick={{
+                          fill: tickColor,
+                          fontSize: 13,
+                          fontWeight: 600,
+                        }}
                         tickFormatter={(v) =>
                           formatCompactCurrency(v, currency)
                         }
