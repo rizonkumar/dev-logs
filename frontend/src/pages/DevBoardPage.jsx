@@ -28,6 +28,10 @@ const DevBoardPage = () => {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const searchRef = useRef(null);
+  const liveRef = useRef(null);
+  const announce = (message) => {
+    if (liveRef.current) liveRef.current.textContent = message;
+  };
 
   useEffect(() => {
     if (status === "idle") {
@@ -47,7 +51,12 @@ const DevBoardPage = () => {
     try {
       localStorage.setItem(
         "devboardState",
-        JSON.stringify({ q: searchQuery, from: dateFrom, to: dateTo, view: viewMode })
+        JSON.stringify({
+          q: searchQuery,
+          from: dateFrom,
+          to: dateTo,
+          view: viewMode,
+        })
       );
     } catch {}
   }, [searchQuery, dateFrom, dateTo, viewMode]);
@@ -56,7 +65,8 @@ const DevBoardPage = () => {
     // hydrate on mount
     try {
       const searchParams = new URLSearchParams(window.location.search);
-      const saved = JSON.parse(localStorage.getItem("devboardState") || "null") || {};
+      const saved =
+        JSON.parse(localStorage.getItem("devboardState") || "null") || {};
       setSearchQuery(searchParams.get("q") ?? saved.q ?? "");
       setDateFrom(searchParams.get("from") ?? saved.from ?? "");
       setDateTo(searchParams.get("to") ?? saved.to ?? "");
@@ -152,6 +162,10 @@ const DevBoardPage = () => {
     }, initialColumns);
   }, [filteredTodos]);
 
+  const handleDragStart = () => {
+    announce("Drag started");
+  };
+
   const handleDragEnd = (result) => {
     const { destination, source, draggableId } = result;
     if (
@@ -169,6 +183,7 @@ const DevBoardPage = () => {
         },
       })
     );
+    announce(`Moved to ${destination.droppableId}`);
   };
 
   const handleSaveTodo = (data) => {
@@ -181,8 +196,10 @@ const DevBoardPage = () => {
       dispatch(
         updateTodo({ todoId: selectedTodo._id, updateData: newTodoData })
       );
+      toast.success("Task updated");
     } else {
       dispatch(createTodo(newTodoData));
+      toast.success("Task added");
     }
     setModal(null);
     setSelectedTodo(null);
@@ -200,11 +217,13 @@ const DevBoardPage = () => {
             <span>Task deleted</span>
             <button
               onClick={() => {
-                dispatch(createTodo({
-                  task: removed.task,
-                  status: removed.status,
-                  isCompleted: removed.isCompleted,
-                }));
+                dispatch(
+                  createTodo({
+                    task: removed.task,
+                    status: removed.status,
+                    isCompleted: removed.isCompleted,
+                  })
+                );
                 toast.dismiss(id);
               }}
               className="px-2 py-0.5 text-sm rounded bg-stone-200 dark:bg-stone-800"
@@ -222,12 +241,14 @@ const DevBoardPage = () => {
     e.stopPropagation();
     setSelectedTodo(todo);
     setModal("edit");
+    announce("Edit task dialog opened");
   };
 
   const openDeleteModal = (e, todo) => {
     e.stopPropagation();
     setSelectedTodo(todo);
     setModal("delete");
+    announce("Delete task confirmation opened");
   };
 
   if (status === "loading") {
@@ -275,7 +296,10 @@ const DevBoardPage = () => {
           <EmptyState onAddTaskClick={() => setModal("add")} />
         )
       ) : (
-        <DragDropContext onDragEnd={handleDragEnd}>
+        <DragDropContext
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto">
             {Object.entries(columns).map(([columnId, tasks]) => (
               <KanbanColumn
@@ -285,11 +309,12 @@ const DevBoardPage = () => {
                 theme={COLUMN_THEME[columnId]}
                 openEditModal={openEditModal}
                 openDeleteModal={openDeleteModal}
-                onQuickAdd={(task) =>
+                onQuickAdd={(task) => {
                   dispatch(
                     createTodo({ task, status: "TODO", isCompleted: false })
-                  )
-                }
+                  );
+                  toast.success("Task added");
+                }}
               />
             ))}
           </div>
@@ -312,6 +337,7 @@ const DevBoardPage = () => {
           onConfirm={handleDeleteConfirm}
         />
       )}
+      <div aria-live="polite" className="sr-only" ref={liveRef} />
     </div>
   );
 };

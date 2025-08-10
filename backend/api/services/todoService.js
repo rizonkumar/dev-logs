@@ -1,7 +1,7 @@
 const Todo = require("../models/todoModel");
 
 const getAllTodos = async (userId, queryParams = {}) => {
-  const { q, status, from, to, includeCompleted } = queryParams;
+  const { q, status, from, to, includeCompleted, tags, tag } = queryParams;
   const filter = { user: userId };
 
   if (q && typeof q === "string" && q.trim().length > 0) {
@@ -42,15 +42,48 @@ const getAllTodos = async (userId, queryParams = {}) => {
     filter.isCompleted = { $ne: true };
   }
 
+  // Filter by tags (matches any of the provided tags)
+  // Supports: tags=Work,DevDeck or tags[]=Work&tags[]=DevDeck, and tag=Work
+  const tagsToFilter = [];
+  if (Array.isArray(tags)) {
+    tags.forEach((t) => {
+      if (typeof t === "string") {
+        const cleaned = t.trim();
+        if (cleaned.length > 0) tagsToFilter.push(cleaned);
+      }
+    });
+  } else if (typeof tags === "string") {
+    tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .forEach((t) => tagsToFilter.push(t));
+  }
+
+  if (typeof tag === "string" && tag.trim().length > 0) {
+    tagsToFilter.push(tag.trim());
+  }
+
+  if (tagsToFilter.length > 0) {
+    filter.tags = { $in: [...new Set(tagsToFilter)] };
+  }
+
   return await Todo.find(filter).sort({ createdAt: -1 });
 };
 
 const createNewTodo = async (userId, todoData) => {
-  const { task, status, tags = [], isCompleted } = todoData;
-  const cleanedTags = tags
+  const { task, status, isCompleted } = todoData;
+  let tagsInput = todoData.tags ?? [];
+  if (typeof tagsInput === "string") {
+    tagsInput = tagsInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+  const cleanedTags = Array.isArray(tagsInput)
     ? [
         ...new Set(
-          tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)
+          tagsInput.map((tag) => tag.trim()).filter((tag) => tag.length > 0)
         ),
       ]
     : [];
@@ -65,12 +98,23 @@ const createNewTodo = async (userId, todoData) => {
 };
 
 const updateTodoById = async (userId, todoId, updateData) => {
-  if (updateData.tags) {
-    updateData.tags = [
-      ...new Set(
-        updateData.tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)
-      ),
-    ];
+  if (Object.prototype.hasOwnProperty.call(updateData, "tags")) {
+    let tagsInput = updateData.tags;
+    if (typeof tagsInput === "string") {
+      tagsInput = tagsInput
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+    }
+    if (Array.isArray(tagsInput)) {
+      updateData.tags = [
+        ...new Set(
+          tagsInput.map((tag) => tag.trim()).filter((tag) => tag.length > 0)
+        ),
+      ];
+    } else {
+      updateData.tags = [];
+    }
   }
 
   const todo = await Todo.findOne({ _id: todoId, user: userId });

@@ -84,19 +84,39 @@ const KanbanColumn = ({
                               }
                             )}
                           </p>
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => openEditModal(e, todo)}
-                              className="p-1 text-gray-500 dark:text-stone-300 hover:text-blue-600 rounded hover:bg-blue-100 dark:hover:bg-blue-950/30 cursor-pointer"
-                            >
-                              <Edit2 size={14} />
-                            </button>
-                            <button
-                              onClick={(e) => openDeleteModal(e, todo)}
-                              className="p-1 text-gray-500 dark:text-stone-300 hover:text-red-600 rounded hover:bg-red-100 dark:hover:bg-red-950/30 cursor-pointer"
-                            >
-                              <Trash2 size={14} />
-                            </button>
+                          <div className="flex items-center gap-2">
+                            {Array.isArray(todo.tags) &&
+                              todo.tags.length > 0 && (
+                                <div className="hidden md:flex flex-wrap gap-1 mr-1">
+                                  {todo.tags.slice(0, 3).map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] text-stone-600 dark:text-stone-300"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                  {todo.tags.length > 3 && (
+                                    <span className="px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] text-stone-600 dark:text-stone-300">
+                                      +{todo.tags.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={(e) => openEditModal(e, todo)}
+                                className="p-1 text-gray-500 dark:text-stone-300 hover:text-blue-600 rounded hover:bg-blue-100 dark:hover:bg-blue-950/30 cursor-pointer"
+                              >
+                                <Edit2 size={14} />
+                              </button>
+                              <button
+                                onClick={(e) => openDeleteModal(e, todo)}
+                                className="p-1 text-gray-500 dark:text-stone-300 hover:text-red-600 rounded hover:bg-red-100 dark:hover:bg-red-950/30 cursor-pointer"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
