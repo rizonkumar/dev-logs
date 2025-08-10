@@ -16,8 +16,6 @@ import CategoriesManager from "../components/finance/page/CategoriesManager";
 import FinanceTab from "../components/finance/page/FinanceTab";
 import { CircleDollarSign, TrendingUp, Wallet } from "lucide-react";
 
-// inline UI helpers and large sections extracted to dedicated components
-
 export default function FinancePage() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
