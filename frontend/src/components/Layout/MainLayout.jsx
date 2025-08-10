@@ -40,7 +40,7 @@ const MainLayout = ({ children }) => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
 
-  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isTimerOpen, setIsTimerOpen] = useState(false);
