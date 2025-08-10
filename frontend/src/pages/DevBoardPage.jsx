@@ -1,214 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { DragDropContext } from "@hello-pangea/dnd";
 import {
   fetchTodos,
   updateTodo,
   deleteTodo,
   createTodo,
 } from "../app/features/todosSlice";
-import {
-  Circle,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  GripVertical,
-  Plus,
-  Edit2,
-  Trash2,
-  X,
-  ListTodo,
-  ClipboardList,
-  Search,
-  CalendarRange,
-  RotateCcw,
-} from "lucide-react";
-
-const COLUMN_THEME = {
-  TODO: {
-    title: "To Do",
-    icon: Circle,
-    color: "blue",
-    headerClasses:
-      "border-blue-500 text-blue-700 dark:text-blue-300 dark:border-blue-400/60",
-    iconClasses: "text-blue-500 dark:text-blue-400",
-    badgeClasses:
-      "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300",
-  },
-  IN_PROGRESS: {
-    title: "In Progress",
-    icon: Clock,
-    color: "yellow",
-    headerClasses:
-      "border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-400/60",
-    iconClasses: "text-yellow-500 dark:text-yellow-400",
-    badgeClasses:
-      "bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-300",
-  },
-  IN_REVIEW: {
-    title: "In Review",
-    icon: AlertCircle,
-    color: "purple",
-    headerClasses:
-      "border-purple-500 text-purple-700 dark:text-purple-300 dark:border-purple-400/60",
-    iconClasses: "text-purple-500 dark:text-purple-400",
-    badgeClasses:
-      "bg-purple-100 text-purple-800 dark:bg-purple-950/40 dark:text-purple-300",
-  },
-  DONE: {
-    title: "Done",
-    icon: CheckCircle,
-    color: "green",
-    headerClasses:
-      "border-green-500 text-green-700 dark:text-green-300 dark:border-green-400/60",
-    iconClasses: "text-green-500 dark:text-green-400",
-    badgeClasses:
-      "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300",
-  },
-};
-
-const Modal = ({ children, onClose }) => (
-  <div className="fixed inset-0 bg-gray-900/10 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-xl w-full max-w-md relative p-6">
-      <button
-        onClick={onClose}
-        className="absolute top-3 right-3 p-1.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-full text-gray-600 dark:text-stone-300 hover:text-gray-800 dark:hover:text-white transition-colors"
-      >
-        <X size={18} />
-      </button>
-      {children}
-    </div>
-  </div>
-);
-
-const AddEditModal = ({ todo, onClose, onSave }) => {
-  const [task, setTask] = useState(todo ? todo.task : "");
-  const [status, setStatus] = useState(todo ? todo.status : "TODO");
-  const isEditing = !!todo;
-
-  const handleSave = () => {
-    if (!task.trim()) return;
-    onSave({ task, status });
-  };
-
-  return (
-    <Modal onClose={onClose}>
-      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {isEditing ? "Edit Task" : "Add New Task"}
-      </h3>
-      <div className="space-y-4">
-        <textarea
-          value={task}
-          onChange={(e) => setTask(e.target.value)}
-          placeholder="Enter task description..."
-          className="w-full bg-stone-50 dark:bg-stone-900 p-3 rounded-lg border border-stone-300 dark:border-stone-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-gray-800 dark:text-stone-100 placeholder-gray-400 dark:placeholder-stone-400"
-          rows={3}
-          autoFocus
-        />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="w-full bg-stone-50 dark:bg-stone-900 p-3 rounded-lg border border-stone-300 dark:border-stone-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-gray-800 dark:text-stone-100 appearance-none"
-        >
-          {Object.keys(COLUMN_THEME).map((statusKey) => (
-            <option key={statusKey} value={statusKey}>
-              {COLUMN_THEME[statusKey].title}
-            </option>
-          ))}
-        </select>
-        <div className="flex justify-end gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="px-5 py-2 text-gray-800 dark:text-stone-900 bg-white dark:bg-stone-200 hover:bg-stone-100 dark:hover:bg-stone-100 border border-stone-300 dark:border-stone-300 rounded-lg font-semibold transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-5 py-2 bg-gray-800 hover:bg-black text-white rounded-lg font-semibold transition-colors cursor-pointer dark:bg-stone-900 dark:hover:bg-black"
-          >
-            {isEditing ? "Save Changes" : "Add Task"}
-          </button>
-        </div>
-      </div>
-    </Modal>
-  );
-};
-
-const DeleteModal = ({ onClose, onConfirm }) => (
-  <Modal onClose={onClose}>
-    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-      Delete Task
-    </h3>
-    <p className="text-gray-500 dark:text-stone-300 mb-6">
-      Are you sure? This action cannot be undone.
-    </p>
-    <div className="flex justify-end gap-3">
-      <button
-        onClick={onClose}
-        className="px-5 py-2 text-gray-800 dark:text-stone-900 bg-white dark:bg-stone-200 hover:bg-stone-100 dark:hover:bg-stone-100 border border-stone-300 dark:border-stone-300 rounded-lg font-semibold transition-colors cursor-pointer"
-      >
-        Cancel
-      </button>
-      <button
-        onClick={onConfirm}
-        className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors cursor-pointer"
-      >
-        Delete
-      </button>
-    </div>
-  </Modal>
-);
-
-const EmptyState = ({ onAddTaskClick }) => (
-  <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl p-10 max-w-lg shadow-sm">
-      <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center rounded-2xl mb-6 border border-blue-200 dark:border-blue-900/40">
-        <ClipboardList size={32} />
-      </div>
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-        Your Board is Clear!
-      </h2>
-      <p className="text-gray-500 dark:text-stone-300 mb-6">
-        Get started by adding your first task. Let's make today productive.
-      </p>
-      <button
-        onClick={onAddTaskClick}
-        className="flex items-center mx-auto gap-2 bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white text-white dark:text-stone-900 px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-sm"
-      >
-        <Plus size={18} /> Add Your First Task
-      </button>
-    </div>
-  </div>
-);
-
-const TaskCard = ({ todo, provided }) => (
-  <div
-    ref={provided.innerRef}
-    {...provided.draggableProps}
-    className="group p-3 rounded-lg bg-white border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 transition-all"
-  >
-    <div className="flex items-start gap-2">
-      <div
-        {...provided.dragHandleProps}
-        className="p-1 mt-0.5 text-stone-400 hover:text-stone-600 cursor-grab active:cursor-grabbing"
-      >
-        <GripVertical size={16} />
-      </div>
-      <div className="flex-1">
-        <p className="text-gray-800 font-medium text-sm">{todo.task}</p>
-        <div className="flex items-center justify-between mt-3">
-          <p className="text-xs text-stone-500">
-            {new Date(todo.createdAt).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+import { Search } from "lucide-react";
+import BoardHeader from "../components/devboard/BoardHeader";
+import AddEditModal from "../components/devboard/AddEditModal";
+import DeleteModal from "../components/devboard/DeleteModal";
+import EmptyState from "../components/devboard/EmptyState";
+import KanbanColumn from "../components/devboard/KanbanColumn";
+import { COLUMN_THEME } from "../components/devboard/columnTheme";
 
 const DevBoardPage = () => {
   const dispatch = useDispatch();
@@ -351,107 +156,18 @@ const DevBoardPage = () => {
 
   return (
     <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50 dark:bg-stone-950">
-      {/* Header: two rows on wide screens, stacked on small */}
-      <header className="mb-4">
-        {/* Row 1: title + primary controls */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <ListTodo size={28} /> Dev Board
-            </h1>
-            <p className="text-gray-500 dark:text-stone-300">
-              Drag & drop to organize your tasks.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center bg-stone-200 dark:bg-stone-800 rounded-lg p-1 border border-transparent dark:border-stone-700">
-              <button
-                onClick={() => setViewMode("today")}
-                aria-pressed={viewMode === "today"}
-                className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
-                  viewMode === "today"
-                    ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
-                    : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
-                }`}
-              >
-                Today
-              </button>
-              <button
-                onClick={() => setViewMode("all")}
-                aria-pressed={viewMode === "all"}
-                className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors cursor-pointer ${
-                  viewMode === "all"
-                    ? "bg-white text-gray-800 shadow-sm ring-1 ring-stone-300 dark:bg-stone-700 dark:text-white dark:ring-stone-500"
-                    : "text-gray-600 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/40 hover:text-gray-800 dark:hover:text-white"
-                }`}
-              >
-                All Tasks
-              </button>
-            </div>
-            <button
-              onClick={() => setModal("add")}
-              className="flex items-center gap-2 bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white text-white dark:text-stone-900 px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer"
-            >
-              <Plus size={18} /> Add Task
-            </button>
-            {/* Mobile-only Reset placed next to Add Task */}
-            <button
-              onClick={clearFilters}
-              className="sm:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-sm font-semibold cursor-pointer"
-              title="Clear filters"
-            >
-              <RotateCcw size={14} /> Reset
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="relative w-full sm:max-w-md md:max-w-lg">
-            <Search
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500"
-            />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search tasks..."
-              aria-label="Search tasks"
-              className="w-full pl-9 pr-3 py-2 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm text-gray-800 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
-            <div className="flex items-center gap-1">
-              <CalendarRange
-                size={16}
-                className="text-stone-400 dark:text-stone-500"
-              />
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                aria-label="From date"
-                className="px-2 py-1.5 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm text-gray-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-stone-400">–</span>
-              <input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                aria-label="To date"
-                className="px-2 py-1.5 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm text-gray-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              onClick={clearFilters}
-              className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-sm font-semibold cursor-pointer"
-              title="Clear filters"
-            >
-              <RotateCcw size={14} /> Reset
-            </button>
-          </div>
-        </div>
-      </header>
+      <BoardHeader
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        dateFrom={dateFrom}
+        setDateFrom={setDateFrom}
+        dateTo={dateTo}
+        setDateTo={setDateTo}
+        clearFilters={clearFilters}
+        onAddTask={() => setModal("add")}
+      />
 
       {filteredTodos.length === 0 && status === "succeeded" ? (
         debouncedSearch || dateFrom || dateTo ? (
@@ -476,104 +192,16 @@ const DevBoardPage = () => {
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto">
-            {Object.entries(columns).map(([columnId, tasks]) => {
-              const theme = COLUMN_THEME[columnId];
-              const Icon = theme.icon;
-              return (
-                <div
-                  key={columnId}
-                  className="flex flex-col bg-stone-100 dark:bg-stone-900 rounded-xl min-w-[280px] border border-transparent dark:border-stone-700"
-                >
-                  <div
-                    className={`flex items-center gap-3 p-4 border-t-4 ${theme.headerClasses}`}
-                  >
-                    <Icon className={`w-5 h-5 ${theme.iconClasses}`} />
-                    <h2 className="text-lg font-bold dark:text-white">
-                      {theme.title}
-                    </h2>
-                    <span
-                      className={`ml-auto text-sm font-bold ${theme.badgeClasses} px-2.5 py-0.5 rounded-full`}
-                    >
-                      {tasks.length}
-                    </span>
-                  </div>
-                  <Droppable droppableId={columnId}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={`flex-1 p-3 space-y-3 transition-colors rounded-b-xl ${
-                          snapshot.isDraggingOver
-                            ? "bg-stone-200/70 dark:bg-stone-800/60"
-                            : ""
-                        }`}
-                      >
-                        {tasks.map((todo, index) => (
-                          <Draggable
-                            key={todo._id}
-                            draggableId={todo._id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className="group relative p-3 rounded-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-sm hover:shadow-md hover:border-stone-300 dark:hover:border-stone-600 transition-all cursor-pointer"
-                                onClick={(e) => openEditModal(e, todo)}
-                              >
-                                <div className="flex items-start gap-2">
-                                  <div
-                                    {...provided.dragHandleProps}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="p-1 mt-0.5 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 cursor-grab active:cursor-grabbing"
-                                  >
-                                    <GripVertical size={16} />
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className="text-gray-800 dark:text-stone-100 font-medium text-sm">
-                                      {todo.task}
-                                    </p>
-                                    <div className="flex items-center justify-between mt-3">
-                                      <p className="text-xs text-stone-500 dark:text-stone-400">
-                                        {new Date(
-                                          todo.createdAt
-                                        ).toLocaleDateString("en-US", {
-                                          month: "short",
-                                          day: "numeric",
-                                        })}
-                                      </p>
-                                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                          onClick={(e) =>
-                                            openEditModal(e, todo)
-                                          }
-                                          className="p-1 text-gray-500 dark:text-stone-300 hover:text-blue-600 rounded hover:bg-blue-100 dark:hover:bg-blue-950/30 cursor-pointer"
-                                        >
-                                          <Edit2 size={14} />
-                                        </button>
-                                        <button
-                                          onClick={(e) =>
-                                            openDeleteModal(e, todo)
-                                          }
-                                          className="p-1 text-gray-500 dark:text-stone-300 hover:text-red-600 rounded hover:bg-red-100 dark:hover:bg-red-950/30 cursor-pointer"
-                                        >
-                                          <Trash2 size={14} />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </div>
-              );
-            })}
+            {Object.entries(columns).map(([columnId, tasks]) => (
+              <KanbanColumn
+                key={columnId}
+                columnId={columnId}
+                tasks={tasks}
+                theme={COLUMN_THEME[columnId]}
+                openEditModal={openEditModal}
+                openDeleteModal={openDeleteModal}
+              />
+            ))}
           </div>
         </DragDropContext>
       )}

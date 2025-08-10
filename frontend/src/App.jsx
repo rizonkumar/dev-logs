@@ -13,7 +13,6 @@ import FinancePage from "./pages/FinancePage";
 import MainLayout from "./components/Layout/MainLayout";
 import PomodoroTimer from "./components/PomodoroTimer";
 import PrivateRoute from "./components/PrivateRoute";
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import "./App.css";
 
 function App() {
