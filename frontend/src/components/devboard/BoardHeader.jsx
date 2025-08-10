@@ -1,5 +1,6 @@
 import React from "react";
 import { ListTodo, Search, CalendarRange, RotateCcw, Plus } from "lucide-react";
+import TagInput from "../TagInput";
 
 const BoardHeader = ({
   viewMode,
@@ -12,6 +13,9 @@ const BoardHeader = ({
   setDateTo,
   clearFilters,
   onAddTask,
+  searchInputRef,
+  selectedTags = [],
+  setSelectedTags = () => {},
 }) => {
   return (
     <header className="mb-4">
@@ -77,10 +81,18 @@ const BoardHeader = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search tasks..."
             aria-label="Search tasks"
+            ref={searchInputRef}
             className="w-full pl-9 pr-3 py-2 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm text-gray-800 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
+          <div className="w-full sm:w-auto">
+            <TagInput
+              compact
+              selectedTags={selectedTags}
+              onTagsChange={setSelectedTags}
+            />
+          </div>
           <div className="flex items-center gap-1">
             <CalendarRange
               size={16}

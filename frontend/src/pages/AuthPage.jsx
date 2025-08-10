@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
+import Logo from "../components/Logo";
 import {
   BookOpen,
   CheckSquare,
@@ -23,8 +24,6 @@ import {
   UserButton,
 } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
-
-// removed old email/password inputs
 
 const FeatureCard = ({ icon, title, description, delay }) => (
   <Motion.div
@@ -199,9 +198,7 @@ const AuthPage = () => {
         <div className="hidden lg:flex flex-col justify-between p-12 bg-stone-100/70 dark:bg-stone-800/40 relative">
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-12">
-              <div className="w-12 h-12 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-xl">
-                D
-              </div>
+              <Logo size={42} withText={false} />
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Dev Dashboard
               </h1>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { DragDropContext } from "@hello-pangea/dnd";
 import {
@@ -8,6 +8,8 @@ import {
   createTodo,
 } from "../app/features/todosSlice";
 import { Search } from "lucide-react";
+import { toast } from "react-toastify";
+import KanbanSkeleton from "../components/devboard/KanbanSkeleton";
 import BoardHeader from "../components/devboard/BoardHeader";
 import AddEditModal from "../components/devboard/AddEditModal";
 import DeleteModal from "../components/devboard/DeleteModal";
@@ -25,12 +27,68 @@ const DevBoardPage = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [tagsFilter, setTagsFilter] = useState([]);
+  const searchRef = useRef(null);
+  const liveRef = useRef(null);
+  const announce = (message) => {
+    if (liveRef.current) liveRef.current.textContent = message;
+  };
 
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchTodos());
     }
   }, [status, dispatch]);
+
+  // persist view and filters to URL + localStorage
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set("q", searchQuery);
+    if (dateFrom) params.set("from", dateFrom);
+    if (dateTo) params.set("to", dateTo);
+    if (viewMode) params.set("view", viewMode);
+    if (tagsFilter && tagsFilter.length > 0)
+      params.set("tags", tagsFilter.join(","));
+    const url = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", url);
+    try {
+      localStorage.setItem(
+        "devboardState",
+        JSON.stringify({
+          q: searchQuery,
+          from: dateFrom,
+          to: dateTo,
+          view: viewMode,
+          tags: tagsFilter,
+        })
+      );
+    } catch {}
+  }, [searchQuery, dateFrom, dateTo, viewMode, tagsFilter]);
+
+  useEffect(() => {
+    // hydrate on mount
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const saved =
+        JSON.parse(localStorage.getItem("devboardState") || "null") || {};
+      setSearchQuery(searchParams.get("q") ?? saved.q ?? "");
+      setDateFrom(searchParams.get("from") ?? saved.from ?? "");
+      setDateTo(searchParams.get("to") ?? saved.to ?? "");
+      setViewMode(searchParams.get("view") ?? saved.view ?? "today");
+      const tagsFromQuery = searchParams.get("tags");
+      if (tagsFromQuery) {
+        setTagsFilter(
+          tagsFromQuery
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        );
+      } else if (Array.isArray(saved.tags)) {
+        setTagsFilter(saved.tags.filter((t) => typeof t === "string"));
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -44,23 +102,54 @@ const DevBoardPage = () => {
     if (debouncedSearch) params.q = debouncedSearch;
     if (dateFrom) params.from = dateFrom;
     if (dateTo) params.to = dateTo;
+    if (tagsFilter && tagsFilter.length > 0) params.tags = tagsFilter.join(",");
     if (Object.keys(params).length > 0) {
       dispatch(fetchTodos(params));
     } else {
       // When all filters are cleared, refetch the full list so UI restores Today view properly
       dispatch(fetchTodos());
     }
-  }, [debouncedSearch, dateFrom, dateTo, dispatch]);
+  }, [debouncedSearch, dateFrom, dateTo, tagsFilter, dispatch]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setDateFrom("");
     setDateTo("");
+    setTagsFilter([]);
     dispatch(fetchTodos());
   };
 
+  // keyboard shortcuts
+  useEffect(() => {
+    const onKey = (e) => {
+      if (
+        e.target &&
+        ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)
+      )
+        return;
+      if (e.key === "/") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      } else if (e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        setModal("add");
+      } else if (e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        clearFilters();
+      } else if (e.key === "1") {
+        setViewMode("today");
+      } else if (e.key === "2") {
+        setViewMode("all");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [clearFilters]);
+
   const filteredTodos = useMemo(() => {
-    const hasServerFilters = Boolean(debouncedSearch || dateFrom || dateTo);
+    const hasServerFilters = Boolean(
+      debouncedSearch || dateFrom || dateTo || (tagsFilter && tagsFilter.length)
+    );
     if (viewMode === "all" || hasServerFilters) return todos;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -75,7 +164,7 @@ const DevBoardPage = () => {
       const isActive = todo.status !== "DONE";
       return isToday || isActive;
     });
-  }, [todos, viewMode, debouncedSearch, dateFrom, dateTo]);
+  }, [todos, viewMode, debouncedSearch, dateFrom, dateTo, tagsFilter]);
 
   const columns = useMemo(() => {
     const initialColumns = {
@@ -91,6 +180,10 @@ const DevBoardPage = () => {
       return acc;
     }, initialColumns);
   }, [filteredTodos]);
+
+  const handleDragStart = () => {
+    announce("Drag started");
+  };
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -109,6 +202,7 @@ const DevBoardPage = () => {
         },
       })
     );
+    announce(`Moved to ${destination.droppableId}`);
   };
 
   const handleSaveTodo = (data) => {
@@ -116,40 +210,72 @@ const DevBoardPage = () => {
       task: data.task,
       status: data.status,
       isCompleted: data.status === "DONE",
+      tags: Array.isArray(data.tags) ? data.tags : [],
     };
     if (modal === "edit" && selectedTodo) {
       dispatch(
         updateTodo({ todoId: selectedTodo._id, updateData: newTodoData })
       );
+      toast.success("Task updated");
     } else {
       dispatch(createTodo(newTodoData));
+      toast.success("Task added");
     }
     setModal(null);
     setSelectedTodo(null);
   };
 
   const handleDeleteConfirm = () => {
-    if (selectedTodo) dispatch(deleteTodo(selectedTodo._id));
-    setModal(null);
-    setSelectedTodo(null);
+    if (selectedTodo) {
+      const removed = selectedTodo;
+      dispatch(deleteTodo(selectedTodo._id));
+      setModal(null);
+      setSelectedTodo(null);
+      const id = toast(
+        () => (
+          <div className="flex items-center gap-3">
+            <span>Task deleted</span>
+            <button
+              onClick={() => {
+                dispatch(
+                  createTodo({
+                    task: removed.task,
+                    status: removed.status,
+                    isCompleted: removed.isCompleted,
+                    tags: Array.isArray(removed.tags) ? removed.tags : [],
+                  })
+                );
+                toast.dismiss(id);
+              }}
+              className="px-2 py-0.5 text-sm rounded bg-stone-200 dark:bg-stone-800"
+            >
+              Undo
+            </button>
+          </div>
+        ),
+        { autoClose: 5000 }
+      );
+    }
   };
 
   const openEditModal = (e, todo) => {
     e.stopPropagation();
     setSelectedTodo(todo);
     setModal("edit");
+    announce("Edit task dialog opened");
   };
 
   const openDeleteModal = (e, todo) => {
     e.stopPropagation();
     setSelectedTodo(todo);
     setModal("delete");
+    announce("Delete task confirmation opened");
   };
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center h-full p-6">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
+      <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50 dark:bg-stone-950">
+        <KanbanSkeleton />
       </div>
     );
   }
@@ -167,6 +293,9 @@ const DevBoardPage = () => {
         setDateTo={setDateTo}
         clearFilters={clearFilters}
         onAddTask={() => setModal("add")}
+        searchInputRef={searchRef}
+        selectedTags={tagsFilter}
+        setSelectedTags={setTagsFilter}
       />
 
       {filteredTodos.length === 0 && status === "succeeded" ? (
@@ -190,8 +319,21 @@ const DevBoardPage = () => {
           <EmptyState onAddTaskClick={() => setModal("add")} />
         )
       ) : (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto">
+        <DragDropContext
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div
+            className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto"
+            onDragOver={(e) => {
+              const edge = 80;
+              const x = e.clientX;
+              const w = window.innerWidth;
+              if (x < edge) window.scrollBy({ left: -20, behavior: "smooth" });
+              else if (w - x < edge)
+                window.scrollBy({ left: 20, behavior: "smooth" });
+            }}
+          >
             {Object.entries(columns).map(([columnId, tasks]) => (
               <KanbanColumn
                 key={columnId}
@@ -200,6 +342,12 @@ const DevBoardPage = () => {
                 theme={COLUMN_THEME[columnId]}
                 openEditModal={openEditModal}
                 openDeleteModal={openDeleteModal}
+                onQuickAdd={(task) => {
+                  dispatch(
+                    createTodo({ task, status: "TODO", isCompleted: false })
+                  );
+                  toast.success("Task added");
+                }}
               />
             ))}
           </div>
@@ -222,6 +370,7 @@ const DevBoardPage = () => {
           onConfirm={handleDeleteConfirm}
         />
       )}
+      <div aria-live="polite" className="sr-only" ref={liveRef} />
     </div>
   );
 };

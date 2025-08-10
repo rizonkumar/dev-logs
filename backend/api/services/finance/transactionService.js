@@ -122,11 +122,12 @@ const getAllTransactions = async (userId, queryParams = {}) => {
     }
   }
 
+  const primaryDateField = field;
   const sortOption = (() => {
-    if (sort === "oldest") return { transactionDate: 1, createdAt: 1 };
-    if (sort === "amount_desc") return { amount: -1, transactionDate: -1 };
-    if (sort === "amount_asc") return { amount: 1, transactionDate: -1 };
-    return { transactionDate: -1, createdAt: -1 };
+    if (sort === "oldest") return { [primaryDateField]: 1, createdAt: 1 };
+    if (sort === "amount_desc") return { amount: -1, [primaryDateField]: -1 };
+    if (sort === "amount_asc") return { amount: 1, [primaryDateField]: -1 };
+    return { [primaryDateField]: -1, createdAt: -1 };
   })();
 
   const query = FinanceTransaction.find(filter)

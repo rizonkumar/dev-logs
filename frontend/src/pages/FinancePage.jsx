@@ -14,7 +14,13 @@ import BudgetsEditor from "../components/finance/page/BudgetsEditor";
 import GoalsSection from "../components/finance/page/GoalsSection";
 import CategoriesManager from "../components/finance/page/CategoriesManager";
 import FinanceTab from "../components/finance/page/FinanceTab";
-import { CircleDollarSign, TrendingUp, Wallet } from "lucide-react";
+import BillsSection from "../components/finance/page/BillsSection";
+import {
+  CircleDollarSign,
+  TrendingUp,
+  Wallet,
+  CalendarClock,
+} from "lucide-react";
 
 export default function FinancePage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -165,6 +171,41 @@ export default function FinancePage() {
     setProgress((p) => ({ ...p, [categoryId]: data }));
   };
 
+  const refreshAllProgress = async () => {
+    try {
+      const expenseCategoryIds = (categories || [])
+        .filter((c) => c.type === "EXPENSE")
+        .map((c) => c._id);
+
+      if (expenseCategoryIds.length === 0) {
+        setProgress({});
+        return;
+      }
+
+      const entries = await Promise.all(
+        expenseCategoryIds.map(async (id) => {
+          const data = await budgetService.getBudgetProgress({
+            categoryId: id,
+            month,
+            year,
+          });
+          return [id, data];
+        })
+      );
+
+      setProgress((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
+    } catch (e) {
+      console.error("Failed to refresh all budget progress", e);
+    }
+  };
+
+  // When the Budgets tab is opened, fetch progress for all expense categories
+  useEffect(() => {
+    if (!loading && activeTab === "budgets") {
+      refreshAllProgress();
+    }
+  }, [activeTab, loading, month, year, categories]);
+
   const filteredTx = useMemo(() => {
     return transactions.filter(
       (t) =>
@@ -211,6 +252,15 @@ export default function FinancePage() {
             Budgets
           </FinanceTab>
           <FinanceTab
+            id="bills"
+            active={activeTab === "bills"}
+            onClick={setActiveTab}
+            icon={CalendarClock}
+            variant="bills"
+          >
+            Bills
+          </FinanceTab>
+          <FinanceTab
             id="goals"
             active={activeTab === "goals"}
             onClick={setActiveTab}
@@ -241,6 +291,26 @@ export default function FinancePage() {
           goals={goals}
           recent={recent}
           currency={currency}
+          onRefresh={async () => {
+            await Promise.allSettled([
+              (async () => {
+                try {
+                  const ov = await getOverview();
+                  setOverview(ov);
+                  setRecent(ov.recentTransactions || []);
+                } catch (e) {
+                  console.error("Error refreshing overview", e);
+                }
+              })(),
+              (async () => {
+                try {
+                  setGoals(await goalsService.listGoals());
+                } catch (e) {
+                  console.error("Error refreshing goals", e);
+                }
+              })(),
+            ]);
+          }}
         />
       ) : null}
 
@@ -287,8 +357,15 @@ export default function FinancePage() {
             await refreshProgress(payload.category);
           }}
           onUpdateBudget={async (id, updates) => {
-            await budgetService.updateBudget(id, updates);
+            const updated = await budgetService.updateBudget(id, updates);
             setBudgets(await budgetService.listBudgets({ month, year }));
+            const categoryId = updated?.category?._id || updated?.category;
+            if (categoryId) await refreshProgress(categoryId);
+          }}
+          onDeleteBudget={async (id, categoryId) => {
+            await budgetService.deleteBudget(id);
+            setBudgets(await budgetService.listBudgets({ month, year }));
+            if (categoryId) await refreshProgress(categoryId);
           }}
           onRefreshProgress={(categoryId) => refreshProgress(categoryId)}
         />
@@ -301,6 +378,10 @@ export default function FinancePage() {
           onAddContribution={addGoalContribution}
           onCreated={refreshGoals}
         />
+      )}
+
+      {!loading && activeTab === "bills" && (
+        <BillsSection categories={categories} currency={currency} />
       )}
 
       {!loading && activeTab === "categories" && (

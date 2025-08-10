@@ -13,6 +13,7 @@ export default function BudgetsEditor({
   progressByCategory,
   onCreateBudget,
   onUpdateBudget,
+  onDeleteBudget,
   onRefreshProgress,
   onCreateCategory,
 }) {
@@ -31,9 +32,9 @@ export default function BudgetsEditor({
     <div className="grid gap-4">
       <Card>
         <SectionTitle>Create Monthly Budget</SectionTitle>
-        <div className="grid md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
           <select
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
           >
@@ -47,42 +48,35 @@ export default function BudgetsEditor({
           </select>
           {form.category === "OTHER" && (
             <input
-              className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+              className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
               placeholder="New expense category name"
               value={otherName}
               onChange={(e) => setOtherName(e.target.value)}
             />
           )}
           <input
-            type="number"
-            min="1"
-            max="12"
-            placeholder="Month"
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
-            value={form.month || month}
-            onChange={(e) => setForm({ ...form, month: e.target.value })}
+            type="month"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
+            value={`${String(form.year || year).padStart(4, "0")}-${String(
+              form.month || month
+            ).padStart(2, "0")}`}
+            onChange={(e) => {
+              const [y, m] = e.target.value.split("-");
+              setForm({ ...form, month: Number(m), year: Number(y) });
+            }}
           />
           <input
             type="number"
-            min="2000"
-            max="2100"
-            placeholder="Year"
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
-            value={form.year || year}
-            onChange={(e) => setForm({ ...form, year: e.target.value })}
+            min="0"
+            step="0.01"
+            placeholder="Amount"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 w-full"
+            value={form.amount}
+            onChange={(e) => setForm({ ...form, amount: e.target.value })}
           />
-          <div className="flex gap-3">
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Amount"
-              className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 flex-1"
-              value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: e.target.value })}
-            />
+          <div className="justify-self-end">
             <button
-              className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900"
+              className="px-4 py-2 rounded-lg bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer hover:bg-black dark:hover:bg-stone-200 shadow-sm"
               disabled={saving || !form.category || !form.amount}
               onClick={async () => {
                 try {
@@ -145,9 +139,23 @@ export default function BudgetsEditor({
                     }
                   }}
                 />
+                {currentBudget ? (
+                  <button
+                    onClick={async () => {
+                      const confirmDelete = window.confirm(
+                        `Delete budget for ${c.name}?`
+                      );
+                      if (!confirmDelete) return;
+                      await onDeleteBudget?.(currentBudget._id, c._id);
+                    }}
+                    className="text-xs px-3 py-1 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 cursor-pointer hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                  >
+                    Delete
+                  </button>
+                ) : null}
                 <button
                   onClick={() => onRefreshProgress?.(c._id)}
-                  className="text-xs px-3 py-1 rounded bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 cursor-pointer hover:bg-sky-200 dark:hover:bg-sky-800 transition-colors"
+                  className="text-xs px-3 py-1 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 cursor-pointer hover:bg-sky-200 dark:hover:bg-sky-800 transition-colors"
                 >
                   Refresh
                 </button>
@@ -179,18 +187,41 @@ export default function BudgetsEditor({
           <SectionTitle>Existing Budgets (This Month)</SectionTitle>
           <ul className="text-sm space-y-1">
             {budgets.map((b) => (
-              <li key={b._id} className="flex justify-between">
-                <span>
+              <li
+                key={b._id}
+                className="flex items-center justify-between gap-3"
+              >
+                <span className="truncate">
                   {typeof b.category === "object"
                     ? b.category?.name
                     : categories.find((c) => c._id === b.category)?.name || "—"}
                 </span>
-                <span>
-                  {new Intl.NumberFormat(undefined, {
-                    style: "currency",
-                    currency,
-                  }).format(b.amount)}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span>
+                    {new Intl.NumberFormat(undefined, {
+                      style: "currency",
+                      currency,
+                    }).format(b.amount)}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      const catId = b.category?._id || b.category;
+                      const confirmDelete = window.confirm(
+                        `Delete budget for ${
+                          typeof b.category === "object"
+                            ? b.category?.name
+                            : categories.find((c) => c._id === b.category)
+                                ?.name || "this category"
+                        }?`
+                      );
+                      if (!confirmDelete) return;
+                      await onDeleteBudget?.(b._id, catId);
+                    }}
+                    className="text-xs px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 cursor-pointer hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

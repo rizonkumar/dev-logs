@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
 import { COLUMN_THEME } from "./columnTheme";
+import TagInput from "../TagInput";
 
 const AddEditModal = ({ todo, onClose, onSave }) => {
   const [task, setTask] = useState(todo ? todo.task : "");
   const [status, setStatus] = useState(todo ? todo.status : "TODO");
+  const [tags, setTags] = useState(Array.isArray(todo?.tags) ? todo.tags : []);
   const isEditing = !!todo;
 
   const handleSave = () => {
     if (!task.trim()) return;
-    onSave({ task, status });
+    onSave({ task, status, tags });
   };
 
   return (
@@ -37,6 +39,7 @@ const AddEditModal = ({ todo, onClose, onSave }) => {
             </option>
           ))}
         </select>
+        <TagInput selectedTags={tags} onTagsChange={setTags} />
         <div className="flex justify-end gap-3 pt-2">
           <button
             onClick={onClose}
