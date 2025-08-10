@@ -6,7 +6,6 @@ import catService from "../services/finance/categoriesService";
 import budgetService from "../services/finance/budgetsService";
 import goalsService from "../services/finance/goalsService";
 import projectsService from "../services/finance/projectsService";
-import calculatorsService from "../services/finance/calculatorsService";
 import TransactionForm from "../components/finance/TransactionForm";
 import GoalForm from "../components/finance/GoalForm";
 import StatCard from "../components/finance/StatCard";
@@ -226,13 +225,11 @@ export default function FinancePage() {
   const [goals, setGoals] = useState([]);
 
   const [projects, setProjects] = useState([]);
-  const [profit, setProfit] = useState({});
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(
     () => JSON.parse(localStorage.getItem("userInfo"))?.financeCurrency || "USD"
   );
 
-  // Simple create-form states
   const [categoryForm, setCategoryForm] = useState({
     name: "",
     type: "EXPENSE",
@@ -318,7 +315,7 @@ export default function FinancePage() {
       setOverview(ov);
       setRecent(ov.recentTransactions || []);
     } catch {
-      // noop
+      console.error("Failed to refresh overview");
     }
   };
 
@@ -391,8 +388,6 @@ export default function FinancePage() {
           : true)
     );
   }, [transactions, filters]);
-
-  // Theme is globally controlled in layout; no local toggle here
 
   return (
     <div className="p-4 sm:p-6">
@@ -792,92 +787,6 @@ export default function FinancePage() {
         </div>
       )}
 
-      {/* Projects section removed */}
-      {activeTab === "__removed_projects__" && (
-        <div className="grid gap-4">
-          <Card>
-            <div className="grid md:grid-cols-3 gap-3">
-              <input
-                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
-                placeholder="Project name"
-                value={projectForm.name}
-                onChange={(e) =>
-                  setProjectForm({ ...projectForm, name: e.target.value })
-                }
-              />
-              <input
-                className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
-                placeholder="Client (optional)"
-                value={projectForm.client}
-                onChange={(e) =>
-                  setProjectForm({ ...projectForm, client: e.target.value })
-                }
-              />
-              <div className="flex items-center justify-end">
-                <button
-                  className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900"
-                  disabled={savingProject || !projectForm.name}
-                  onClick={async () => {
-                    try {
-                      setSavingProject(true);
-                      await projectsService.createProject({
-                        name: projectForm.name,
-                        client: projectForm.client || undefined,
-                      });
-                      setProjectForm({ name: "", client: "" });
-                      await refreshProjects();
-                    } finally {
-                      setSavingProject(false);
-                    }
-                  }}
-                >
-                  {savingProject ? "Saving..." : "Create"}
-                </button>
-              </div>
-            </div>
-          </Card>
-          {projects.map((p) => (
-            <Card key={p._id}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{p.name}</p>
-                  <p className="text-xs text-stone-500">{p.client || "—"}</p>
-                </div>
-                <button
-                  className="text-xs px-3 py-1 rounded bg-stone-200 dark:bg-stone-800"
-                  onClick={async () =>
-                    setProfit({
-                      ...profit,
-                      [p._id]: await projectsService.getProfitability(p._id),
-                    })
-                  }
-                >
-                  View Profitability
-                </button>
-              </div>
-              {profit[p._id] && (
-                <div className="mt-3 text-sm">
-                  <div>
-                    Income:{" "}
-                    {formatCurrencyWith(profit[p._id].totalIncome, currency)}
-                  </div>
-                  <div>
-                    Expense:{" "}
-                    {formatCurrencyWith(profit[p._id].totalExpense, currency)}
-                  </div>
-                  <div className="font-semibold">
-                    Profit: {formatCurrencyWith(profit[p._id].profit, currency)}
-                  </div>
-                </div>
-              )}
-            </Card>
-          ))}
-          {projects.length === 0 && (
-            <p className="text-sm text-stone-500">No projects</p>
-          )}
-        </div>
-      )}
-
       {!loading && activeTab === "categories" && (
         <div className="grid gap-4">
           <Card>
@@ -1007,64 +916,6 @@ export default function FinancePage() {
                 );
               })()}
             </div>
-          </Card>
-        </div>
-      )}
-
-      {/* Calculators section removed */}
-      {activeTab === "__removed_calculators__" && (
-        <div className="grid gap-4 max-w-3xl">
-          <Card>
-            <SectionTitle>Contract vs Full-Time</SectionTitle>
-            <button
-              className="px-3 py-2 rounded bg-stone-200 dark:bg-stone-800 text-sm"
-              onClick={async () => {
-                const res = await calculatorsService.contractVsFullTime({
-                  contract: {
-                    dayRate: 600,
-                    daysPerWeek: 5,
-                    weeks: 46,
-                    taxRate: 0.35,
-                  },
-                  fullTime: {
-                    salary: 150000,
-                    bonus: 10000,
-                    stockValue: 15000,
-                    taxRate: 0.32,
-                  },
-                });
-                alert(
-                  `Net diff: ${formatCurrencyWith(res.differenceNet, currency)}`
-                );
-              }}
-            >
-              Run Example
-            </button>
-          </Card>
-
-          <Card>
-            <SectionTitle>FIRE Calculator</SectionTitle>
-            <button
-              className="px-3 py-2 rounded bg-stone-200 dark:bg-stone-800 text-sm"
-              onClick={async () => {
-                const res = await calculatorsService.fire({
-                  currentSavings: 50000,
-                  monthlyContribution: 2000,
-                  expectedReturnRate: 0.05,
-                  withdrawalRate: 0.04,
-                  annualExpenses: 60000,
-                  years: 25,
-                });
-                alert(
-                  `Projected NW: ${formatCurrencyWith(
-                    res.projectedNetWorth,
-                    currency
-                  )} | Progress: ${(res.progress * 100).toFixed(1)}%`
-                );
-              }}
-            >
-              Run Example
-            </button>
           </Card>
         </div>
       )}

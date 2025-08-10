@@ -19,10 +19,8 @@ import {
   Flame,
   CalendarDays,
   Trophy,
-  CalendarCheck,
   Rocket,
   Zap,
-  Medal,
   Crown,
   Moon,
 } from "lucide-react";
@@ -396,37 +394,6 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
           />
         </div>
 
-        {(() => {
-          const hasWeekly = currentStreak >= 7;
-          const hasDedicated = currentStreak >= 14;
-          const hasHardcore = currentStreak >= 30;
-          return (
-            <div className="flex flex-wrap items-center gap-2">
-              <AchievementBadge
-                achieved={hasWeekly}
-                icon={CalendarDays}
-                label="Weekly"
-                achievedClass="ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300"
-                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
-              />
-              <AchievementBadge
-                achieved={hasDedicated}
-                icon={Flame}
-                label="Dev Dedicated"
-                achievedClass="ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300"
-                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
-              />
-              <AchievementBadge
-                achieved={hasHardcore}
-                icon={Trophy}
-                label="Hard Core"
-                achievedClass="ring-yellow-300/50 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300"
-                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
-              />
-            </div>
-          );
-        })()}
-
         <div className="bg-stone-100 dark:bg-stone-800/70 p-3 rounded-xl border border-stone-200 dark:border-stone-700">
           <div className="flex items-center justify-between mb-1">
             <p className="text-sm font-semibold text-gray-800 dark:text-white">
@@ -447,103 +414,65 @@ const DetailedStatsCard = ({ logs, logStats, githubData }) => {
         {(() => {
           const baseClass =
             "ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800";
-          const milestones = [
+          const scale = [
             {
-              t: 0,
+              threshold: 0,
               label: "Start",
               icon: Moon,
-              cls: "ring-stone-300 bg-stone-100 text-stone-700 dark:ring-stone-700 dark:bg-stone-800 dark:text-stone-200",
+              cls: "ring-stone-300/60 bg-stone-500/10 text-stone-700 dark:text-stone-200",
             },
             {
-              t: 4,
+              threshold: 10,
               label: "Spark",
               icon: Zap,
               cls: "ring-cyan-300/50 bg-cyan-500/15 text-cyan-700 dark:text-cyan-300",
             },
             {
-              t: 7,
-              label: "Week",
-              icon: CalendarCheck,
-              cls: "ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300",
+              threshold: 20,
+              label: "Warm-Up",
+              icon: Flame,
+              cls: "ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300",
             },
             {
-              t: 10,
-              label: "Lift-off",
+              threshold: 40,
+              label: "Momentum",
               icon: Rocket,
               cls: "ring-blue-300/50 bg-blue-500/15 text-blue-700 dark:text-blue-300",
             },
             {
-              t: 30,
-              label: "Medal",
-              icon: Medal,
+              threshold: 60,
+              label: "Focus",
+              icon: Sparkles,
+              cls: "ring-violet-300/50 bg-violet-500/15 text-violet-700 dark:text-violet-300",
+            },
+            {
+              threshold: 80,
+              label: "Beast",
+              icon: Trophy,
               cls: "ring-amber-300/50 bg-amber-500/15 text-amber-700 dark:text-amber-300",
             },
             {
-              t: 100,
-              label: "Crown",
+              threshold: 95,
+              label: "Legend",
               icon: Crown,
               cls: "ring-yellow-300/60 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
             },
           ];
 
-          const best =
-            milestones
-              .filter((m) => (longestStreak || 0) >= m.t)
-              .slice(-1)[0] || milestones[0];
+          let currentIndex = 0;
+          for (let i = 0; i < scale.length; i += 1) {
+            if (productivityScore >= scale[i].threshold) currentIndex = i;
+          }
 
-          const next = milestones.find((m) => m.t > (longestStreak || 0));
-
-          const selection = [best, next].filter(Boolean).slice(0, 2);
-
-          return (
-            <div className="flex flex-wrap items-center gap-1.5">
-              {selection.map((m) => (
-                <MilestoneChip
-                  key={m.t}
-                  active={(longestStreak || 0) >= m.t}
-                  icon={m.icon}
-                  label={`${m.label} ${m.t}`}
-                  activeClass={m.cls}
-                  baseClass={baseClass}
-                />
-              ))}
-            </div>
-          );
-        })()}
-
-        {(() => {
-          const defs = [
-            {
-              threshold: 30,
-              label: "Hard Core",
-              icon: Trophy,
-              cls: "ring-yellow-300/50 bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
-            },
-            {
-              threshold: 14,
-              label: "Dev Dedicated",
-              icon: Flame,
-              cls: "ring-orange-300/50 bg-orange-500/15 text-orange-700 dark:text-orange-300",
-            },
-            {
-              threshold: 7,
-              label: "Weekly",
-              icon: CalendarDays,
-              cls: "ring-purple-300/50 bg-purple-500/15 text-purple-700 dark:text-purple-300",
-            },
-          ];
-
-          const best = defs.find((d) => (currentStreak || 0) >= d.threshold);
-          if (!best) return null;
-
+          const current = scale[currentIndex];
           return (
             <div className="flex flex-wrap items-center gap-2">
               <AchievementBadge
                 achieved
-                icon={best.icon}
-                label={best.label}
-                achievedClass={best.cls}
-                baseClass="ring-stone-300 bg-stone-100 dark:ring-stone-700 dark:bg-stone-800"
+                icon={current.icon}
+                label={current.label}
+                achievedClass={current.cls}
+                baseClass={baseClass}
               />
             </div>
           );
