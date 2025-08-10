@@ -31,7 +31,7 @@ export default function BudgetsEditor({
     <div className="grid gap-4">
       <Card>
         <SectionTitle>Create Monthly Budget</SectionTitle>
-        <div className="grid md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
           <select
             className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
             value={form.category}
@@ -71,18 +71,18 @@ export default function BudgetsEditor({
             value={form.year || year}
             onChange={(e) => setForm({ ...form, year: e.target.value })}
           />
-          <div className="flex gap-3">
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Amount"
-              className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 flex-1"
-              value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: e.target.value })}
-            />
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Amount"
+            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 w-full"
+            value={form.amount}
+            onChange={(e) => setForm({ ...form, amount: e.target.value })}
+          />
+          <div className="justify-self-end">
             <button
-              className="px-3 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900"
+              className="px-4 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer hover:bg-black dark:hover:bg-stone-200"
               disabled={saving || !form.category || !form.amount}
               onClick={async () => {
                 try {
