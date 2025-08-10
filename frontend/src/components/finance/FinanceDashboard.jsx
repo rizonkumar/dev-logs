@@ -25,6 +25,15 @@ import {
   Line,
   CartesianGrid,
   Label,
+  AreaChart as ReAreaChart,
+  Area,
+  RadarChart as ReRadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  RadialBarChart as ReRadialBarChart,
+  RadialBar,
 } from "recharts";
 
 const formatCurrency = (n, currency = "USD") =>
@@ -39,6 +48,8 @@ export default function FinanceDashboard({
   currency,
 }) {
   const [view, setView] = useState("summary");
+  const [txChartType, setTxChartType] = useState("area"); // area | line | bar
+  const [catChartType, setCatChartType] = useState("radial"); // pie | radial | radar
 
   const incomeVsExpenseData = useMemo(
     () => [
@@ -105,6 +116,16 @@ export default function FinanceDashboard({
   const PIE_COLORS = [
     "#16a34a", // green-600
     "#dc2626", // red-600
+  ];
+  const CATEGORY_COLORS = [
+    "#2563eb", // blue-600
+    "#06b6d4", // cyan-500
+    "#f59e0b", // amber-500
+    "#ef4444", // red-500
+    "#10b981", // emerald-500
+    "#a855f7", // purple-500
+    "#84cc16", // lime-500
+    "#fb7185", // rose-400
   ];
 
   const CustomPieTooltip = ({ active, payload }) => {
@@ -287,142 +308,306 @@ export default function FinanceDashboard({
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-            <Card className="xl:col-span-1">
-              <SectionTitle>Income vs Expense</SectionTitle>
-              <div className="w-full h-[260px]">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+            <Card className="xl:col-span-8">
+              <div className="flex items-center justify-between">
+                <SectionTitle>Transactions</SectionTitle>
+                <div className="relative">
+                  <button
+                    className="inline-flex items-center gap-2 rounded-md border border-stone-200 dark:border-stone-700 px-3 py-1.5 text-xs sm:text-sm hover:bg-stone-50 dark:hover:bg-stone-800"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const next =
+                        txChartType === "area"
+                          ? "line"
+                          : txChartType === "line"
+                          ? "bar"
+                          : "area";
+                      setTxChartType(next);
+                    }}
+                    title="Toggle chart type"
+                  >
+                    {txChartType === "area"
+                      ? "Area chart"
+                      : txChartType === "line"
+                      ? "Line chart"
+                      : "Bar chart"}
+                  </button>
+                </div>
+              </div>
+              <div className="w-full h-[240px] sm:h-[300px] lg:h-[340px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RePieChart>
-                    <defs>
-                      <filter
-                        id="shadow"
-                        x="-20%"
-                        y="-20%"
-                        width="140%"
-                        height="140%"
-                      >
-                        <feDropShadow
-                          dx="0"
-                          dy="2"
-                          stdDeviation="3"
-                          floodOpacity="0.15"
-                        />
-                      </filter>
-                    </defs>
-                    <Pie
-                      data={incomeVsExpenseData}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={2}
-                      stroke="#ffffff"
-                      strokeWidth={1}
-                      filter="url(#shadow)"
+                  {txChartType === "area" ? (
+                    <ReAreaChart
+                      data={netByDayData}
+                      margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
                     >
-                      {incomeVsExpenseData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={PIE_COLORS[index % PIE_COLORS.length]}
-                        />
-                      ))}
-                      <Label
-                        position="center"
-                        content={({ viewBox }) => {
-                          const { cx, cy } = viewBox;
-                          const balance =
-                            (overview?.income || 0) - (overview?.expense || 0);
-                          return (
-                            <text
-                              x={cx}
-                              y={cy}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                            >
-                              <tspan
-                                className="fill-stone-500"
-                                x={cx}
-                                dy="-0.35em"
-                                style={{ fontSize: 12 }}
-                              >
-                                Balance
-                              </tspan>
-                              <tspan
-                                className="fill-stone-900 dark:fill-white"
-                                x={cx}
-                                dy="1.2em"
-                                style={{ fontSize: 14, fontWeight: 700 }}
-                              >
-                                {formatCurrency(balance, currency)}
-                              </tspan>
-                            </text>
-                          );
-                        }}
+                      <defs>
+                        <linearGradient
+                          id="incomeGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.25}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                        <linearGradient
+                          id="expenseGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#ef4444"
+                            stopOpacity={0.25}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#ef4444"
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <YAxis
+                        tickFormatter={(v) => formatCurrency(v, currency)}
+                        width={80}
                       />
-                    </Pie>
-                    <Tooltip content={<CustomPieTooltip />} />
-                    <Legend />
-                  </RePieChart>
+                      <Tooltip content={<CustomLineTooltip />} />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="income"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        fill="url(#incomeGradient)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="expense"
+                        stroke="#ef4444"
+                        strokeWidth={2}
+                        fill="url(#expenseGradient)"
+                      />
+                    </ReAreaChart>
+                  ) : txChartType === "line" ? (
+                    <ReLineChart
+                      data={netByDayData}
+                      margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <YAxis
+                        tickFormatter={(v) => formatCurrency(v, currency)}
+                        width={80}
+                      />
+                      <Tooltip content={<CustomLineTooltip />} />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="income"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        dot={{ r: 0 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="expense"
+                        stroke="#ef4444"
+                        strokeWidth={2}
+                        dot={{ r: 0 }}
+                      />
+                    </ReLineChart>
+                  ) : (
+                    <ReBarChart
+                      data={netByDayData}
+                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <YAxis
+                        tickFormatter={(v) => formatCurrency(v, currency)}
+                        width={80}
+                      />
+                      <Tooltip content={<CustomLineTooltip />} />
+                      <Legend />
+                      <Bar
+                        dataKey="income"
+                        fill="#3b82f6"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="expense"
+                        fill="#ef4444"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </ReBarChart>
+                  )}
                 </ResponsiveContainer>
               </div>
             </Card>
 
-            <Card className="xl:col-span-2">
-              <SectionTitle>Top Expenses by Category (Recent)</SectionTitle>
-              <div className="w-full h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ReBarChart
-                    data={expenseByCategoryData}
-                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 12 }}
-                      interval={0}
-                      angle={-15}
-                      height={50}
-                      tickMargin={10}
-                    />
-                    <YAxis
-                      tickFormatter={(v) => formatCurrency(v, currency)}
-                      width={80}
-                    />
-                    <Tooltip content={<CustomBarTooltip />} />
-                    <Bar dataKey="value" fill="#ef4444" radius={[6, 6, 0, 0]} />
-                  </ReBarChart>
-                </ResponsiveContainer>
+            <Card className="xl:col-span-4">
+              <div className="flex items-center justify-between">
+                <SectionTitle>Categories</SectionTitle>
+                <button
+                  className="inline-flex items-center gap-2 rounded-md border border-stone-200 dark:border-stone-700 px-3 py-1.5 text-xs sm:text-sm hover:bg-stone-50 dark:hover:bg-stone-800"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const next =
+                      catChartType === "radial"
+                        ? "pie"
+                        : catChartType === "pie"
+                        ? "radar"
+                        : "radial";
+                    setCatChartType(next);
+                  }}
+                  title="Toggle chart type"
+                >
+                  {catChartType === "pie"
+                    ? "Pie chart"
+                    : catChartType === "radar"
+                    ? "Radar chart"
+                    : "Radial chart"}
+                </button>
               </div>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            <Card>
-              <SectionTitle>Net Flow by Day (Recent)</SectionTitle>
-              <div className="w-full h-[320px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ReLineChart
-                    data={netByDayData}
-                    margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                    <YAxis
-                      tickFormatter={(v) => formatCurrency(v, currency)}
-                      width={80}
-                    />
-                    <Tooltip content={<CustomLineTooltip />} />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="net"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      dot={{ r: 2 }}
-                      activeDot={{ r: 4 }}
-                    />
-                  </ReLineChart>
-                </ResponsiveContainer>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 items-center">
+                <div className="w-full h-[220px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    {catChartType === "pie" ? (
+                      <RePieChart>
+                        <Pie
+                          data={expenseByCategoryData}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={55}
+                          outerRadius={85}
+                          paddingAngle={2}
+                        >
+                          {expenseByCategoryData.map((entry, index) => (
+                            <Cell
+                              key={`cat-${index}`}
+                              fill={
+                                CATEGORY_COLORS[index % CATEGORY_COLORS.length]
+                              }
+                            />
+                          ))}
+                          <Label
+                            position="center"
+                            content={({ viewBox }) => {
+                              const { cx, cy } = viewBox;
+                              return (
+                                <text
+                                  x={cx}
+                                  y={cy}
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
+                                >
+                                  <tspan
+                                    className="fill-stone-500"
+                                    x={cx}
+                                    dy="-0.35em"
+                                    style={{ fontSize: 11 }}
+                                  >
+                                    Expenses
+                                  </tspan>
+                                  <tspan
+                                    className="fill-stone-900 dark:fill-white"
+                                    x={cx}
+                                    dy="1.3em"
+                                    style={{ fontSize: 13, fontWeight: 700 }}
+                                  >
+                                    by Category
+                                  </tspan>
+                                </text>
+                              );
+                            }}
+                          />
+                        </Pie>
+                        <Tooltip content={<CustomBarTooltip />} />
+                      </RePieChart>
+                    ) : catChartType === "radar" ? (
+                      <ReRadarChart
+                        data={expenseByCategoryData}
+                        outerRadius={90}
+                      >
+                        <PolarGrid />
+                        <PolarAngleAxis
+                          dataKey="name"
+                          tick={{ fontSize: 11 }}
+                        />
+                        <PolarRadiusAxis tick={false} />
+                        <Radar
+                          name="Expenses"
+                          dataKey="value"
+                          stroke="#2563eb"
+                          fill="#60a5fa"
+                          fillOpacity={0.4}
+                        />
+                        <Tooltip content={<CustomBarTooltip />} />
+                      </ReRadarChart>
+                    ) : (
+                      <ReRadialBarChart
+                        innerRadius={30}
+                        outerRadius={100}
+                        data={expenseByCategoryData.map((c, i) => ({
+                          ...c,
+                          fill: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+                        }))}
+                      >
+                        <RadialBar
+                          background
+                          dataKey="value"
+                          cornerRadius={6}
+                        />
+                        <Legend verticalAlign="bottom" height={0} />
+                        <Tooltip content={<CustomBarTooltip />} />
+                      </ReRadialBarChart>
+                    )}
+                  </ResponsiveContainer>
+                </div>
+                <div className="space-y-2">
+                  {expenseByCategoryData.length === 0 && (
+                    <p className="text-sm text-stone-500">
+                      No expense categories yet
+                    </p>
+                  )}
+                  {expenseByCategoryData.map((c, i) => (
+                    <div
+                      key={c.name}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="inline-block w-2.5 h-2.5 rounded-full"
+                          style={{
+                            backgroundColor:
+                              CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+                          }}
+                        />
+                        <span className="text-sm text-stone-700 dark:text-stone-300 truncate max-w-[140px] sm:max-w-[160px]">
+                          {c.name}
+                        </span>
+                      </div>
+                      <div className="text-sm font-medium text-stone-900 dark:text-white">
+                        {formatCurrency(c.value || 0, currency)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </Card>
           </div>
