@@ -13,4 +13,19 @@ export const createCategory = async (payload) => {
   return response.data;
 };
 
-export default { listCategories, createCategory };
+export const updateCategory = async (id, updates) => {
+  const response = await axios.put(`${BASE}/${id}`, updates);
+  return response.data;
+};
+
+export const deleteCategory = async (id) => {
+  const response = await axios.delete(`${BASE}/${id}`);
+  return response.data;
+};
+
+export default {
+  listCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+};

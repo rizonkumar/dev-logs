@@ -37,6 +37,13 @@ export default function FinanceTab({
         "hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-200",
       icon: "text-emerald-600 dark:text-emerald-300",
     },
+    bills: {
+      active:
+        "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-200 border-amber-200 dark:border-amber-800",
+      hover:
+        "hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-200",
+      icon: "text-amber-600 dark:text-amber-300",
+    },
     categories: {
       active:
         "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 border-violet-200 dark:border-violet-800",

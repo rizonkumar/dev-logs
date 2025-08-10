@@ -14,7 +14,13 @@ import BudgetsEditor from "../components/finance/page/BudgetsEditor";
 import GoalsSection from "../components/finance/page/GoalsSection";
 import CategoriesManager from "../components/finance/page/CategoriesManager";
 import FinanceTab from "../components/finance/page/FinanceTab";
-import { CircleDollarSign, TrendingUp, Wallet } from "lucide-react";
+import BillsSection from "../components/finance/page/BillsSection";
+import {
+  CircleDollarSign,
+  TrendingUp,
+  Wallet,
+  CalendarClock,
+} from "lucide-react";
 
 export default function FinancePage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -246,6 +252,15 @@ export default function FinancePage() {
             Budgets
           </FinanceTab>
           <FinanceTab
+            id="bills"
+            active={activeTab === "bills"}
+            onClick={setActiveTab}
+            icon={CalendarClock}
+            variant="bills"
+          >
+            Bills
+          </FinanceTab>
+          <FinanceTab
             id="goals"
             active={activeTab === "goals"}
             onClick={setActiveTab}
@@ -276,6 +291,26 @@ export default function FinancePage() {
           goals={goals}
           recent={recent}
           currency={currency}
+          onRefresh={async () => {
+            await Promise.allSettled([
+              (async () => {
+                try {
+                  const ov = await getOverview();
+                  setOverview(ov);
+                  setRecent(ov.recentTransactions || []);
+                } catch (e) {
+                  console.error("Error refreshing overview", e);
+                }
+              })(),
+              (async () => {
+                try {
+                  setGoals(await goalsService.listGoals());
+                } catch (e) {
+                  console.error("Error refreshing goals", e);
+                }
+              })(),
+            ]);
+          }}
         />
       ) : null}
 
@@ -343,6 +378,10 @@ export default function FinancePage() {
           onAddContribution={addGoalContribution}
           onCreated={refreshGoals}
         />
+      )}
+
+      {!loading && activeTab === "bills" && (
+        <BillsSection categories={categories} currency={currency} />
       )}
 
       {!loading && activeTab === "categories" && (

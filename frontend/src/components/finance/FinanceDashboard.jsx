@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   BarChart3 as BarChartIcon,
   ChevronDown,
+  RefreshCw,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -47,6 +48,7 @@ export default function FinanceDashboard({
   goals,
   recent,
   currency,
+  onRefresh,
 }) {
   const [view, setView] = useState("summary");
   const [txChartType, setTxChartType] = useState("area"); // area | line | bar
@@ -54,6 +56,7 @@ export default function FinanceDashboard({
   const [txMenuOpen, setTxMenuOpen] = useState(false);
   const [catMenuOpen, setCatMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Keep grid/tick colors readable in both themes
   React.useEffect(() => {
@@ -254,31 +257,52 @@ export default function FinanceDashboard({
         <div className="text-sm text-stone-500">
           {view === "summary" ? "Summary view" : "Charts view"}
         </div>
-        <div className="inline-flex rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setView("summary")}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
-              view === "summary"
-                ? "bg-stone-900 text-white dark:bg-white dark:text-stone-900"
-                : "bg-transparent text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60"
-            }`}
+            onClick={async () => {
+              if (!onRefresh || refreshing) return;
+              try {
+                setRefreshing(true);
+                await onRefresh();
+              } finally {
+                setRefreshing(false);
+              }
+            }}
+            title="Refresh"
+            className="px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm inline-flex items-center gap-2 cursor-pointer"
           >
-            <LayoutDashboard className="w-4 h-4" />
-            Summary
+            <RefreshCw
+              className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+            />
+            <span>Refresh</span>
           </button>
-          <button
-            type="button"
-            onClick={() => setView("charts")}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
-              view === "charts"
-                ? "bg-stone-900 text-white dark:bg-white dark:text-stone-900"
-                : "bg-transparent text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60"
-            }`}
-          >
-            <BarChartIcon className="w-4 h-4" />
-            Charts
-          </button>
+          <div className="inline-flex rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setView("summary")}
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
+                view === "summary"
+                  ? "bg-stone-900 text-white dark:bg-white dark:text-stone-900"
+                  : "bg-transparent text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60"
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Summary
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("charts")}
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
+                view === "charts"
+                  ? "bg-stone-900 text-white dark:bg-white dark:text-stone-900"
+                  : "bg-transparent text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60"
+              }`}
+            >
+              <BarChartIcon className="w-4 h-4" />
+              Charts
+            </button>
+          </div>
         </div>
       </div>
 
@@ -426,12 +450,12 @@ export default function FinanceDashboard({
                   )}
                 </div>
               </div>
-              <div className="w-full h-[260px] sm:h-[320px] lg:h-[360px]">
+              <div className="w-full h-[300px] sm:h-[360px] lg:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   {txChartType === "area" ? (
                     <ReAreaChart
                       data={netByDayData}
-                      margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+                      margin={{ top: 18, right: 20, left: 12, bottom: 20 }}
                     >
                       <defs>
                         <linearGradient
@@ -475,17 +499,15 @@ export default function FinanceDashboard({
                         strokeDasharray="3 3"
                         stroke={gridStroke}
                       />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fontSize: 12, fill: tickColor }}
-                        tickMargin={8}
-                      />
+                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: tickColor }} tickMargin={10} tickLine={false} axisLine={{ stroke: gridStroke }} />
                       <YAxis
                         tick={{ fill: tickColor }}
                         tickFormatter={(v) =>
                           formatCompactCurrency(v, currency)
                         }
-                        width={70}
+                        width={72}
+                        tickLine={false}
+                        axisLine={{ stroke: gridStroke }}
                       />
                       <Tooltip content={<CustomLineTooltip />} />
                       <Legend />
@@ -505,25 +527,20 @@ export default function FinanceDashboard({
                       />
                     </ReAreaChart>
                   ) : txChartType === "line" ? (
-                    <ReLineChart
-                      data={netByDayData}
-                      margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-                    >
+                    <ReLineChart data={netByDayData} margin={{ top: 18, right: 20, left: 12, bottom: 20 }}>
                       <CartesianGrid
                         strokeDasharray="3 3"
                         stroke={gridStroke}
                       />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fontSize: 12, fill: tickColor }}
-                        tickMargin={8}
-                      />
+                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: tickColor }} tickMargin={10} tickLine={false} axisLine={{ stroke: gridStroke }} />
                       <YAxis
                         tick={{ fill: tickColor }}
                         tickFormatter={(v) =>
                           formatCompactCurrency(v, currency)
                         }
-                        width={70}
+                        width={72}
+                        tickLine={false}
+                        axisLine={{ stroke: gridStroke }}
                       />
                       <Tooltip content={<CustomLineTooltip />} />
                       <Legend />
@@ -543,25 +560,20 @@ export default function FinanceDashboard({
                       />
                     </ReLineChart>
                   ) : (
-                    <ReBarChart
-                      data={netByDayData}
-                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                    >
+                    <ReBarChart data={netByDayData} margin={{ top: 18, right: 10, left: 12, bottom: 20 }}>
                       <CartesianGrid
                         strokeDasharray="3 3"
                         stroke={gridStroke}
                       />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fontSize: 12, fill: tickColor }}
-                        tickMargin={8}
-                      />
+                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: tickColor }} tickMargin={10} tickLine={false} axisLine={{ stroke: gridStroke }} />
                       <YAxis
                         tick={{ fill: tickColor }}
                         tickFormatter={(v) =>
                           formatCompactCurrency(v, currency)
                         }
-                        width={70}
+                        width={72}
+                        tickLine={false}
+                        axisLine={{ stroke: gridStroke }}
                       />
                       <Tooltip content={<CustomLineTooltip />} />
                       <Legend />
