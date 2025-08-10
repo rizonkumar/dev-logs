@@ -127,7 +127,7 @@ export default function CategoriesManager({ categories, onCreate }) {
                       <button
                         title="Cancel"
                         onClick={() => setEditingId(null)}
-                        className="ml-1"
+                        className="ml-1 cursor-pointer"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -141,6 +141,7 @@ export default function CategoriesManager({ categories, onCreate }) {
                           setEditingId(c._id);
                           setEditDraft({ name: c.name, type: c.type });
                         }}
+                        className="cursor-pointer"
                       >
                         <Pencil className="w-3 h-3" />
                       </button>
@@ -151,6 +152,7 @@ export default function CategoriesManager({ categories, onCreate }) {
                           await catService.deleteCategory(c._id);
                           setBusyId(null);
                         }}
+                        className="cursor-pointer"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -224,7 +226,7 @@ export default function CategoriesManager({ categories, onCreate }) {
                       <button
                         title="Cancel"
                         onClick={() => setEditingId(null)}
-                        className="ml-1"
+                        className="ml-1 cursor-pointer"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -238,6 +240,7 @@ export default function CategoriesManager({ categories, onCreate }) {
                           setEditingId(c._id);
                           setEditDraft({ name: c.name, type: c.type });
                         }}
+                        className="cursor-pointer"
                       >
                         <Pencil className="w-3 h-3" />
                       </button>
@@ -248,6 +251,7 @@ export default function CategoriesManager({ categories, onCreate }) {
                           await catService.deleteCategory(c._id);
                           setBusyId(null);
                         }}
+                        className="cursor-pointer"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>

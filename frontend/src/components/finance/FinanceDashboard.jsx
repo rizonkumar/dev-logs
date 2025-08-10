@@ -281,7 +281,7 @@ export default function FinanceDashboard({
             <button
               type="button"
               onClick={() => setView("summary")}
-              className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors cursor-pointer ${
                 view === "summary"
                   ? "bg-stone-900 text-white dark:bg-white dark:text-stone-900"
                   : "bg-transparent text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60"
@@ -293,7 +293,7 @@ export default function FinanceDashboard({
             <button
               type="button"
               onClick={() => setView("charts")}
-              className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors cursor-pointer ${
                 view === "charts"
                   ? "bg-stone-900 text-white dark:bg-white dark:text-stone-900"
                   : "bg-transparent text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60"
@@ -499,7 +499,13 @@ export default function FinanceDashboard({
                         strokeDasharray="3 3"
                         stroke={gridStroke}
                       />
-                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: tickColor }} tickMargin={10} tickLine={false} axisLine={{ stroke: gridStroke }} />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12, fill: tickColor }}
+                        tickMargin={10}
+                        tickLine={false}
+                        axisLine={{ stroke: gridStroke }}
+                      />
                       <YAxis
                         tick={{ fill: tickColor }}
                         tickFormatter={(v) =>
@@ -527,12 +533,21 @@ export default function FinanceDashboard({
                       />
                     </ReAreaChart>
                   ) : txChartType === "line" ? (
-                    <ReLineChart data={netByDayData} margin={{ top: 18, right: 20, left: 12, bottom: 20 }}>
+                    <ReLineChart
+                      data={netByDayData}
+                      margin={{ top: 18, right: 20, left: 12, bottom: 20 }}
+                    >
                       <CartesianGrid
                         strokeDasharray="3 3"
                         stroke={gridStroke}
                       />
-                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: tickColor }} tickMargin={10} tickLine={false} axisLine={{ stroke: gridStroke }} />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12, fill: tickColor }}
+                        tickMargin={10}
+                        tickLine={false}
+                        axisLine={{ stroke: gridStroke }}
+                      />
                       <YAxis
                         tick={{ fill: tickColor }}
                         tickFormatter={(v) =>
@@ -560,12 +575,21 @@ export default function FinanceDashboard({
                       />
                     </ReLineChart>
                   ) : (
-                    <ReBarChart data={netByDayData} margin={{ top: 18, right: 10, left: 12, bottom: 20 }}>
+                    <ReBarChart
+                      data={netByDayData}
+                      margin={{ top: 18, right: 10, left: 12, bottom: 20 }}
+                    >
                       <CartesianGrid
                         strokeDasharray="3 3"
                         stroke={gridStroke}
                       />
-                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: tickColor }} tickMargin={10} tickLine={false} axisLine={{ stroke: gridStroke }} />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12, fill: tickColor }}
+                        tickMargin={10}
+                        tickLine={false}
+                        axisLine={{ stroke: gridStroke }}
+                      />
                       <YAxis
                         tick={{ fill: tickColor }}
                         tickFormatter={(v) =>
