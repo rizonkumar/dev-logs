@@ -9,6 +9,7 @@ import {
   Timer,
   User,
   LogIn,
+  LogOut,
   Notebook,
   PanelLeft,
   Menu,
@@ -20,9 +21,10 @@ import { motion as Motion } from "framer-motion";
 import {
   SignedIn,
   SignedOut,
-  UserButton,
   SignInButton,
   SignUpButton,
+  SignOutButton,
+  useClerk,
 } from "@clerk/clerk-react";
 
 const navItems = [
@@ -40,7 +42,7 @@ const MainLayout = ({ children }) => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
 
-  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(false);
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isTimerOpen, setIsTimerOpen] = useState(false);
@@ -48,8 +50,6 @@ const MainLayout = ({ children }) => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
-
-  // Logout handled by Clerk's <UserButton> now
 
   useEffect(() => {
     const prefersDark =
@@ -139,159 +139,201 @@ const MainLayout = ({ children }) => {
     },
   };
 
-  const SidebarContent = ({ isExpanded }) => (
-    <>
-      <div
-        className={`p-4 h-20 flex items-center gap-3 border-b border-stone-200 dark:border-stone-700 ${
-          !isExpanded && "justify-center"
-        }`}
-      >
-        <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-          {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
-        </div>
-        <h1
-          className={`text-xl font-bold text-gray-900 dark:text-white overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
-            isExpanded ? "opacity-100" : "opacity-0"
+  const SidebarContent = ({ isExpanded }) => {
+    const { openUserProfile } = useClerk();
+    return (
+      <>
+        <div
+          className={`p-4 h-20 flex items-center gap-3 border-b border-stone-200 dark:border-stone-700 ${
+            !isExpanded && "justify-center"
           }`}
         >
-          {userInfo?.name
-            ? `${userInfo.name.split(" ")[0]}'s Board`
-            : "Rizon's Board"}
-        </h1>
-      </div>
+          <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+            {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
+          </div>
+          <h1
+            className={`text-xl font-bold text-gray-900 dark:text-white overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+              isExpanded ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {userInfo?.name
+              ? `${userInfo.name.split(" ")[0]}'s Board`
+              : "Rizon's Board"}
+          </h1>
+        </div>
 
-      <nav className="flex-1 p-3 space-y-2">
-        {navItems.map((item) => (
-          <li key={item.path} className="list-none">
-            <NavLink
-              to={item.path}
-              end={item.path === "/"}
-              className={({ isActive }) =>
-                `relative flex items-center gap-4 px-4 py-2.5 rounded-lg transition-colors duration-200 group ${
-                  !isExpanded && "justify-center"
-                } ${
-                  isActive
-                    ? colorConfig[item.color].active
-                    : colorConfig[item.color].hover
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <div
-                      className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${
-                        colorConfig[item.color].border
+        <nav className="flex-1 p-3 space-y-2">
+          {navItems.map((item) => (
+            <li key={item.path} className="list-none">
+              <NavLink
+                to={item.path}
+                end={item.path === "/"}
+                className={({ isActive }) =>
+                  `relative flex items-center gap-4 px-4 py-2.5 rounded-lg transition-colors duration-200 group ${
+                    !isExpanded && "justify-center"
+                  } ${
+                    isActive
+                      ? colorConfig[item.color].active
+                      : colorConfig[item.color].hover
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <div
+                        className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${
+                          colorConfig[item.color].border
+                        }`}
+                      ></div>
+                    )}
+                    <item.icon
+                      size={20}
+                      className={`flex-shrink-0 ${
+                        isActive ? "" : colorConfig[item.color].inactive
                       }`}
-                    ></div>
-                  )}
-                  <item.icon
-                    size={20}
-                    className={`flex-shrink-0 ${
-                      isActive ? "" : colorConfig[item.color].inactive
-                    }`}
-                  />
-                  <span
-                    className={`transition-opacity duration-200 whitespace-nowrap ${
-                      isExpanded ? "opacity-100" : "opacity-0 hidden"
-                    } ${
-                      isActive
-                        ? "font-semibold"
-                        : `text-gray-700 dark:text-stone-300 font-medium ${
-                            colorConfig[item.color].textHover
-                          }`
-                    }`}
-                  >
-                    {item.label}
-                  </span>
+                    />
+                    <span
+                      className={`transition-opacity duration-200 whitespace-nowrap ${
+                        isExpanded ? "opacity-100" : "opacity-0 hidden"
+                      } ${
+                        isActive
+                          ? "font-semibold"
+                          : `text-gray-700 dark:text-stone-300 font-medium ${
+                              colorConfig[item.color].textHover
+                            }`
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                    {!isExpanded && (
+                      <div className="absolute left-full ml-3 px-3 py-1.5 text-sm bg-stone-800 text-stone-100 dark:bg-stone-800 dark:text-stone-100 rounded-md scale-0 group-hover:scale-100 transition-transform origin-left whitespace-nowrap z-20">
+                        {item.label}
+                      </div>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            </li>
+          ))}
+        </nav>
+
+        <div className="p-3 border-t border-stone-200 dark:border-stone-700 space-y-2">
+          <button
+            onClick={toggleTheme}
+            className={`relative group w-full flex items-center gap-4 px-4 py-2.5 rounded-lg transition-colors cursor-pointer ${
+              !isExpanded && "justify-center"
+            } ${
+              isDark
+                ? "text-yellow-300 hover:bg-stone-800"
+                : "text-gray-600 hover:bg-stone-100"
+            }`}
+            title={isDark ? "Light Mode" : "Dark Mode"}
+          >
+            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            <span
+              className={`transition-opacity duration-200 whitespace-nowrap ${
+                isExpanded ? "opacity-100" : "opacity-0 hidden"
+              }`}
+            >
+              {isDark ? "Light Mode" : "Dark Mode"}
+            </span>
+            {!isExpanded && (
+              <div className="absolute left-full ml-3 px-3 py-1.5 text-sm bg-stone-800 text-stone-100 dark:bg-stone-800 dark:text-stone-100 rounded-md scale-0 group-hover:scale-100 transition-transform origin-left whitespace-nowrap z-20">
+                {isDark ? "Light Mode" : "Dark Mode"}
+              </div>
+            )}
+          </button>
+
+          <button
+            onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
+            className={`relative group w-full hidden lg:flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer ${
+              !isExpanded && "justify-center"
+            }`}
+          >
+            <PanelLeft
+              size={20}
+              className={`transition-transform duration-300 flex-shrink-0 ${
+                !isExpanded ? "rotate-180" : ""
+              }`}
+            />
+            <span
+              className={`transition-opacity duration-200 whitespace-nowrap ${
+                isExpanded ? "opacity-100" : "opacity-0 hidden"
+              }`}
+            >
+              {isDesktopSidebarOpen ? "Collapse Menu" : "Expand Menu"}
+            </span>
+            {!isExpanded && (
+              <div className="absolute left-full ml-3 px-3 py-1.5 text-sm bg-stone-800 text-stone-100 dark:bg-stone-800 dark:text-stone-100 rounded-md scale-0 group-hover:scale-100 transition-transform origin-left whitespace-nowrap z-20">
+                {isDesktopSidebarOpen ? "Collapse Menu" : "Expand Menu"}
+              </div>
+            )}
+          </button>
+
+          <div className={`${!isExpanded && "justify-center"}`}>
+            <SignedIn>
+              <div className="space-y-2">
+                <div
+                  onClick={() => openUserProfile()}
+                  className={`relative group w-full flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer ${
+                    !isExpanded && "justify-center"
+                  }`}
+                  title="Manage Account"
+                >
+                  <User size={20} className="flex-shrink-0" />
+                  {isExpanded && <span className="text-sm">Account</span>}
                   {!isExpanded && (
                     <div className="absolute left-full ml-3 px-3 py-1.5 text-sm bg-stone-800 text-stone-100 dark:bg-stone-800 dark:text-stone-100 rounded-md scale-0 group-hover:scale-100 transition-transform origin-left whitespace-nowrap z-20">
-                      {item.label}
+                      Account
                     </div>
                   )}
-                </>
-              )}
-            </NavLink>
-          </li>
-        ))}
-      </nav>
+                </div>
 
-      <div className="p-3 border-t border-stone-200 dark:border-stone-700 space-y-2">
-        <button
-          onClick={toggleTheme}
-          className={`w-full flex items-center gap-4 px-4 py-2.5 rounded-lg transition-colors cursor-pointer ${
-            !isExpanded && "justify-center"
-          } ${
-            isDark
-              ? "text-yellow-300 hover:bg-stone-800"
-              : "text-gray-600 hover:bg-stone-100"
-          }`}
-        >
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
-          <span
-            className={`transition-opacity duration-200 whitespace-nowrap ${
-              isExpanded ? "opacity-100" : "opacity-0 hidden"
-            }`}
-          >
-            {isDark ? "Light Mode" : "Dark Mode"}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
-          className={`w-full hidden lg:flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer ${
-            !isExpanded && "justify-center"
-          }`}
-        >
-          <PanelLeft
-            size={20}
-            className={`transition-transform duration-300 flex-shrink-0 ${
-              !isExpanded ? "rotate-180" : ""
-            }`}
-          />
-          <span
-            className={`transition-opacity duration-200 whitespace-nowrap ${
-              isExpanded ? "opacity-100" : "opacity-0 hidden"
-            }`}
-          >
-            Collapse Menu
-          </span>
-        </button>
-
-        <div className={`${!isExpanded && "justify-center"}`}>
-          <SignedIn>
-            <div className="flex items-center gap-4 px-2">
-              <UserButton afterSignOutUrl="/" />
-              {isExpanded && (
-                <span className="text-sm text-gray-600 dark:text-stone-300">
-                  Account
-                </span>
-              )}
-            </div>
-          </SignedIn>
-          <SignedOut>
-            <div className="flex items-center gap-3 px-2">
-              <SignInButton mode="modal">
-                <button
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white transition-colors`}
-                >
-                  <LogIn size={20} />
-                  {isExpanded && <span>Login</span>}
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white transition-colors`}
-                >
-                  <span className="text-sm">Sign Up</span>
-                </button>
-              </SignUpButton>
-            </div>
-          </SignedOut>
+                <SignOutButton signOutOptions={{ redirectUrl: "/" }}>
+                  <div
+                    className={`relative group w-full flex items-center gap-4 px-4 py-2.5 rounded-lg text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-700 transition-colors cursor-pointer ${
+                      !isExpanded && "justify-center"
+                    }`}
+                    title="Logout"
+                  >
+                    <LogOut size={20} className="flex-shrink-0" />
+                    {isExpanded && (
+                      <span className="text-sm font-semibold">Logout</span>
+                    )}
+                    {!isExpanded && (
+                      <div className="absolute left-full ml-3 px-3 py-1.5 text-sm bg-stone-800 text-stone-100 dark:bg-stone-800 dark:text-stone-100 rounded-md scale-0 group-hover:scale-100 transition-transform origin-left whitespace-nowrap z-20">
+                        Logout
+                      </div>
+                    )}
+                  </div>
+                </SignOutButton>
+              </div>
+            </SignedIn>
+            <SignedOut>
+              <div className="flex items-center gap-3 px-2">
+                <SignInButton mode="modal">
+                  <button
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white transition-colors`}
+                  >
+                    <LogIn size={20} />
+                    {isExpanded && <span>Login</span>}
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-800 dark:hover:text-white transition-colors`}
+                  >
+                    <span className="text-sm">Sign Up</span>
+                  </button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
+          </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  };
 
   return (
     <div className="relative min-h-screen lg:h-screen lg:overflow-hidden lg:flex bg-stone-50 dark:bg-stone-950 font-sans text-gray-800 dark:text-stone-100">
@@ -351,7 +393,7 @@ const MainLayout = ({ children }) => {
         <main className="flex-1 overflow-y-auto">{children}</main>
 
         <Motion.button
-          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center cursor-grab"
+          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center cursor-grab relative group"
           style={{ cursor: "grab" }}
           drag
           dragMomentum={false}
@@ -366,8 +408,12 @@ const MainLayout = ({ children }) => {
           }}
           onClick={() => setIsTimerOpen(true)}
           aria-label="Open Pomodoro timer"
+          title="Pomodoro Timer"
         >
           <Timer size={22} />
+          <span className="pointer-events-none absolute right-14 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-md bg-stone-800 text-stone-100 text-xs shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Pomodoro Timer
+          </span>
         </Motion.button>
         <PomodoroQuickModal
           isOpen={isTimerOpen}
