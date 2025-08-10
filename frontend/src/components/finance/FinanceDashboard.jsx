@@ -89,16 +89,18 @@ export default function FinanceDashboard({
     };
   }, []);
 
-  const gridStroke = isDark ? "#334155" : "#e5e7eb"; // slate-700 : gray-200
-  const tickColor = isDark ? "#cbd5e1" : "#475569"; // slate-300 : slate-600
+  const gridStroke = isDark ? "#374151" : "#e5e7eb"; // darker in dark for subtle grid
+  const tickColor = isDark ? "#e5e7eb" : "#475569"; // brighter ticks in dark
 
-  const incomeVsExpenseData = useMemo(
-    () => [
-      { name: "Income", value: Number(overview?.income || 0) },
-      { name: "Expense", value: Number(overview?.expense || 0) },
-    ],
-    [overview?.income, overview?.expense]
-  );
+  const formatCompactCurrency = (n, cur = "USD") =>
+    new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: cur,
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(n || 0);
+
+  // removed unused incomeVsExpenseData – we compute per-chart as needed
 
   const expenseByCategoryData = useMemo(() => {
     const map = new Map();
@@ -345,6 +347,29 @@ export default function FinanceDashboard({
             <p className="text-sm text-stone-500">
               {(overview?.upcomingBills || []).length} scheduled
             </p>
+            <div className="mt-3 space-y-2">
+              {(overview?.upcomingBills || []).slice(0, 5).map((b) => (
+                <div
+                  key={b._id}
+                  className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-2"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                      {b.category?.name || "Bill"}
+                    </span>
+                    <span className="text-sm text-stone-600 dark:text-stone-300">
+                      {b.description || "—"}
+                    </span>
+                  </div>
+                  <div className="text-xs sm:text-sm text-stone-500">
+                    {new Date(b.dueDate).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+              {(overview?.upcomingBills || []).length === 0 && (
+                <p className="text-sm text-stone-500">No upcoming bills</p>
+              )}
+            </div>
           </Card>
         </div>
       ) : (
@@ -401,7 +426,7 @@ export default function FinanceDashboard({
                   )}
                 </div>
               </div>
-              <div className="w-full h-[240px] sm:h-[300px] lg:h-[340px]">
+              <div className="w-full h-[260px] sm:h-[320px] lg:h-[360px]">
                 <ResponsiveContainer width="100%" height="100%">
                   {txChartType === "area" ? (
                     <ReAreaChart
@@ -453,25 +478,28 @@ export default function FinanceDashboard({
                       <XAxis
                         dataKey="date"
                         tick={{ fontSize: 12, fill: tickColor }}
+                        tickMargin={8}
                       />
                       <YAxis
                         tick={{ fill: tickColor }}
-                        tickFormatter={(v) => formatCurrency(v, currency)}
-                        width={80}
+                        tickFormatter={(v) =>
+                          formatCompactCurrency(v, currency)
+                        }
+                        width={70}
                       />
                       <Tooltip content={<CustomLineTooltip />} />
                       <Legend />
                       <Area
                         type="monotone"
                         dataKey="income"
-                        stroke="#3b82f6"
+                        stroke="#60a5fa"
                         strokeWidth={2}
                         fill="url(#incomeGradient)"
                       />
                       <Area
                         type="monotone"
                         dataKey="expense"
-                        stroke="#ef4444"
+                        stroke="#f87171"
                         strokeWidth={2}
                         fill="url(#expenseGradient)"
                       />
@@ -488,25 +516,28 @@ export default function FinanceDashboard({
                       <XAxis
                         dataKey="date"
                         tick={{ fontSize: 12, fill: tickColor }}
+                        tickMargin={8}
                       />
                       <YAxis
                         tick={{ fill: tickColor }}
-                        tickFormatter={(v) => formatCurrency(v, currency)}
-                        width={80}
+                        tickFormatter={(v) =>
+                          formatCompactCurrency(v, currency)
+                        }
+                        width={70}
                       />
                       <Tooltip content={<CustomLineTooltip />} />
                       <Legend />
                       <Line
                         type="monotone"
                         dataKey="income"
-                        stroke="#3b82f6"
+                        stroke="#60a5fa"
                         strokeWidth={2}
                         dot={{ r: 0 }}
                       />
                       <Line
                         type="monotone"
                         dataKey="expense"
-                        stroke="#ef4444"
+                        stroke="#f87171"
                         strokeWidth={2}
                         dot={{ r: 0 }}
                       />
@@ -523,23 +554,26 @@ export default function FinanceDashboard({
                       <XAxis
                         dataKey="date"
                         tick={{ fontSize: 12, fill: tickColor }}
+                        tickMargin={8}
                       />
                       <YAxis
                         tick={{ fill: tickColor }}
-                        tickFormatter={(v) => formatCurrency(v, currency)}
-                        width={80}
+                        tickFormatter={(v) =>
+                          formatCompactCurrency(v, currency)
+                        }
+                        width={70}
                       />
                       <Tooltip content={<CustomLineTooltip />} />
                       <Legend />
                       <Bar
                         dataKey="income"
-                        fill="#3b82f6"
-                        radius={[4, 4, 0, 0]}
+                        fill="#60a5fa"
+                        radius={[6, 6, 0, 0]}
                       />
                       <Bar
                         dataKey="expense"
-                        fill="#ef4444"
-                        radius={[4, 4, 0, 0]}
+                        fill="#f87171"
+                        radius={[6, 6, 0, 0]}
                       />
                     </ReBarChart>
                   )}
@@ -599,7 +633,7 @@ export default function FinanceDashboard({
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 items-center">
-                <div className="w-full h-[220px]">
+                <div className="w-full h-[240px]">
                   <ResponsiveContainer width="100%" height="100%">
                     {catChartType === "pie" ? (
                       <RePieChart>
@@ -607,8 +641,8 @@ export default function FinanceDashboard({
                           data={expenseByCategoryData}
                           dataKey="value"
                           nameKey="name"
-                          innerRadius={55}
-                          outerRadius={85}
+                          innerRadius={58}
+                          outerRadius={92}
                           paddingAngle={2}
                         >
                           {expenseByCategoryData.map((entry, index) => (
@@ -675,8 +709,8 @@ export default function FinanceDashboard({
                       </ReRadarChart>
                     ) : (
                       <ReRadialBarChart
-                        innerRadius={30}
-                        outerRadius={100}
+                        innerRadius={34}
+                        outerRadius={104}
                         data={expenseByCategoryData.map((c, i) => ({
                           ...c,
                           fill: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
@@ -685,7 +719,7 @@ export default function FinanceDashboard({
                         <RadialBar
                           background
                           dataKey="value"
-                          cornerRadius={6}
+                          cornerRadius={8}
                         />
                         <Legend verticalAlign="bottom" height={0} />
                         <Tooltip content={<CustomBarTooltip />} />
