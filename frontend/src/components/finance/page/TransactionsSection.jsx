@@ -1,6 +1,7 @@
 import React from "react";
 import TransactionForm from "../TransactionForm";
 import TransactionsTable from "../TransactionsTable";
+import EditTransactionModal from "../EditTransactionModal";
 
 export default function TransactionsSection({
   categories,
@@ -14,6 +15,7 @@ export default function TransactionsSection({
   onDelete,
   pagination,
 }) {
+  const [editing, setEditing] = React.useState(null);
   return (
     <div className="grid gap-4">
       <TransactionForm
@@ -28,7 +30,17 @@ export default function TransactionsSection({
         filters={filters}
         onChangeFilters={onChangeFilters}
         onDelete={onDelete}
+        onEdit={(t) => setEditing(t)}
         pagination={pagination}
+      />
+      <EditTransactionModal
+        open={Boolean(editing)}
+        onClose={() => setEditing(null)}
+        transaction={editing}
+        categories={categories}
+        projects={projects}
+        onUpdated={onCreated}
+        onCategoryCreated={onCategoryCreated}
       />
     </div>
   );

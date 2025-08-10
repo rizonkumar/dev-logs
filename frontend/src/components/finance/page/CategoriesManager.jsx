@@ -25,15 +25,15 @@ export default function CategoriesManager({ categories, onCreate }) {
     <div className="grid gap-4">
       <Card>
         <SectionTitle>Create Category</SectionTitle>
-        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+        <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
           <input
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 flex-1"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 flex-1 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
             placeholder="Category name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <select
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 w-48"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 w-48 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value })}
           >
@@ -41,7 +41,7 @@ export default function CategoriesManager({ categories, onCreate }) {
             <option value="EXPENSE">Expense</option>
           </select>
           <button
-            className="px-4 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900 whitespace-nowrap cursor-pointer hover:opacity-90 transition"
+            className="px-4 py-2 rounded-lg bg-stone-900 text-white dark:bg-white dark:text-stone-900 whitespace-nowrap cursor-pointer hover:opacity-90 transition-colors shadow-sm"
             disabled={saving || !form.name}
             onClick={async () => {
               try {

@@ -12,6 +12,7 @@ export default function TransactionsTable({
   filters,
   onChangeFilters,
   onDelete,
+  onEdit,
   pagination,
 }) {
   return (
@@ -93,12 +94,20 @@ export default function TransactionsTable({
                     {formatCurrency(t.amount, currency)}
                   </td>
                   <td className="py-2 text-right">
-                    <button
-                      className="text-xs px-2 py-1 rounded bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 cursor-pointer transition-colors hover:bg-red-200 dark:hover:bg-red-800"
-                      onClick={() => onDelete?.(t._id)}
-                    >
-                      Delete
-                    </button>
+                    <div className="inline-flex items-center gap-2">
+                      <button
+                        className="text-xs px-2 py-1 rounded bg-stone-200 text-stone-900 dark:bg-stone-800 dark:text-stone-200 cursor-pointer transition-colors hover:bg-stone-300 dark:hover:bg-stone-700"
+                        onClick={() => onEdit?.(t)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="text-xs px-2 py-1 rounded bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 cursor-pointer transition-colors hover:bg-red-200 dark:hover:bg-red-800"
+                        onClick={() => onDelete?.(t._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

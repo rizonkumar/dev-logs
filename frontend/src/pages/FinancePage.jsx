@@ -165,6 +165,41 @@ export default function FinancePage() {
     setProgress((p) => ({ ...p, [categoryId]: data }));
   };
 
+  const refreshAllProgress = async () => {
+    try {
+      const expenseCategoryIds = (categories || [])
+        .filter((c) => c.type === "EXPENSE")
+        .map((c) => c._id);
+
+      if (expenseCategoryIds.length === 0) {
+        setProgress({});
+        return;
+      }
+
+      const entries = await Promise.all(
+        expenseCategoryIds.map(async (id) => {
+          const data = await budgetService.getBudgetProgress({
+            categoryId: id,
+            month,
+            year,
+          });
+          return [id, data];
+        })
+      );
+
+      setProgress((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
+    } catch (e) {
+      console.error("Failed to refresh all budget progress", e);
+    }
+  };
+
+  // When the Budgets tab is opened, fetch progress for all expense categories
+  useEffect(() => {
+    if (!loading && activeTab === "budgets") {
+      refreshAllProgress();
+    }
+  }, [activeTab, loading, month, year, categories]);
+
   const filteredTx = useMemo(() => {
     return transactions.filter(
       (t) =>
@@ -287,8 +322,15 @@ export default function FinancePage() {
             await refreshProgress(payload.category);
           }}
           onUpdateBudget={async (id, updates) => {
-            await budgetService.updateBudget(id, updates);
+            const updated = await budgetService.updateBudget(id, updates);
             setBudgets(await budgetService.listBudgets({ month, year }));
+            const categoryId = updated?.category?._id || updated?.category;
+            if (categoryId) await refreshProgress(categoryId);
+          }}
+          onDeleteBudget={async (id, categoryId) => {
+            await budgetService.deleteBudget(id);
+            setBudgets(await budgetService.listBudgets({ month, year }));
+            if (categoryId) await refreshProgress(categoryId);
           }}
           onRefreshProgress={(categoryId) => refreshProgress(categoryId)}
         />

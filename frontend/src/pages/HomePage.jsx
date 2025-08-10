@@ -527,12 +527,14 @@ function HomePage() {
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 relative text-gray-900 dark:text-stone-100 bg-stone-50 dark:bg-stone-950 min-h-full">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-6 relative z-10 flex items-center gap-3">
-          <Logo size={34} withText={false} />
-          <h1 className="text-2xl md:text-3xl font-bold">
-            Developer Dashboard
-          </h1>
-          <p className="text-gray-500 dark:text-stone-300 text-sm">
+        <header className="mb-6 relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <Logo size={34} withText={false} />
+            <h1 className="text-2xl md:text-3xl font-bold">
+              Developer Dashboard
+            </h1>
+          </div>
+          <p className="text-gray-500 dark:text-stone-300 text-sm sm:leading-none">
             Welcome back, {userInfo?.name || "Developer"}!
           </p>
         </header>

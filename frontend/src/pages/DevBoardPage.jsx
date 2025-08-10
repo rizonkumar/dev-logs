@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { DragDropContext } from "@hello-pangea/dnd";
 import {
@@ -8,6 +8,8 @@ import {
   createTodo,
 } from "../app/features/todosSlice";
 import { Search } from "lucide-react";
+import { toast } from "react-toastify";
+import KanbanSkeleton from "../components/devboard/KanbanSkeleton";
 import BoardHeader from "../components/devboard/BoardHeader";
 import AddEditModal from "../components/devboard/AddEditModal";
 import DeleteModal from "../components/devboard/DeleteModal";
@@ -25,12 +27,43 @@ const DevBoardPage = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const searchRef = useRef(null);
 
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchTodos());
     }
   }, [status, dispatch]);
+
+  // persist view and filters to URL + localStorage
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set("q", searchQuery);
+    if (dateFrom) params.set("from", dateFrom);
+    if (dateTo) params.set("to", dateTo);
+    if (viewMode) params.set("view", viewMode);
+    const url = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", url);
+    try {
+      localStorage.setItem(
+        "devboardState",
+        JSON.stringify({ q: searchQuery, from: dateFrom, to: dateTo, view: viewMode })
+      );
+    } catch {}
+  }, [searchQuery, dateFrom, dateTo, viewMode]);
+
+  useEffect(() => {
+    // hydrate on mount
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const saved = JSON.parse(localStorage.getItem("devboardState") || "null") || {};
+      setSearchQuery(searchParams.get("q") ?? saved.q ?? "");
+      setDateFrom(searchParams.get("from") ?? saved.from ?? "");
+      setDateTo(searchParams.get("to") ?? saved.to ?? "");
+      setViewMode(searchParams.get("view") ?? saved.view ?? "today");
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -58,6 +91,33 @@ const DevBoardPage = () => {
     setDateTo("");
     dispatch(fetchTodos());
   };
+
+  // keyboard shortcuts
+  useEffect(() => {
+    const onKey = (e) => {
+      if (
+        e.target &&
+        ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)
+      )
+        return;
+      if (e.key === "/") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      } else if (e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        setModal("add");
+      } else if (e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        clearFilters();
+      } else if (e.key === "1") {
+        setViewMode("today");
+      } else if (e.key === "2") {
+        setViewMode("all");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [clearFilters]);
 
   const filteredTodos = useMemo(() => {
     const hasServerFilters = Boolean(debouncedSearch || dateFrom || dateTo);
@@ -129,9 +189,33 @@ const DevBoardPage = () => {
   };
 
   const handleDeleteConfirm = () => {
-    if (selectedTodo) dispatch(deleteTodo(selectedTodo._id));
-    setModal(null);
-    setSelectedTodo(null);
+    if (selectedTodo) {
+      const removed = selectedTodo;
+      dispatch(deleteTodo(selectedTodo._id));
+      setModal(null);
+      setSelectedTodo(null);
+      const id = toast(
+        () => (
+          <div className="flex items-center gap-3">
+            <span>Task deleted</span>
+            <button
+              onClick={() => {
+                dispatch(createTodo({
+                  task: removed.task,
+                  status: removed.status,
+                  isCompleted: removed.isCompleted,
+                }));
+                toast.dismiss(id);
+              }}
+              className="px-2 py-0.5 text-sm rounded bg-stone-200 dark:bg-stone-800"
+            >
+              Undo
+            </button>
+          </div>
+        ),
+        { autoClose: 5000 }
+      );
+    }
   };
 
   const openEditModal = (e, todo) => {
@@ -148,8 +232,8 @@ const DevBoardPage = () => {
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center h-full p-6">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
+      <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50 dark:bg-stone-950">
+        <KanbanSkeleton />
       </div>
     );
   }
@@ -167,6 +251,7 @@ const DevBoardPage = () => {
         setDateTo={setDateTo}
         clearFilters={clearFilters}
         onAddTask={() => setModal("add")}
+        searchInputRef={searchRef}
       />
 
       {filteredTodos.length === 0 && status === "succeeded" ? (
@@ -200,6 +285,11 @@ const DevBoardPage = () => {
                 theme={COLUMN_THEME[columnId]}
                 openEditModal={openEditModal}
                 openDeleteModal={openDeleteModal}
+                onQuickAdd={(task) =>
+                  dispatch(
+                    createTodo({ task, status: "TODO", isCompleted: false })
+                  )
+                }
               />
             ))}
           </div>

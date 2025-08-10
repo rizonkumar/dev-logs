@@ -65,14 +65,14 @@ export default function TransactionForm({
       <SectionTitle>Add Transaction</SectionTitle>
       <form
         onSubmit={onSubmit}
-        className="grid gap-3 md:grid-cols-2 lg:grid-cols-3"
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
         <select
           value={form.type}
           onChange={(e) =>
             setForm({ ...form, type: e.target.value, category: "" })
           }
-          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+          className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
         >
           <option value="EXPENSE">Expense</option>
           <option value="INCOME">Income</option>
@@ -83,7 +83,7 @@ export default function TransactionForm({
           step="0.01"
           value={form.amount}
           onChange={(e) => setForm({ ...form, amount: e.target.value })}
-          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+          className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
           placeholder="Amount"
           required
         />
@@ -93,12 +93,12 @@ export default function TransactionForm({
           onChange={(e) =>
             setForm({ ...form, transactionDate: e.target.value })
           }
-          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+          className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
         />
         <select
           value={form.category}
           onChange={(e) => setForm({ ...form, category: e.target.value })}
-          className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+          className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
           required
         >
           <option value="">Select Category</option>
@@ -115,7 +115,7 @@ export default function TransactionForm({
           <input
             value={otherCategoryName}
             onChange={(e) => setOtherCategoryName(e.target.value)}
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
             placeholder={`New ${form.type.toLowerCase()} category`}
             required
           />
@@ -123,7 +123,7 @@ export default function TransactionForm({
           <select
             value={form.project}
             onChange={(e) => setForm({ ...form, project: e.target.value })}
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600"
           >
             <option value="">No Project</option>
             {projects.map((p) => (
@@ -137,7 +137,7 @@ export default function TransactionForm({
           <input
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="px-3 py-2 rounded bg-stone-100 dark:bg-stone-800 w-full"
+            className="px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 w-full"
             placeholder="Description (optional)"
           />
         </div>
@@ -145,7 +145,7 @@ export default function TransactionForm({
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer hover:opacity-90 transition"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer hover:opacity-90 transition-colors shadow-sm"
           >
             {loading ? "Saving..." : "Add"}
           </button>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { GripVertical, Edit2, Trash2 } from "lucide-react";
 
@@ -8,8 +8,11 @@ const KanbanColumn = ({
   theme,
   openEditModal,
   openDeleteModal,
+  onQuickAdd,
 }) => {
   const Icon = theme.icon;
+  const [draft, setDraft] = useState("");
+  const showQuickAdd = columnId === "TODO";
   return (
     <div className="flex flex-col bg-stone-100 dark:bg-stone-900 rounded-xl min-w-[280px] border border-transparent dark:border-stone-700">
       <div
@@ -23,6 +26,22 @@ const KanbanColumn = ({
           {tasks.length}
         </span>
       </div>
+      {showQuickAdd && (
+        <div className="px-3 pb-1">
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && draft.trim()) {
+                onQuickAdd?.(draft.trim());
+                setDraft("");
+              }
+            }}
+            placeholder="Quick add task and press Enter"
+            className="w-full mb-2 px-3 py-2 rounded-lg bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm"
+          />
+        </div>
+      )}
       <Droppable droppableId={columnId}>
         {(provided, snapshot) => (
           <div
