@@ -53,11 +53,11 @@ const AddEntryCard = ({
   return (
     <div className="relative">
       <div
-        className="bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl rounded-3xl border border-stone-200/50 dark:border-stone-700/50
-                    shadow-xl shadow-stone-900/5 dark:shadow-stone-100/5"
+        className="bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl rounded-2xl border border-stone-200/50 dark:border-stone-700/50
+                    shadow-lg shadow-stone-900/5 dark:shadow-stone-100/5"
       >
         {/* Header */}
-        <div className="p-6 border-b border-stone-200/50 dark:border-stone-700/50">
+        <div className="p-4 border-b border-stone-200/50 dark:border-stone-700/50">
           <button
             type="button"
             onClick={handleToggleClick}
