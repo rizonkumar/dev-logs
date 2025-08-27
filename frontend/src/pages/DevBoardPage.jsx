@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { DragDropContext } from "@hello-pangea/dnd";
 import {
@@ -40,7 +46,6 @@ const DevBoardPage = () => {
     }
   }, [status, dispatch]);
 
-  // persist view and filters to URL + localStorage
   useEffect(() => {
     const params = new URLSearchParams();
     if (searchQuery) params.set("q", searchQuery);
@@ -62,7 +67,9 @@ const DevBoardPage = () => {
           tags: tagsFilter,
         })
       );
-    } catch {}
+    } catch (error) {
+      console.warn("Failed to save devboard state to localStorage:", error);
+    }
   }, [searchQuery, dateFrom, dateTo, viewMode, tagsFilter]);
 
   useEffect(() => {
@@ -86,8 +93,12 @@ const DevBoardPage = () => {
       } else if (Array.isArray(saved.tags)) {
         setTagsFilter(saved.tags.filter((t) => typeof t === "string"));
       }
-    } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    } catch (error) {
+      console.warn(
+        "Failed to restore devboard state from localStorage:",
+        error
+      );
+    }
   }, []);
 
   useEffect(() => {
@@ -111,13 +122,13 @@ const DevBoardPage = () => {
     }
   }, [debouncedSearch, dateFrom, dateTo, tagsFilter, dispatch]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery("");
     setDateFrom("");
     setDateTo("");
     setTagsFilter([]);
     dispatch(fetchTodos());
-  };
+  }, [dispatch]);
 
   // keyboard shortcuts
   useEffect(() => {
@@ -274,103 +285,126 @@ const DevBoardPage = () => {
 
   if (status === "loading") {
     return (
-      <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50 dark:bg-stone-950">
-        <KanbanSkeleton />
+      <div
+        className="min-h-screen bg-gradient-to-br from-stone-50 via-blue-50/30 to-indigo-50/40
+                      dark:from-stone-950 dark:via-blue-950/20 dark:to-indigo-950/30"
+      >
+        <div className="absolute inset-0 opacity-5 dark:opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,theme(colors.stone.400)_1px,transparent_0)] bg-[length:32px_32px]" />
+        </div>
+        <div className="relative h-full flex flex-col p-3 sm:p-4 md:p-6 lg:p-8">
+          <KanbanSkeleton />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col p-4 md:p-6 bg-stone-50 dark:bg-stone-950">
-      <BoardHeader
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        dateFrom={dateFrom}
-        setDateFrom={setDateFrom}
-        dateTo={dateTo}
-        setDateTo={setDateTo}
-        clearFilters={clearFilters}
-        onAddTask={() => setModal("add")}
-        searchInputRef={searchRef}
-        selectedTags={tagsFilter}
-        setSelectedTags={setTagsFilter}
-      />
+    <div
+      className="min-h-screen bg-gradient-to-br from-stone-50 via-blue-50/30 to-indigo-50/40
+                    dark:from-stone-950 dark:via-blue-950/20 dark:to-indigo-950/30"
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5 dark:opacity-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,theme(colors.stone.400)_1px,transparent_0)] bg-[length:32px_32px]" />
+      </div>
 
-      {filteredTodos.length === 0 && status === "succeeded" ? (
-        debouncedSearch || dateFrom || dateTo ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center p-8 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl max-w-lg w-full">
-              <div className="mx-auto w-14 h-14 bg-blue-100 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center rounded-2xl mb-4 border border-blue-200 dark:border-blue-900/40">
-                <Search size={24} />
+      <div className="relative h-full flex flex-col p-3 sm:p-4 md:p-6 lg:p-8">
+        <BoardHeader
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          dateFrom={dateFrom}
+          setDateFrom={setDateFrom}
+          dateTo={dateTo}
+          setDateTo={setDateTo}
+          clearFilters={clearFilters}
+          onAddTask={() => setModal("add")}
+          searchInputRef={searchRef}
+          selectedTags={tagsFilter}
+          setSelectedTags={setTagsFilter}
+        />
+
+        {filteredTodos.length === 0 && status === "succeeded" ? (
+          debouncedSearch || dateFrom || dateTo ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center p-8 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl max-w-lg w-full">
+                <div className="mx-auto w-14 h-14 bg-blue-100 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center rounded-2xl mb-4 border border-blue-200 dark:border-blue-900/40">
+                  <Search size={24} />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                  No results
+                </h2>
+                <p className="text-sm text-stone-500 dark:text-stone-300">
+                  {debouncedSearch
+                    ? `No tasks found for "${debouncedSearch}"`
+                    : "No tasks found for the selected date range"}
+                </p>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                No results
-              </h2>
-              <p className="text-sm text-stone-500 dark:text-stone-300">
-                {debouncedSearch
-                  ? `No tasks found for "${debouncedSearch}"`
-                  : "No tasks found for the selected date range"}
-              </p>
             </div>
-          </div>
+          ) : (
+            <EmptyState onAddTaskClick={() => setModal("add")} />
+          )
         ) : (
-          <EmptyState onAddTaskClick={() => setModal("add")} />
-        )
-      ) : (
-        <DragDropContext
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <div
-            className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto"
-            onDragOver={(e) => {
-              const edge = 80;
-              const x = e.clientX;
-              const w = window.innerWidth;
-              if (x < edge) window.scrollBy({ left: -20, behavior: "smooth" });
-              else if (w - x < edge)
-                window.scrollBy({ left: 20, behavior: "smooth" });
-            }}
+          <DragDropContext
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
           >
-            {Object.entries(columns).map(([columnId, tasks]) => (
-              <KanbanColumn
-                key={columnId}
-                columnId={columnId}
-                tasks={tasks}
-                theme={COLUMN_THEME[columnId]}
-                openEditModal={openEditModal}
-                openDeleteModal={openDeleteModal}
-                onQuickAdd={(task) => {
-                  dispatch(
-                    createTodo({ task, status: "TODO", isCompleted: false })
-                  );
-                  toast.success("Task added");
-                }}
-              />
-            ))}
-          </div>
-        </DragDropContext>
-      )}
+            <div
+              className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto overflow-y-hidden
+                         auto-cols-max sm:auto-cols-fr items-start"
+              onDragOver={(e) => {
+                const edge = 80;
+                const x = e.clientX;
+                const w = window.innerWidth;
+                if (x < edge)
+                  window.scrollBy({ left: -20, behavior: "smooth" });
+                else if (w - x < edge)
+                  window.scrollBy({ left: 20, behavior: "smooth" });
+              }}
+            >
+              {Object.entries(columns).map(([columnId, tasks]) => (
+                <KanbanColumn
+                  key={columnId}
+                  columnId={columnId}
+                  tasks={tasks}
+                  theme={COLUMN_THEME[columnId]}
+                  openEditModal={openEditModal}
+                  openDeleteModal={openDeleteModal}
+                  onQuickAdd={(task) => {
+                    dispatch(
+                      createTodo({ task, status: "TODO", isCompleted: false })
+                    );
+                    toast.success("Task added");
+                  }}
+                />
+              ))}
+            </div>
+          </DragDropContext>
+        )}
 
-      {modal === "add" && (
-        <AddEditModal onClose={() => setModal(null)} onSave={handleSaveTodo} />
-      )}
-      {modal === "edit" && (
-        <AddEditModal
-          todo={selectedTodo}
-          onClose={() => setModal(null)}
-          onSave={handleSaveTodo}
-        />
-      )}
-      {modal === "delete" && (
-        <DeleteModal
-          onClose={() => setModal(null)}
-          onConfirm={handleDeleteConfirm}
-        />
-      )}
-      <div aria-live="polite" className="sr-only" ref={liveRef} />
+        {modal === "add" && (
+          <AddEditModal
+            onClose={() => setModal(null)}
+            onSave={handleSaveTodo}
+          />
+        )}
+        {modal === "edit" && (
+          <AddEditModal
+            todo={selectedTodo}
+            onClose={() => setModal(null)}
+            onSave={handleSaveTodo}
+          />
+        )}
+        {modal === "delete" && (
+          <DeleteModal
+            onClose={() => setModal(null)}
+            onConfirm={handleDeleteConfirm}
+          />
+        )}
+        <div aria-live="polite" className="sr-only" ref={liveRef} />
+      </div>
     </div>
   );
 };
