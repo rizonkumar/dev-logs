@@ -1,24 +1,76 @@
 import React from "react";
-import { ClipboardList, Plus } from "lucide-react";
+import { ClipboardList, Plus, Sparkles, ArrowRight } from "lucide-react";
 
 const EmptyState = ({ onAddTaskClick }) => (
-  <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl p-10 max-w-lg shadow-sm">
-      <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center rounded-2xl mb-6 border border-blue-200 dark:border-blue-900/40">
-        <ClipboardList size={32} />
+  <div className="flex-1 flex flex-col items-center justify-center text-center p-6 sm:p-8 lg:p-12">
+    <div
+      className="bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl border border-stone-200/50 dark:border-stone-700/50
+                    rounded-3xl p-8 sm:p-10 lg:p-12 max-w-2xl shadow-2xl shadow-stone-900/5 dark:shadow-stone-100/5
+                    relative overflow-hidden"
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5 dark:opacity-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,theme(colors.blue.400)_1px,transparent_0)] bg-[length:24px_24px]" />
       </div>
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-        Your Board is Clear!
-      </h2>
-      <p className="text-gray-500 dark:text-stone-300 mb-6">
-        Get started by adding your first task. Let's make today productive.
-      </p>
-      <button
-        onClick={onAddTaskClick}
-        className="flex items-center mx-auto gap-2 bg-gray-800 hover:bg-black dark:bg-stone-200 dark:hover:bg-white text-white dark:text-stone-900 px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-sm"
-      >
-        <Plus size={18} /> Add Your First Task
-      </button>
+
+      <div className="relative z-10">
+        <div
+          className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500
+                        text-white flex items-center justify-center rounded-3xl shadow-lg shadow-blue-500/25 mb-6
+                        relative"
+        >
+          <ClipboardList size={40} className="sm:w-12 sm:h-12" />
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+            <Sparkles size={16} className="text-yellow-800" />
+          </div>
+        </div>
+
+        <div className="space-y-4 mb-8">
+          <h2
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
+                         dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent leading-tight"
+          >
+            Ready to Organize?
+          </h2>
+          <p className="text-stone-600 dark:text-stone-300 text-base sm:text-lg leading-relaxed max-w-lg mx-auto">
+            Your DevBoard is waiting for its first task. Break down your
+            projects, track progress, and boost your productivity with our
+            intuitive kanban system.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <button
+            onClick={onAddTaskClick}
+            className="group inline-flex items-center gap-3 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500
+                       hover:from-blue-600 hover:via-purple-600 hover:to-indigo-600 text-white px-8 py-4 rounded-2xl
+                       font-bold text-lg transition-all duration-300 shadow-xl shadow-blue-500/25
+                       hover:shadow-2xl hover:shadow-blue-500/30 hover:scale-105 transform cursor-pointer"
+          >
+            <Plus size={24} />
+            Create Your First Task
+            <ArrowRight
+              size={20}
+              className="group-hover:translate-x-1 transition-transform duration-200"
+            />
+          </button>
+
+          <div className="flex flex-wrap justify-center gap-3 text-sm text-stone-500 dark:text-stone-400">
+            <span className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              Drag & Drop
+            </span>
+            <span className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              Real-time Updates
+            </span>
+            <span className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              Smart Filters
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 );
