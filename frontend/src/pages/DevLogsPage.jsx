@@ -256,9 +256,9 @@ function DevLogsPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,theme(colors.stone.400)_1px,transparent_0)] bg-[length:24px_24px]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4 lg:py-8">
           {/* Back Navigation */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <Link
               to="/"
               className="inline-flex items-center text-sm text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white
@@ -278,16 +278,16 @@ function DevLogsPage() {
           </div>
 
           {/* Header Section */}
-          <div className="mb-12">
+          <div className="mb-8 sm:mb-12">
             <DevLogsHeader />
-            <div className="mt-8 text-center lg:text-left">
+            <div className="mt-6 sm:mt-8 text-center lg:text-left">
               <h1
-                className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
-                           dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent mb-6"
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
+                           dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent mb-4 sm:mb-6"
               >
                 Development Journal
               </h1>
-              <p className="text-lg text-stone-600 dark:text-stone-300 max-w-3xl leading-relaxed mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg text-stone-600 dark:text-stone-300 max-w-3xl leading-relaxed mx-auto lg:mx-0">
                 Your personal chronicle of coding adventures, technical
                 discoveries, and growth milestones. Every bug fixed and feature
                 built tells a story.
