@@ -105,10 +105,8 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
 
       <li className="group relative">
         <div className="flex">
-          {/* Timeline Connector */}
           <div className="flex flex-col items-center mr-6">
             <div className="relative">
-              {/* Timeline Node */}
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs
                             border-2 transition-all duration-300 group-hover:scale-110 ${
@@ -128,12 +126,10 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                 </span>
               </div>
 
-              {/* Pulse effect for first item */}
               {index === 0 && (
-                <div className="absolute inset-0 w-14 h-14 rounded-2xl bg-blue-500/20" />
+                <div className="absolute inset-0 w-14 h-14 rounded-2xl" />
               )}
 
-              {/* Special indicator for latest entry */}
               {index === 0 && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -141,7 +137,6 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
               )}
             </div>
 
-            {/* Timeline Line */}
             {index < totalLogs - 1 && (
               <div
                 className="w-0.5 h-full bg-gradient-to-b from-blue-300 via-stone-300 to-transparent
@@ -151,7 +146,6 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
             )}
           </div>
 
-          {/* Log Content Card */}
           <div className="flex-grow pb-4">
             <div
               className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl p-4 rounded-2xl
@@ -161,7 +155,6 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
               <div className="relative">
                 {isEditing ? (
                   <div className="space-y-4">
-                    {/* Edit Tags Section */}
                     <div className="space-y-3">
                       <div className="flex items-center space-x-3">
                         <div
@@ -181,7 +174,6 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                       />
                     </div>
 
-                    {/* Edit Content Section */}
                     <div className="space-y-4">
                       <div className="flex items-center space-x-3">
                         <div
@@ -220,7 +212,6 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                       </div>
                     </div>
 
-                    {/* Edit Actions */}
                     <div className="flex justify-end space-x-4 pt-6 border-t border-stone-200/50 dark:border-stone-700/50">
                       <button
                         onClick={() => setIsEditing(false)}
@@ -245,12 +236,10 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                   </div>
                 ) : (
                   <>
-                    {/* Tags Display */}
                     <div className="mb-3">
                       <TagsDisplay tags={log.tags} />
                     </div>
 
-                    {/* Main Content */}
                     <div className="mb-4">
                       <p
                         className="text-stone-800 dark:text-stone-100 leading-snug whitespace-pre-wrap text-sm
@@ -260,9 +249,7 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                       </p>
                     </div>
 
-                    {/* Footer */}
                     <div className="flex items-center justify-between pt-3 border-t border-stone-200/50 dark:border-stone-700/50">
-                      {/* Stats */}
                       <div className="flex items-center space-x-4 text-xs text-stone-500 dark:text-stone-400">
                         <div
                           className="flex items-center space-x-2 px-3 py-1 bg-stone-100/80 dark:bg-stone-800/80
@@ -289,7 +276,6 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                         </div>
                       </div>
 
-                      {/* Actions */}
                       <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <button
                           onClick={() => setIsEditing(true)}

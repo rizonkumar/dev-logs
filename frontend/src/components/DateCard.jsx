@@ -53,12 +53,6 @@ const DateCard = ({
   const [logToDelete, setLogToDelete] = useState(null);
 
   const relativeDate = getDateRelativeDisplay(date);
-  const fullDate = new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  });
 
   const handleEditClick = (log) => {
     setEditingLogId(log._id);

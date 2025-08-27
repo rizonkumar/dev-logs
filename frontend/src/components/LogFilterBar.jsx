@@ -97,20 +97,25 @@ function LogFilterBar({ range, setRange }) {
               </button>
               {fromPickerOpen && (
                 <div
-                  className="absolute top-full left-0 mt-1 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl
-                              border border-stone-200/50 dark:border-stone-700/50 rounded-xl p-3 shadow-xl
-                              shadow-stone-900/15 dark:shadow-stone-100/15"
+                  className="fixed inset-0 flex items-center justify-center z-[9999] bg-black/20 backdrop-blur-sm"
+                  onClick={() => setFromPickerOpen(false)}
                 >
-                  <DayPicker
-                    mode="single"
-                    selected={range.from}
-                    onSelect={(date) => {
-                      setRange((prev) => ({ ...prev, from: date }));
-                      setFromPickerOpen(false);
-                    }}
-                    initialFocus
-                    className="text-sm"
-                  />
+                  <div
+                    className="bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl border border-stone-200/50 dark:border-stone-700/50
+                                rounded-2xl p-4 shadow-2xl shadow-stone-900/20 dark:shadow-stone-100/20 max-w-sm mx-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <DayPicker
+                      mode="single"
+                      selected={range.from}
+                      onSelect={(date) => {
+                        setRange((prev) => ({ ...prev, from: date }));
+                        setFromPickerOpen(false);
+                      }}
+                      initialFocus
+                      className="text-sm"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -142,20 +147,25 @@ function LogFilterBar({ range, setRange }) {
               </button>
               {toPickerOpen && (
                 <div
-                  className="absolute top-full left-0 mt-1 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl
-                              border border-stone-200/50 dark:border-stone-700/50 rounded-xl p-3 shadow-xl
-                              shadow-stone-900/15 dark:shadow-stone-100/15"
+                  className="fixed inset-0 flex items-center justify-center z-[9999] bg-black/20 backdrop-blur-sm"
+                  onClick={() => setToPickerOpen(false)}
                 >
-                  <DayPicker
-                    mode="single"
-                    selected={range.to}
-                    onSelect={(date) => {
-                      setRange((prev) => ({ ...prev, to: date }));
-                      setToPickerOpen(false);
-                    }}
-                    initialFocus
-                    className="text-sm"
-                  />
+                  <div
+                    className="bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl border border-stone-200/50 dark:border-stone-700/50
+                                rounded-2xl p-4 shadow-2xl shadow-stone-900/20 dark:shadow-stone-100/20 max-w-sm mx-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <DayPicker
+                      mode="single"
+                      selected={range.to}
+                      onSelect={(date) => {
+                        setRange((prev) => ({ ...prev, to: date }));
+                        setToPickerOpen(false);
+                      }}
+                      initialFocus
+                      className="text-sm"
+                    />
+                  </div>
                 </div>
               )}
             </div>
