@@ -129,7 +129,7 @@ function DevLogsPage() {
     );
   } else if (status === "succeeded") {
     content = (
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {sortedDates.length > 0 ? (
           sortedDates.map((date) => (
             <DateCard
@@ -297,16 +297,16 @@ function DevLogsPage() {
 
           {/* Stats Section */}
           {logs && logs.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               <QuickStatsCard logs={logs} />
             </div>
           )}
 
           {/* Filter Section */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <div
-              className="bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl rounded-3xl border border-stone-200/50 dark:border-stone-700/50
-                          shadow-xl shadow-stone-900/5 dark:shadow-stone-100/5 p-8"
+              className="bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-stone-200/50 dark:border-stone-700/50
+                          shadow-xl shadow-stone-900/5 dark:shadow-stone-100/5 p-4 sm:p-6 lg:p-8"
             >
               <LogFilterBar range={dateRange} setRange={setDateRange} />
               {(dateRange.from || dateRange.to) && (
@@ -327,7 +327,7 @@ function DevLogsPage() {
           </div>
 
           {/* Add Entry Section */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <AddEntryCard
               isOpen={isFormOpen}
               onToggle={() => setIsFormOpen(!isFormOpen)}
