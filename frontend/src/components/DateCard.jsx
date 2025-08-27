@@ -266,7 +266,13 @@ const DateCard = ({
                                 "
                     >
                       {editingLogId === log._id ? (
-                        <div className="space-y-3">
+                        <div
+                          className="space-y-3"
+                          onClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          onKeyUp={(e) => e.stopPropagation()}
+                          onInput={(e) => e.stopPropagation()}
+                        >
                           <textarea
                             value={editText}
                             onChange={(e) => setEditText(e.target.value)}
@@ -324,7 +330,12 @@ const DateCard = ({
 
                             <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                               <button
-                                onClick={() => handleEditClick(log)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  e.nativeEvent?.stopImmediatePropagation?.();
+                                  handleEditClick(log);
+                                }}
                                 className="p-1.5 text-stone-400 dark:text-stone-500 hover:text-blue-600 dark:hover:text-blue-400
                                           hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded transition-all duration-300"
                                 title="Edit entry"
@@ -332,7 +343,10 @@ const DateCard = ({
                                 <Edit size={12} />
                               </button>
                               <button
-                                onClick={() => handleDeleteClick(log)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClick(log);
+                                }}
                                 className="p-1.5 text-stone-400 dark:text-stone-500 hover:text-red-600 dark:hover:text-red-400
                                           hover:bg-red-50 dark:hover:bg-red-950/30 rounded transition-all duration-300"
                                 title="Delete entry"

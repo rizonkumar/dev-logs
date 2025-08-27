@@ -154,7 +154,13 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
             >
               <div className="relative">
                 {isEditing ? (
-                  <div className="space-y-4">
+                  <div
+                    className="space-y-4"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    onKeyUp={(e) => e.stopPropagation()}
+                    onInput={(e) => e.stopPropagation()}
+                  >
                     <div className="space-y-3">
                       <div className="flex items-center space-x-3">
                         <div
@@ -224,7 +230,7 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                         <span>Cancel</span>
                       </button>
                       <button
-                        onClick={handleUpdate}
+                        onClick={() => handleUpdate()}
                         className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600
                                   text-white rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg
                                   shadow-green-500/25 font-semibold flex items-center space-x-2"
@@ -278,7 +284,12 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
 
                       <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <button
-                          onClick={() => setIsEditing(true)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.nativeEvent?.stopImmediatePropagation?.();
+                            setIsEditing(true);
+                          }}
                           className="p-2 text-stone-400 dark:text-stone-500 hover:text-blue-600 dark:hover:text-blue-400
                                     hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-all duration-300
                                     hover:scale-110 shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20"
@@ -287,7 +298,10 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                           <Edit size={14} />
                         </button>
                         <button
-                          onClick={handleDeleteClick}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick();
+                          }}
                           className="p-2 text-stone-400 dark:text-stone-500 hover:text-red-600 dark:hover:text-red-400
                                     hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-all duration-300
                                     hover:scale-110 shadow-lg shadow-red-500/10 hover:shadow-red-500/20"

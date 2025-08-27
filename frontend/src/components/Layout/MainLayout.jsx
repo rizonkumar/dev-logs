@@ -338,7 +338,7 @@ const MainLayout = ({ children }) => {
       ></div>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed inset-y-0 left-0 z-[100] flex flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -346,7 +346,7 @@ const MainLayout = ({ children }) => {
       </aside>
 
       <aside
-        className={`hidden lg:flex flex-shrink-0 flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 transition-all duration-300 ease-in-out ${
+        className={`hidden lg:flex flex-shrink-0 flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 transition-all duration-300 ease-in-out z-[100] ${
           isDesktopSidebarOpen ? "w-64" : "w-20"
         }`}
       >
