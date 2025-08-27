@@ -5,7 +5,7 @@ const User = require("../models/userModel");
 const protect = [
   requireAuth(),
   asyncHandler(async (req, res, next) => {
-    const clerkUserId = req.auth.userId;
+    const clerkUserId = req.auth().userId;
     if (!clerkUserId) {
       res.status(401);
       throw new Error("Not authorized");
