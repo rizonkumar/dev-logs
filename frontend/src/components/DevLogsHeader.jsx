@@ -82,8 +82,8 @@ const DevLogsHeader = () => {
 
   return (
     <div className="relative">
-      {/* Header Row */}
-      <div className="flex items-center justify-between flex-wrap gap-6">
+            {/* Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
         {/* Left Side - Profile */}
         <div className="flex items-center">
           <div className="relative group">
@@ -95,16 +95,16 @@ const DevLogsHeader = () => {
                   `https://i.pravatar.cc/150?u=${userInfo?._id}`
                 }
                 alt={userInfo?.name || "Developer"}
-                className="w-20 h-20 rounded-2xl border-4 border-white/80 dark:border-stone-700/80 shadow-xl object-cover
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-3 sm:border-4 border-white/80 dark:border-stone-700/80 shadow-xl object-cover
                           group-hover:scale-105 transition-transform duration-300"
               />
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-3 border-white dark:border-stone-900 shadow-sm" />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full border-2 sm:border-3 border-white dark:border-stone-900 shadow-sm" />
             </div>
           </div>
 
-          <div className="ml-4">
+          <div className="ml-3 sm:ml-4">
             <h2
-              className="text-2xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
+              className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
                           dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent"
             >
               {userInfo?.name || "Developer"}
@@ -122,7 +122,7 @@ const DevLogsHeader = () => {
         </div>
 
         {/* Right Side - Navigation */}
-        <nav className="flex items-center space-x-2">
+        <nav className="flex items-center space-x-1 sm:space-x-2 overflow-hidden">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
@@ -132,33 +132,40 @@ const DevLogsHeader = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`group relative px-4 py-3 rounded-2xl border backdrop-blur-xl transition-all duration-300
-                          hover:scale-105 ${
-                            isActive ? styles.active : styles.inactive
-                          }`}
+                className={`group relative px-2 py-1.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-2xl border backdrop-blur-xl transition-all duration-300
+                          hover:scale-105 flex-shrink-0 ${
+                  isActive ? styles.active : styles.inactive
+                }`}
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 sm:space-x-2">
                   <div
-                    className={`p-1.5 rounded-lg transition-all duration-300 ${
+                    className={`p-1 sm:p-1.5 rounded-lg transition-all duration-300 ${
                       isActive
                         ? "bg-white/20 shadow-inner"
                         : "bg-stone-100/50 dark:bg-stone-700/50 group-hover:bg-white/30 dark:group-hover:bg-stone-600/50"
                     }`}
                   >
                     <Icon
-                      className={`w-4 h-4 transition-colors duration-300 ${styles.icon}`}
+                      className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-300 ${styles.icon}`}
                     />
                   </div>
-                  <div>
-                    <div className="font-semibold text-sm leading-tight">
+                  <div className="hidden sm:block">
+                    <div className="font-semibold text-sm leading-tight whitespace-nowrap">
                       {item.name}
+                    </div>
+                  </div>
+                  <div className="sm:hidden">
+                    <div className="font-semibold text-xs leading-tight whitespace-nowrap">
+                      {item.name === "Dev Logs" ? "Logs" :
+                       item.name === "Dev Board" ? "Board" :
+                       item.name === "Finance" ? "Fin" : item.name}
                     </div>
                   </div>
                 </div>
 
                 {/* Active indicator */}
                 {isActive && (
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-white/60 rounded-full" />
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-0.5 sm:w-6 sm:h-1 bg-white/60 rounded-full" />
                 )}
               </Link>
             );
