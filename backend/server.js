@@ -22,8 +22,13 @@ const limiter = rateLimit({
 
 const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigins = isProduction
-  ? [process.env.FRONTEND_URL, /\.vercel\.app$/]
-  : ["http://localhost:5173"];
+  ? [
+      process.env.FRONTEND_URL,
+      /\.vercel\.app$/,
+      "http://localhost:5173",
+      "http://localhost:4173",
+    ]
+  : ["http://localhost:5173", "http://localhost:4173"];
 
 const corsOptions = {
   origin: (origin, callback) => {
