@@ -53,18 +53,18 @@ function LogFilterBar({ range, setRange }) {
       <div className="flex flex-col space-y-3">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <div
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-purple-500
                           flex items-center justify-center shadow-lg shadow-blue-500/25"
             >
-              <CalendarIcon size={20} className="text-white" />
+              <CalendarIcon size={16} className="text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-stone-900 dark:text-stone-100">
+              <h3 className="font-semibold text-stone-900 dark:text-stone-100 text-sm sm:text-base">
                 Date Range Filter
               </h3>
-              <p className="text-sm text-stone-500 dark:text-stone-400">
+              <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400">
                 Filter your development logs by date
               </p>
             </div>
@@ -72,24 +72,24 @@ function LogFilterBar({ range, setRange }) {
         </div>
 
         {/* Filter Controls */}
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center space-x-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
             <div className="relative" ref={fromWrapperRef}>
               <button
                 onClick={() => setFromPickerOpen((p) => !p)}
-                className="group flex items-center gap-3 bg-white/60 dark:bg-stone-800/60 backdrop-blur-xl
-                          border border-stone-200/50 dark:border-stone-700/50 rounded-2xl px-4 py-3
+                className="group flex items-center gap-2 sm:gap-3 bg-white/60 dark:bg-stone-800/60 backdrop-blur-xl
+                          border border-stone-200/50 dark:border-stone-700/50 rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3
                           text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-800
                           hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300
-                          hover:shadow-lg hover:scale-105 min-w-[140px] justify-start"
+                          hover:shadow-lg hover:scale-105 min-w-[120px] sm:min-w-[140px] justify-start w-full sm:w-auto"
               >
-                <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/40 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/60 transition-colors">
+                <div className="p-1 sm:p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/40 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/60 transition-colors">
                   <CalendarIcon
-                    size={16}
+                    size={14}
                     className="text-blue-600 dark:text-blue-300"
                   />
                 </div>
-                <span className="font-medium">
+                <span className="font-medium text-sm">
                   {range.from
                     ? format(range.from, "MMM dd, yyyy")
                     : "From date"}
@@ -120,8 +120,8 @@ function LogFilterBar({ range, setRange }) {
               )}
             </div>
 
-            <div className="flex items-center px-3 py-2 bg-stone-100/50 dark:bg-stone-700/50 rounded-xl">
-              <span className="text-stone-400 dark:text-stone-500 font-medium">
+            <div className="flex items-center px-2 py-1 sm:px-3 sm:py-2 bg-stone-100/50 dark:bg-stone-700/50 rounded-lg sm:rounded-xl">
+              <span className="text-stone-400 dark:text-stone-500 font-medium text-sm">
                 to
               </span>
             </div>
@@ -129,19 +129,19 @@ function LogFilterBar({ range, setRange }) {
             <div className="relative" ref={toWrapperRef}>
               <button
                 onClick={() => setToPickerOpen((p) => !p)}
-                className="group flex items-center gap-3 bg-white/60 dark:bg-stone-800/60 backdrop-blur-xl
-                          border border-stone-200/50 dark:border-stone-700/50 rounded-2xl px-4 py-3
+                className="group flex items-center gap-2 sm:gap-3 bg-white/60 dark:bg-stone-800/60 backdrop-blur-xl
+                          border border-stone-200/50 dark:border-stone-700/50 rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3
                           text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-800
                           hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300
-                          hover:shadow-lg hover:scale-105 min-w-[140px] justify-start"
+                          hover:shadow-lg hover:scale-105 min-w-[120px] sm:min-w-[140px] justify-start w-full sm:w-auto"
               >
-                <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/40 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/60 transition-colors">
+                <div className="p-1 sm:p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/40 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/60 transition-colors">
                   <CalendarIcon
-                    size={16}
+                    size={14}
                     className="text-purple-600 dark:text-purple-300"
                   />
                 </div>
-                <span className="font-medium">
+                <span className="font-medium text-sm">
                   {range.to ? format(range.to, "MMM dd, yyyy") : "To date"}
                 </span>
               </button>
@@ -174,13 +174,13 @@ function LogFilterBar({ range, setRange }) {
           {(range.from || range.to) && (
             <button
               onClick={handleClear}
-              className="group flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-950/30
+              className="group flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-red-50 dark:bg-red-950/30
                         hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200/50 dark:border-red-800/50
-                        rounded-2xl text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200
-                        transition-all duration-300 hover:scale-105 font-medium"
+                        rounded-xl sm:rounded-2xl text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200
+                        transition-all duration-300 hover:scale-105 font-medium text-sm w-full sm:w-auto justify-center"
             >
               <X
-                size={16}
+                size={14}
                 className="group-hover:rotate-90 transition-transform duration-300"
               />
               <span>Clear Filters</span>
