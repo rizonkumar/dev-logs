@@ -17,103 +17,152 @@ const DevLogsHeader = () => {
       name: "Dashboard",
       href: "/",
       icon: LayoutDashboard,
+      description: "Overview & Analytics",
     },
     {
       name: "Dev Logs",
       href: "/logs",
       icon: ScrollText,
+      description: "Development Journal",
     },
     {
       name: "Dev Board",
       href: "/board",
       icon: KanbanSquare,
+      description: "Project Management",
     },
     {
       name: "Finance",
       href: "/finance",
       icon: Wallet,
+      description: "Financial Tracking",
     },
   ];
 
-  const colorStyles = {
-    Dashboard: {
-      active:
-        "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200",
-      hover:
-        "hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-200",
-      icon: "text-indigo-600 dark:text-indigo-300",
-    },
-    "Dev Logs": {
-      active: "bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-200",
-      hover:
-        "hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-700 dark:hover:text-sky-200",
-      icon: "text-sky-600 dark:text-sky-300",
-    },
-    "Dev Board": {
-      active:
-        "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200",
-      hover:
-        "hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-700 dark:hover:text-violet-200",
-      icon: "text-violet-600 dark:text-violet-300",
-    },
-    Finance: {
-      active:
-        "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-200",
-      hover:
-        "hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-200",
-      icon: "text-emerald-600 dark:text-emerald-300",
-    },
+  const getNavigationStyles = (itemName, isActive) => {
+    const baseStyles = {
+      Dashboard: {
+        active:
+          "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25",
+        inactive:
+          "bg-white/60 dark:bg-stone-800/60 text-stone-600 dark:text-stone-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 hover:text-indigo-700 dark:hover:text-indigo-200",
+        icon: isActive ? "text-white" : "text-indigo-600 dark:text-indigo-300",
+        border: "border-indigo-200/50 dark:border-indigo-800/50",
+      },
+      "Dev Logs": {
+        active:
+          "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25",
+        inactive:
+          "bg-white/60 dark:bg-stone-800/60 text-stone-600 dark:text-stone-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-700 dark:hover:text-blue-200",
+        icon: isActive ? "text-white" : "text-blue-600 dark:text-blue-300",
+        border: "border-blue-200/50 dark:border-blue-800/50",
+      },
+      "Dev Board": {
+        active:
+          "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25",
+        inactive:
+          "bg-white/60 dark:bg-stone-800/60 text-stone-600 dark:text-stone-300 hover:bg-violet-50 dark:hover:bg-violet-950/30 hover:text-violet-700 dark:hover:text-violet-200",
+        icon: isActive ? "text-white" : "text-violet-600 dark:text-violet-300",
+        border: "border-violet-200/50 dark:border-violet-800/50",
+      },
+      Finance: {
+        active:
+          "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25",
+        inactive:
+          "bg-white/60 dark:bg-stone-800/60 text-stone-600 dark:text-stone-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-700 dark:hover:text-emerald-200",
+        icon: isActive
+          ? "text-white"
+          : "text-emerald-600 dark:text-emerald-300",
+        border: "border-emerald-200/50 dark:border-emerald-800/50",
+      },
+    };
+
+    return baseStyles[itemName] || baseStyles["Dashboard"];
   };
 
   return (
-    <div className="mb-8">
-      <div className="flex flex-col space-y-6">
+    <div className="relative">
+      {/* Header Row */}
+      <div className="flex items-center justify-between flex-wrap gap-6">
+        {/* Left Side - Profile */}
         <div className="flex items-center">
-          <img
-            src={
-              userInfo?.profileImage ||
-              `https://i.pravatar.cc/100?u=${userInfo?._id}`
-            }
-            alt={userInfo?.name || "User"}
-            className="w-20 h-20 rounded-full border-4 border-white dark:border-stone-800 shadow-md object-cover"
-          />
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300" />
+            <div className="relative">
+              <img
+                src={
+                  userInfo?.profileImage ||
+                  `https://i.pravatar.cc/150?u=${userInfo?._id}`
+                }
+                alt={userInfo?.name || "Developer"}
+                className="w-20 h-20 rounded-2xl border-4 border-white/80 dark:border-stone-700/80 shadow-xl object-cover
+                          group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-3 border-white dark:border-stone-900 shadow-sm" />
+            </div>
+          </div>
+
           <div className="ml-4">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2
+              className="text-2xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
+                          dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent"
+            >
               {userInfo?.name || "Developer"}
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-stone-300">
+            </h2>
+            <p className="text-stone-600 dark:text-stone-300 text-sm font-medium">
               {userInfo?.title || "Software Developer | Building products"}
             </p>
+            <div className="flex items-center mt-1 space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-xs text-stone-500 dark:text-stone-400">
+                Active Developer
+              </span>
+            </div>
           </div>
         </div>
 
-        <nav>
-          <ul className="flex items-center gap-1">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
-              const colors = colorStyles[item.name] || {};
-              return (
-                <li key={item.name}>
-                  <Link
-                    to={item.href}
-                    className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium ${
+        {/* Right Side - Navigation */}
+        <nav className="flex items-center space-x-2">
+          {navigation.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.href;
+            const styles = getNavigationStyles(item.name, isActive);
+
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`group relative px-4 py-3 rounded-2xl border backdrop-blur-xl transition-all duration-300
+                          hover:scale-105 ${
+                            isActive ? styles.active : styles.inactive
+                          }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <div
+                    className={`p-1.5 rounded-lg transition-all duration-300 ${
                       isActive
-                        ? colors.active ||
-                          "bg-stone-200 dark:bg-stone-800 text-gray-900 dark:text-white"
-                        : `${
-                            colors.hover ||
-                            "hover:bg-stone-100 dark:hover:bg-stone-800"
-                          } text-stone-600 dark:text-stone-300`
+                        ? "bg-white/20 shadow-inner"
+                        : "bg-stone-100/50 dark:bg-stone-700/50 group-hover:bg-white/30 dark:group-hover:bg-stone-600/50"
                     }`}
                   >
-                    <Icon className={`w-4 h-4 ${colors.icon || ""}`} />
-                    <span>{item.name}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+                    <Icon
+                      className={`w-4 h-4 transition-colors duration-300 ${styles.icon}`}
+                    />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm leading-tight">
+                      {item.name}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Active indicator */}
+                {isActive && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-white/60 rounded-full" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </div>
