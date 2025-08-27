@@ -112,7 +112,7 @@ function DevLogsPage() {
 
   if (status === "loading") {
     content = (
-      <div className="flex justify-center items-center py-32">
+      <div className="flex justify-center items-center py-12 sm:py-16">
         <div className="text-center">
           <div className="relative mb-8">
             <div className="w-20 h-20 border-4 border-stone-200/30 dark:border-stone-700/30 border-t-blue-500 rounded-full animate-spin mx-auto" />
@@ -143,9 +143,9 @@ function DevLogsPage() {
             />
           ))
         ) : (
-          <div className="flex justify-center items-center py-32">
+          <div className="flex justify-center items-center py-12 sm:py-16">
             <div className="text-center max-w-2xl mx-auto">
-              <div className="relative mb-12">
+              <div className="relative mb-8">
                 <div
                   className="w-32 h-32 rounded-3xl bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-700
                               flex items-center justify-center mx-auto shadow-xl shadow-stone-900/10 dark:shadow-stone-100/10"
@@ -170,7 +170,7 @@ function DevLogsPage() {
                 {dateRange.from ? "No entries found" : "Start your journey"}
               </h3>
 
-              <p className="text-xl text-stone-600 dark:text-stone-300 mb-12 leading-relaxed">
+              <p className="text-xl text-stone-600 dark:text-stone-300 mb-8 leading-relaxed">
                 {dateRange.from
                   ? "Try adjusting your date range or clear filters to see all entries."
                   : "Begin your development journey by documenting your first coding experience."}
@@ -210,7 +210,7 @@ function DevLogsPage() {
     );
   } else if (status === "failed") {
     content = (
-      <div className="flex justify-center items-center py-32">
+      <div className="flex justify-center items-center py-12 sm:py-16">
         <div className="text-center max-w-lg mx-auto">
           <div className="relative mb-8">
             <div
@@ -256,9 +256,9 @@ function DevLogsPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,theme(colors.stone.400)_1px,transparent_0)] bg-[length:24px_24px]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4 lg:py-8">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3 lg:py-4">
           {/* Back Navigation */}
-          <div className="mb-4 sm:mb-6">
+          <div className="mb-2 sm:mb-3">
             <Link
               to="/"
               className="inline-flex items-center text-sm text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white
@@ -278,16 +278,16 @@ function DevLogsPage() {
           </div>
 
           {/* Header Section */}
-          <div className="mb-8 sm:mb-12">
+          <div className="mb-4 sm:mb-6">
             <DevLogsHeader />
-            <div className="mt-6 sm:mt-8 text-center lg:text-left">
+            <div className="mt-2 sm:mt-3 text-center lg:text-left">
               <h1
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
-                           dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent mb-4 sm:mb-6"
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
+                           dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent mb-3 sm:mb-4"
               >
                 Development Journal
               </h1>
-              <p className="text-base sm:text-lg text-stone-600 dark:text-stone-300 max-w-3xl leading-relaxed mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg text-stone-600 dark:text-stone-300 max-w-3xl leading-relaxed mx-auto lg:mx-0 mb-4 sm:mb-6">
                 Your personal chronicle of coding adventures, technical
                 discoveries, and growth milestones. Every bug fixed and feature
                 built tells a story.
@@ -295,52 +295,57 @@ function DevLogsPage() {
             </div>
           </div>
 
-          {/* Stats Section */}
+          {/* Stats Section - Only show when there are logs */}
           {logs && logs.length > 0 && (
-            <div className="mb-6 sm:mb-8">
+            <div className="mb-4 sm:mb-6">
               <QuickStatsCard logs={logs} />
             </div>
           )}
 
-          {/* Filter Section */}
-          <div className="mb-6 sm:mb-8">
-            <div
-              className="bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-stone-200/50 dark:border-stone-700/50
-                          shadow-xl shadow-stone-900/5 dark:shadow-stone-100/5 p-4 sm:p-6 lg:p-8"
-            >
-              <LogFilterBar range={dateRange} setRange={setDateRange} />
-              {(dateRange.from || dateRange.to) && (
-                <div
-                  className="mt-6 p-4 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-800/50
-                            rounded-2xl backdrop-blur-sm"
-                >
-                  <p className="text-sm text-blue-700 dark:text-blue-300 flex items-center font-medium">
-                    <Calendar size={16} className="mr-3 text-blue-500" />
-                    Showing logs{" "}
-                    {dateRange.from &&
-                      `from ${format(dateRange.from, "LLL dd, y")}`}{" "}
-                    {dateRange.to && `to ${format(dateRange.to, "LLL dd, y")}`}
-                  </p>
-                </div>
-              )}
+          {/* Filter Section - Only show when there are logs */}
+          {logs && logs.length > 0 && (
+            <div className="mb-4 sm:mb-6">
+              <div
+                className="bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-stone-200/50 dark:border-stone-700/50
+                            shadow-xl shadow-stone-900/5 dark:shadow-stone-100/5 p-4 sm:p-6 lg:p-8"
+              >
+                <LogFilterBar range={dateRange} setRange={setDateRange} />
+                {(dateRange.from || dateRange.to) && (
+                  <div
+                    className="mt-6 p-4 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-800/50
+                              rounded-2xl backdrop-blur-sm"
+                  >
+                    <p className="text-sm text-blue-700 dark:text-blue-300 flex items-center font-medium">
+                      <Calendar size={16} className="mr-3 text-blue-500" />
+                      Showing logs{" "}
+                      {dateRange.from &&
+                        `from ${format(dateRange.from, "LLL dd, y")}`}{" "}
+                      {dateRange.to &&
+                        `to ${format(dateRange.to, "LLL dd, y")}`}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Add Entry Section */}
-          <div className="mb-6 sm:mb-8">
-            <AddEntryCard
-              isOpen={isFormOpen}
-              onToggle={() => setIsFormOpen(!isFormOpen)}
-              newEntry={newEntry}
-              setNewEntry={setNewEntry}
-              onSubmit={handleAddEntry}
-              isLoading={status === "loading"}
-              selectedDate={selectedDate}
-              error={error}
-              selectedTags={selectedTags}
-              onTagsChange={setSelectedTags}
-            />
-          </div>
+          {/* Add Entry Section - Only show when there are existing logs */}
+          {logs && logs.length > 0 && (
+            <div className="mb-4 sm:mb-6">
+              <AddEntryCard
+                isOpen={isFormOpen}
+                onToggle={() => setIsFormOpen(!isFormOpen)}
+                newEntry={newEntry}
+                setNewEntry={setNewEntry}
+                onSubmit={handleAddEntry}
+                isLoading={status === "loading"}
+                selectedDate={selectedDate}
+                error={error}
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+              />
+            </div>
+          )}
 
           {/* Content Section */}
           <div className="relative">{content}</div>
