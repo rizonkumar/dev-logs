@@ -83,7 +83,7 @@ const DevLogsHeader = () => {
   return (
     <div className="relative">
       {/* Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
         {/* Left Side - Profile */}
         <div className="flex items-center">
           <div className="relative group">
@@ -95,16 +95,16 @@ const DevLogsHeader = () => {
                   `https://i.pravatar.cc/150?u=${userInfo?._id}`
                 }
                 alt={userInfo?.name || "Developer"}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-3 sm:border-4 border-white/80 dark:border-stone-700/80 shadow-xl object-cover
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 sm:border-3 border-white/80 dark:border-stone-700/80 shadow-xl object-cover
                           group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full border-2 sm:border-3 border-white dark:border-stone-900 shadow-sm" />
             </div>
           </div>
 
-          <div className="ml-3 sm:ml-4">
+          <div className="ml-2 sm:ml-3">
             <h2
-              className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
+              className="text-lg sm:text-xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
                           dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent"
             >
               {userInfo?.name || "Developer"}
@@ -122,7 +122,7 @@ const DevLogsHeader = () => {
         </div>
 
         {/* Right Side - Navigation */}
-        <nav className="flex items-center space-x-1 sm:space-x-2 overflow-hidden">
+        <nav className="flex items-center space-x-0.5 sm:space-x-1 overflow-hidden">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
@@ -132,7 +132,7 @@ const DevLogsHeader = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`group relative px-2 py-1.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-2xl border backdrop-blur-xl transition-all duration-300
+                className={`group relative px-2 py-1 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl border backdrop-blur-xl transition-all duration-300
                           hover:scale-105 flex-shrink-0 ${
                             isActive ? styles.active : styles.inactive
                           }`}
