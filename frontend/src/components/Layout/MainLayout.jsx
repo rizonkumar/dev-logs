@@ -11,9 +11,10 @@ import {
   LogIn,
   LogOut,
   Notebook,
-  PanelLeft,
   Menu,
   Wallet,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Moon, Sun } from "lucide-react";
 import PomodoroQuickModal from "../PomodoroQuickModal";
@@ -143,23 +144,41 @@ const MainLayout = ({ children }) => {
     const { openUserProfile } = useClerk();
     return (
       <>
-        <div
-          className={`p-4 h-20 flex items-center gap-3 border-b border-stone-200 dark:border-stone-700 ${
-            !isExpanded && "justify-center"
-          }`}
-        >
-          <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-            {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
-          </div>
-          <h1
-            className={`text-xl font-bold text-gray-900 dark:text-white overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
-              isExpanded ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {userInfo?.name
-              ? `${userInfo.name.split(" ")[0]}'s Board`
-              : "Rizon's Board"}
-          </h1>
+        <div className="p-4 h-20 border-b border-stone-200 dark:border-stone-700 flex items-center justify-center">
+          {isExpanded ? (
+            <>
+              <div className="flex items-center gap-3 flex-1">
+                <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
+                </div>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white overflow-hidden whitespace-nowrap">
+                  {userInfo?.name
+                    ? `${userInfo.name.split(" ")[0]}'s Board`
+                    : "Rizon's Board"}
+                </h1>
+              </div>
+              <button
+                onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
+                className="hidden lg:flex items-center justify-center p-1.5 rounded-md text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer ml-2"
+                title="Collapse Menu"
+              >
+                <ChevronLeft size={18} />
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-sm">
+                {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
+              </div>
+              <button
+                onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
+                className="hidden lg:flex items-center justify-center p-1.5 rounded-md text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+                title="Expand Menu"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
         </div>
 
         <nav className="flex-1 p-3 space-y-2">
@@ -241,32 +260,6 @@ const MainLayout = ({ children }) => {
             {!isExpanded && (
               <div className="absolute left-full ml-3 px-3 py-1.5 text-sm bg-stone-800 text-stone-100 dark:bg-stone-800 dark:text-stone-100 rounded-md scale-0 group-hover:scale-100 transition-transform origin-left whitespace-nowrap z-20">
                 {isDark ? "Light Mode" : "Dark Mode"}
-              </div>
-            )}
-          </button>
-
-          <button
-            onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
-            className={`relative group w-full hidden lg:flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer ${
-              !isExpanded && "justify-center"
-            }`}
-          >
-            <PanelLeft
-              size={20}
-              className={`transition-transform duration-300 flex-shrink-0 ${
-                !isExpanded ? "rotate-180" : ""
-              }`}
-            />
-            <span
-              className={`transition-opacity duration-200 whitespace-nowrap ${
-                isExpanded ? "opacity-100" : "opacity-0 hidden"
-              }`}
-            >
-              {isDesktopSidebarOpen ? "Collapse Menu" : "Expand Menu"}
-            </span>
-            {!isExpanded && (
-              <div className="absolute left-full ml-3 px-3 py-1.5 text-sm bg-stone-800 text-stone-100 dark:bg-stone-800 dark:text-stone-100 rounded-md scale-0 group-hover:scale-100 transition-transform origin-left whitespace-nowrap z-20">
-                {isDesktopSidebarOpen ? "Collapse Menu" : "Expand Menu"}
               </div>
             )}
           </button>
