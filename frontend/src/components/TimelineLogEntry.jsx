@@ -105,10 +105,10 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
 
       <li className="group relative">
         <div className="flex">
-          <div className="flex flex-col items-center mr-6">
+          <div className="flex flex-col items-center mr-4 sm:mr-6">
             <div className="relative">
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-xs
                             border-2 transition-all duration-300 group-hover:scale-110 ${
                               index === 0
                                 ? "bg-gradient-to-br from-blue-500 to-purple-500 border-blue-400 shadow-lg shadow-blue-500/25"
@@ -116,7 +116,7 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
                             }`}
               >
                 <span
-                  className={`transition-colors duration-300 ${
+                  className={`transition-colors duration-300 text-xs sm:text-sm ${
                     index === 0
                       ? "text-white"
                       : "text-stone-600 dark:text-stone-200"
@@ -127,12 +127,12 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
               </div>
 
               {index === 0 && (
-                <div className="absolute inset-0 w-14 h-14 rounded-2xl" />
+                <div className="absolute inset-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-500/20" />
               )}
 
               {index === 0 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-pulse" />
                 </div>
               )}
             </div>
@@ -140,15 +140,15 @@ const TimelineLogEntry = ({ log, index, totalLogs }) => {
             {index < totalLogs - 1 && (
               <div
                 className="w-0.5 h-full bg-gradient-to-b from-blue-300 via-stone-300 to-transparent
-                            dark:from-blue-700 dark:via-stone-700 dark:to-transparent mt-4 min-h-[60px]
+                            dark:from-blue-700 dark:via-stone-700 dark:to-transparent mt-3 sm:mt-4 min-h-[50px] sm:min-h-[60px]
                             rounded-full opacity-60"
               />
             )}
           </div>
 
-          <div className="flex-grow pb-4">
+          <div className="flex-grow pb-3 sm:pb-4">
             <div
-              className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl p-4 rounded-2xl
+              className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl p-3 sm:p-4 rounded-xl sm:rounded-2xl
                         border border-stone-200/50 dark:border-stone-700/50 shadow-lg shadow-stone-900/5
                         dark:shadow-stone-100/5"
             >
