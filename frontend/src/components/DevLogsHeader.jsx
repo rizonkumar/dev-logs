@@ -82,7 +82,7 @@ const DevLogsHeader = () => {
 
   return (
     <div className="relative">
-            {/* Header Row */}
+      {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
         {/* Left Side - Profile */}
         <div className="flex items-center">
@@ -134,8 +134,8 @@ const DevLogsHeader = () => {
                 to={item.href}
                 className={`group relative px-2 py-1.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-2xl border backdrop-blur-xl transition-all duration-300
                           hover:scale-105 flex-shrink-0 ${
-                  isActive ? styles.active : styles.inactive
-                }`}
+                            isActive ? styles.active : styles.inactive
+                          }`}
               >
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <div
@@ -156,9 +156,13 @@ const DevLogsHeader = () => {
                   </div>
                   <div className="sm:hidden">
                     <div className="font-semibold text-xs leading-tight whitespace-nowrap">
-                      {item.name === "Dev Logs" ? "Logs" :
-                       item.name === "Dev Board" ? "Board" :
-                       item.name === "Finance" ? "Fin" : item.name}
+                      {item.name === "Dev Logs"
+                        ? "Logs"
+                        : item.name === "Dev Board"
+                        ? "Board"
+                        : item.name === "Finance"
+                        ? "Fin"
+                        : item.name}
                     </div>
                   </div>
                 </div>
