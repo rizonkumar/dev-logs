@@ -57,7 +57,7 @@ const AddEntryCard = ({
                     shadow-lg shadow-stone-900/5 dark:shadow-stone-100/5"
       >
         {/* Header */}
-        <div className="p-4 border-b border-stone-200/50 dark:border-stone-700/50">
+        <div className="p-3 sm:p-4 border-b border-stone-200/50 dark:border-stone-700/50">
           <button
             type="button"
             onClick={handleToggleClick}
@@ -137,7 +137,7 @@ const AddEntryCard = ({
             isOpen ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="p-6 bg-gradient-to-br from-stone-50/80 to-white/80 dark:from-stone-900/60 dark:to-stone-800/60">
+          <div className="p-3 sm:p-6 bg-gradient-to-br from-stone-50/80 to-white/80 dark:from-stone-900/60 dark:to-stone-800/60">
             <form onSubmit={handleFormSubmit} className="space-y-6">
               {/* Tags Section */}
               <div className="space-y-4">
