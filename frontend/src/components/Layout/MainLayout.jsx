@@ -144,36 +144,41 @@ const MainLayout = ({ children }) => {
     const { openUserProfile } = useClerk();
     return (
       <>
-        <div
-          className={`p-4 h-20 flex items-center gap-3 border-b border-stone-200 dark:border-stone-700 ${
-            !isExpanded && "justify-center"
-          }`}
-        >
-          <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-            {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
-          </div>
-          <h1
-            className={`text-xl font-bold text-gray-900 dark:text-white overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
-              isExpanded ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {userInfo?.name
-              ? `${userInfo.name.split(" ")[0]}'s Board`
-              : "Rizon's Board"}
-          </h1>
-          <button
-            onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
-            className={`hidden lg:flex items-center justify-center p-1.5 rounded-md text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer ml-auto ${
-              !isExpanded && "order-first"
-            }`}
-            title={isDesktopSidebarOpen ? "Collapse Menu" : "Expand Menu"}
-          >
-            {isDesktopSidebarOpen ? (
-              <ChevronLeft size={18} />
-            ) : (
-              <ChevronRight size={18} />
-            )}
-          </button>
+        <div className="p-4 h-20 border-b border-stone-200 dark:border-stone-700 flex items-center justify-center">
+          {isExpanded ? (
+            <>
+              <div className="flex items-center gap-3 flex-1">
+                <div className="w-10 h-10 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
+                </div>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white overflow-hidden whitespace-nowrap">
+                  {userInfo?.name
+                    ? `${userInfo.name.split(" ")[0]}'s Board`
+                    : "Rizon's Board"}
+                </h1>
+              </div>
+              <button
+                onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
+                className="hidden lg:flex items-center justify-center p-1.5 rounded-md text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer ml-2"
+                title="Collapse Menu"
+              >
+                <ChevronLeft size={18} />
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-sm">
+                {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : "R"}
+              </div>
+              <button
+                onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
+                className="hidden lg:flex items-center justify-center p-1.5 rounded-md text-gray-500 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+                title="Expand Menu"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
         </div>
 
         <nav className="flex-1 p-3 space-y-2">
