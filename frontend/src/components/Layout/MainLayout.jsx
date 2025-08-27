@@ -47,6 +47,7 @@ const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isTimerOpen, setIsTimerOpen] = useState(false);
+  const [isDraggingTimer, setIsDraggingTimer] = useState(false);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -387,19 +388,28 @@ const MainLayout = ({ children }) => {
 
         <Motion.button
           className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center cursor-grab relative group"
-          style={{ cursor: "grab" }}
+          style={{ cursor: isDraggingTimer ? "grabbing" : "grab" }}
           drag
           dragMomentum={false}
           dragElastic={0.05}
           onDragStart={(event) => {
+            setIsDraggingTimer(true);
             const target = event?.currentTarget;
             if (target) target.style.cursor = "grabbing";
           }}
           onDragEnd={(event) => {
+            setIsDraggingTimer(false);
             const target = event?.currentTarget;
             if (target) target.style.cursor = "grab";
           }}
-          onClick={() => setIsTimerOpen(true)}
+          onClick={(e) => {
+            // Prevent click if we were just dragging
+            if (isDraggingTimer) {
+              e.preventDefault();
+              return;
+            }
+            setIsTimerOpen(true);
+          }}
           aria-label="Open Pomodoro timer"
           title="Pomodoro Timer"
         >
