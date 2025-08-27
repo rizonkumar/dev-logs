@@ -51,14 +51,13 @@ export default function FinanceDashboard({
   onRefresh,
 }) {
   const [view, setView] = useState("summary");
-  const [txChartType, setTxChartType] = useState("area"); // area | line | bar
-  const [catChartType, setCatChartType] = useState("radial"); // pie | radial | radar
+  const [txChartType, setTxChartType] = useState("area");
+  const [catChartType, setCatChartType] = useState("radial");
   const [txMenuOpen, setTxMenuOpen] = useState(false);
   const [catMenuOpen, setCatMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Keep grid/tick colors readable in both themes
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     const compute = () => {
