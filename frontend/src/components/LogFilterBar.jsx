@@ -97,9 +97,9 @@ function LogFilterBar({ range, setRange }) {
               </button>
               {fromPickerOpen && (
                 <div
-                  className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl
-                              border border-stone-200/50 dark:border-stone-700/50 rounded-2xl p-4 shadow-2xl
-                              shadow-stone-900/20 dark:shadow-stone-100/20"
+                  className="absolute top-full left-0 mt-1 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl
+                              border border-stone-200/50 dark:border-stone-700/50 rounded-xl p-3 shadow-xl
+                              shadow-stone-900/15 dark:shadow-stone-100/15"
                 >
                   <DayPicker
                     mode="single"
@@ -142,9 +142,9 @@ function LogFilterBar({ range, setRange }) {
               </button>
               {toPickerOpen && (
                 <div
-                  className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl
-                              border border-stone-200/50 dark:border-stone-700/50 rounded-2xl p-4 shadow-2xl
-                              shadow-stone-900/20 dark:shadow-stone-100/20"
+                  className="absolute top-full left-0 mt-1 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl
+                              border border-stone-200/50 dark:border-stone-700/50 rounded-xl p-3 shadow-xl
+                              shadow-stone-900/15 dark:shadow-stone-100/15"
                 >
                   <DayPicker
                     mode="single"
