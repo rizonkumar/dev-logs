@@ -192,28 +192,43 @@ const DevBoardPage = () => {
     }, initialColumns);
   }, [filteredTodos]);
 
-  const handleDragStart = () => {
-    announce("Drag started");
+  const handleDragStart = (start) => {
+    announce(`Dragging task from ${start.source.droppableId}`);
+    // Add visual feedback and performance optimizations
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "grabbing";
   };
 
   const handleDragEnd = (result) => {
+    // Clean up drag styles
+    document.body.style.userSelect = "";
+    document.body.style.cursor = "";
+
     const { destination, source, draggableId } = result;
     if (
       !destination ||
       (destination.droppableId === source.droppableId &&
         destination.index === source.index)
-    )
+    ) {
+      announce("Drag cancelled");
       return;
+    }
+
+    // Add smooth transition feedback
+    const sourceColumn = source.droppableId;
+    const destinationColumn = destination.droppableId;
+
     dispatch(
       updateTodo({
         todoId: draggableId,
         updateData: {
-          status: destination.droppableId,
-          isCompleted: destination.droppableId === "DONE",
+          status: destinationColumn,
+          isCompleted: destinationColumn === "DONE",
         },
       })
     );
-    announce(`Moved to ${destination.droppableId}`);
+
+    announce(`Task moved from ${sourceColumn} to ${destinationColumn}`);
   };
 
   const handleSaveTodo = (data) => {

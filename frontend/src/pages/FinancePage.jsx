@@ -46,8 +46,6 @@ export default function FinancePage() {
     () => JSON.parse(localStorage.getItem("userInfo"))?.financeCurrency || "USD"
   );
 
-  // removed unused local form states (moved into extracted components)
-
   const month = useMemo(() => new Date().getMonth() + 1, []);
   const year = useMemo(() => new Date().getFullYear(), []);
 
@@ -160,8 +158,6 @@ export default function FinancePage() {
     }
   };
 
-  // removed unused refreshProjects (no in-page usage)
-
   const refreshProgress = async (categoryId) => {
     const data = await budgetService.getBudgetProgress({
       categoryId,
@@ -199,7 +195,6 @@ export default function FinancePage() {
     }
   };
 
-  // When the Budgets tab is opened, fetch progress for all expense categories
   useEffect(() => {
     if (!loading && activeTab === "budgets") {
       refreshAllProgress();

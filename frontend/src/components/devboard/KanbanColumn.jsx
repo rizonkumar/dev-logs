@@ -59,9 +59,9 @@ const KanbanColumn = ({
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`flex-1 p-3 sm:p-4 transition-all duration-500 ease-out rounded-b-2xl overflow-y-auto scrollbar-thin scrollbar-thumb-stone-300/50 scrollbar-track-transparent dark:scrollbar-thumb-stone-600/50 ${
+            className={`flex-1 p-3 sm:p-4 transition-colors duration-200 ease-out rounded-b-2xl overflow-y-auto scrollbar-thin scrollbar-thumb-stone-300/50 scrollbar-track-transparent dark:scrollbar-thumb-stone-600/50 ${
               snapshot.isDraggingOver
-                ? "bg-gradient-to-br from-blue-500/15 to-purple-500/15 dark:from-blue-500/25 dark:to-purple-500/25 shadow-inner ring-2 ring-blue-500/20 dark:ring-blue-400/30"
+                ? "bg-stone-100/40 dark:bg-stone-800/40 shadow-inner"
                 : "bg-stone-50/30 dark:bg-stone-950/30"
             }`}
           >
@@ -80,10 +80,14 @@ const KanbanColumn = ({
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className="group relative p-4 rounded-xl bg-white/90 dark:bg-stone-900/90 backdrop-blur-xl
+                        className={`group relative p-4 rounded-xl bg-white/90 dark:bg-stone-900/90 backdrop-blur-xl
                                    border border-stone-200/60 dark:border-stone-700/60 shadow-lg shadow-stone-900/8
-                                   dark:shadow-stone-100/8 transition-all duration-300 ease-out
-                                   cursor-pointer mb-3 sm:mb-4 touch-manipulation select-none"
+                                   dark:shadow-stone-100/8 transition-all duration-200 ease-out
+                                   cursor-pointer mb-3 sm:mb-4 touch-manipulation select-none ${
+                                     provided.isDragging
+                                       ? "rotate-2 scale-105 shadow-2xl z-50"
+                                       : ""
+                                   }`}
                         onClick={(e) => openEditModal(e, todo)}
                       >
                         <div className="flex items-start gap-3">
@@ -91,9 +95,9 @@ const KanbanColumn = ({
                             {...provided.dragHandleProps}
                             onClick={(e) => e.stopPropagation()}
                             className="p-2 mt-0.5 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300
-                                       hover:bg-stone-100/60 dark:hover:bg-stone-800/60 rounded-lg transition-all duration-200
+                                       hover:bg-stone-100/60 dark:hover:bg-stone-800/60 rounded-lg transition-all duration-150
                                        cursor-grab active:cursor-grabbing group-hover:text-stone-500 dark:group-hover:text-stone-400
-                                       touch-manipulation active:scale-95"
+                                       touch-manipulation active:scale-95 active:bg-stone-200/80 dark:active:bg-stone-700/80"
                           >
                             <GripVertical
                               size={16}
