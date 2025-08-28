@@ -47,6 +47,7 @@ const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isTimerOpen, setIsTimerOpen] = useState(false);
+  const [isDraggingTimer, setIsDraggingTimer] = useState(false);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -338,7 +339,7 @@ const MainLayout = ({ children }) => {
       ></div>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed inset-y-0 left-0 z-[100] flex flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -346,7 +347,7 @@ const MainLayout = ({ children }) => {
       </aside>
 
       <aside
-        className={`hidden lg:flex flex-shrink-0 flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 transition-all duration-300 ease-in-out ${
+        className={`hidden lg:flex flex-shrink-0 flex-col bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-700 transition-all duration-300 ease-in-out z-[100] ${
           isDesktopSidebarOpen ? "w-64" : "w-20"
         }`}
       >
@@ -387,19 +388,28 @@ const MainLayout = ({ children }) => {
 
         <Motion.button
           className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg ring-2 ring-blue-300/30 flex items-center justify-center cursor-grab relative group"
-          style={{ cursor: "grab" }}
+          style={{ cursor: isDraggingTimer ? "grabbing" : "grab" }}
           drag
           dragMomentum={false}
           dragElastic={0.05}
           onDragStart={(event) => {
+            setIsDraggingTimer(true);
             const target = event?.currentTarget;
             if (target) target.style.cursor = "grabbing";
           }}
           onDragEnd={(event) => {
+            setIsDraggingTimer(false);
             const target = event?.currentTarget;
             if (target) target.style.cursor = "grab";
           }}
-          onClick={() => setIsTimerOpen(true)}
+          onClick={(e) => {
+            // Prevent click if we were just dragging
+            if (isDraggingTimer) {
+              e.preventDefault();
+              return;
+            }
+            setIsTimerOpen(true);
+          }}
           aria-label="Open Pomodoro timer"
           title="Pomodoro Timer"
         >

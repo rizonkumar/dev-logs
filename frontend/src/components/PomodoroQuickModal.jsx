@@ -112,7 +112,10 @@ const PomodoroQuickModal = ({ isOpen, onClose }) => {
       drag
       dragMomentum={false}
       dragElastic={0.05}
-      onDragStart={() => setIsDragging(true)}
+      onDragStart={(event) => {
+        event.preventDefault();
+        setIsDragging(true);
+      }}
       onDragEnd={() => setIsDragging(false)}
       initial={{ opacity: 0, scale: 0.95, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
