@@ -215,7 +215,7 @@ export default function FinancePage() {
 
   return (
     <div className="p-4 sm:p-6">
-      <DevLogsHeader />
+      <DevLogsHeader showProfile={false} />
 
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-2">
