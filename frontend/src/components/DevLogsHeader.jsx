@@ -8,7 +8,7 @@ import {
   Wallet,
 } from "lucide-react";
 
-const DevLogsHeader = () => {
+const DevLogsHeader = ({ showProfile = true }) => {
   const location = useLocation();
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -82,47 +82,49 @@ const DevLogsHeader = () => {
 
   return (
     <div className="relative">
-      {/* Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-        {/* Left Side - Profile */}
-        <div className="flex items-center">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300" />
-            <div className="relative">
-              <img
-                src={
-                  userInfo?.profileImage ||
-                  `https://i.pravatar.cc/150?u=${userInfo?._id}`
-                }
-                alt={userInfo?.name || "Developer"}
-                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 sm:border-3 border-white/80 dark:border-stone-700/80 shadow-xl object-cover
-                          group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full border-2 sm:border-3 border-white dark:border-stone-900 shadow-sm" />
+      <div
+        className={`flex ${
+          showProfile
+            ? "flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4"
+            : "justify-end"
+        }`}
+      >
+        {showProfile && (
+          <div className="flex items-center">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300" />
+              <div className="relative">
+                <img
+                  src={userInfo?.profileImage}
+                  alt={userInfo?.name || "Developer"}
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 sm:border-3 border-white/80 dark:border-stone-700/80 shadow-xl object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full border-2 sm:border-3 border-white dark:border-stone-900 shadow-sm" />
+              </div>
+            </div>
+
+            <div className="ml-2 sm:ml-3">
+              <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent">
+                {userInfo?.name || "Developer"}
+              </h2>
+              <p className="text-stone-600 dark:text-stone-300 text-sm font-medium">
+                {userInfo?.title || "Software Developer | Building products"}
+              </p>
+              <div className="flex items-center mt-1 space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-xs text-stone-500 dark:text-stone-400">
+                  Active Developer
+                </span>
+              </div>
             </div>
           </div>
+        )}
 
-          <div className="ml-2 sm:ml-3">
-            <h2
-              className="text-lg sm:text-xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
-                          dark:from-stone-100 dark:via-stone-200 dark:to-stone-100 bg-clip-text text-transparent"
-            >
-              {userInfo?.name || "Developer"}
-            </h2>
-            <p className="text-stone-600 dark:text-stone-300 text-sm font-medium">
-              {userInfo?.title || "Software Developer | Building products"}
-            </p>
-            <div className="flex items-center mt-1 space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-xs text-stone-500 dark:text-stone-400">
-                Active Developer
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side - Navigation */}
-        <nav className="flex items-center space-x-0.5 sm:space-x-1 overflow-hidden">
+        <nav
+          className={`flex items-center space-x-0.5 sm:space-x-1 overflow-hidden ${
+            showProfile ? "" : "w-full justify-end"
+          }`}
+        >
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
@@ -132,10 +134,9 @@ const DevLogsHeader = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`group relative px-2 py-1 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl border backdrop-blur-xl transition-all duration-300
-                          hover:scale-105 flex-shrink-0 ${
-                            isActive ? styles.active : styles.inactive
-                          }`}
+                className={`group relative px-2 py-1 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-105 flex-shrink-0 ${
+                  isActive ? styles.active : styles.inactive
+                }`}
               >
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <div
@@ -167,7 +168,6 @@ const DevLogsHeader = () => {
                   </div>
                 </div>
 
-                {/* Active indicator */}
                 {isActive && (
                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-0.5 sm:w-6 sm:h-1 bg-white/60 rounded-full" />
                 )}

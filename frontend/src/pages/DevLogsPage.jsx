@@ -279,7 +279,7 @@ function DevLogsPage() {
 
           {/* Header Section */}
           <div className="mb-4 sm:mb-6">
-            <DevLogsHeader />
+            <DevLogsHeader showProfile={false} />
             <div className="mt-2 sm:mt-3 text-center lg:text-left">
               <h1
                 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900
